@@ -1,28 +1,23 @@
 # V1 - FastAPI + Basic LLM Chat API
 
 ## Goal
-Build the base backend for InsightAgent with a clean FastAPI structure, configuration loading, logging setup, a health endpoint, and then a basic LLM-backed chat endpoint.
+Build the base backend for InsightAgent with a clean FastAPI structure, configuration loading, logging setup, a health endpoint, and a basic LLM-backed chat endpoint.
 
 ## Current Status
-In progress.
+In progress. The main V1 backend flow is working locally:
+- `GET /health`
+- `POST /chat`
+- Groq-backed LLM service wrapper
+- Pydantic request and response models
+- latency tracking for `/chat`
 
-Completed so far:
-- Created the implementation project directory.
-- Added the initial folder and documentation structure.
-- Created placeholder files for the V1 backend modules.
-
-Not built yet:
-- FastAPI app entrypoint.
-- `/health` endpoint.
-- Config and logging implementation.
-- `/chat` endpoint.
-- LLM service wrapper.
-- Chat request and response schemas.
-- LLM error and timeout handling.
-- Manual API test results.
+Remaining V1 polish:
+- Add automated tests.
+- Improve controlled exception handling shape.
+- Add clearer `/chat` examples to README.
 
 ## What We Built
-Initial structure:
+Current structure:
 
 ```text
 app/
@@ -30,20 +25,24 @@ app/
   config.py
   api/
     routes_health.py
+    routes_chat.py
   schemas/
     common.py
+    chat.py
   services/
+    llm_service.py
   utils/
     logger.py
 ```
 
-Planned first endpoint:
+Endpoints:
 
 ```text
 GET /health
+POST /chat
 ```
 
-Expected response:
+`GET /health` response:
 
 ```json
 {
@@ -53,13 +52,39 @@ Expected response:
 }
 ```
 
+`POST /chat` request:
+
+```json
+{
+  "message": "Explain what a CSV file is in one sentence."
+}
+```
+
+`POST /chat` response shape:
+
+```json
+{
+  "answer": "...",
+  "model": "llama-3.1-8b-instant",
+  "latency_ms": 1234.56,
+  "status": "success"
+}
+```
+
 ## Why We Built It
-- A health endpoint proves the API is alive before adding LLM complexity.
-- Separating routes, schemas, services, and utilities gives the project a maintainable backend shape.
-- Configuration and logging are added early because every later feature will depend on them.
+- `/health` proves the API is alive before adding LLM complexity.
+- `/chat` proves the backend can accept validated input, call an LLM service, and return a stable response.
+- Separating routes, schemas, config, logging, and services gives the project a maintainable backend shape.
+- Groq is used as the V1 LLM provider because it is free-tier friendly for learning.
 
 ## Key Concepts Learned
-- Pending. We will fill this after rebuilding the code step by step.
+- FastAPI app creation and router registration.
+- Pydantic request and response models.
+- Environment-driven configuration with `.env`.
+- Keeping secrets out of code and GitHub.
+- Service-layer separation: route code calls `llm_service`, not the provider client directly.
+- Basic latency tracking with `time.perf_counter()`.
+- PowerShell API testing with `Invoke-RestMethod`.
 
 ## API Design
 ### `GET /health`
@@ -68,35 +93,50 @@ Purpose:
 - Stay public and dependency-free.
 - Confirm the app can boot successfully.
 
-Response model:
-- `status`: service state.
-- `service`: application name.
-- `version`: current project version.
+### `POST /chat`
+Purpose:
+- Accept a user message.
+- Send the message through the LLM service wrapper.
+- Return an answer, model name, latency, and status.
+
+Failure behavior:
+- If the LLM service raises `LLMServiceError`, the route returns HTTP `503`.
 
 ## Implementation Notes
-- `app/main.py` will create the FastAPI app and include routers.
-- `app/config.py` will store app settings using Pydantic settings.
-- `app/api/routes_health.py` will own the health route.
-- `app/schemas/common.py` will define shared response schemas.
-- `app/utils/logger.py` will centralize logging setup.
+- `app/main.py` creates the FastAPI app and includes routers.
+- `app/config.py` stores app and LLM settings using Pydantic settings.
+- `app/api/routes_health.py` owns the health route.
+- `app/api/routes_chat.py` owns the chat route.
+- `app/schemas/common.py` defines shared response schemas.
+- `app/schemas/chat.py` defines chat request and response schemas.
+- `app/services/llm_service.py` owns provider/client interaction.
+- `app/utils/logger.py` centralizes logging setup.
 
 ## Testing
-Pending:
-- Install dependencies.
-- Start Uvicorn.
-- Call `/health` from browser or curl.
-- Add automated test for `/health`.
+Manual tests performed:
+- Started the API with Uvicorn.
+- Called `/health` in the browser.
+- Called `/chat` with PowerShell `Invoke-RestMethod`.
+- Confirmed Groq returned a real answer.
+- Confirmed `.env` is ignored by Git.
 
-Manual test command:
+Manual `/chat` test command:
 
-```bash
-curl http://127.0.0.1:8000/health
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/chat" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body '{"message":"Explain what a CSV file is in one sentence."}'
 ```
 
 ## Interview Explanation
-Pending. We will write this after implementing and testing the first V1 slice ourselves.
+In V1, I built the FastAPI foundation for InsightAgent. I separated app setup, config, logging, schemas, routes, and LLM service logic. The `/health` endpoint confirms the backend is running, while `/chat` accepts a validated message, calls a Groq-backed LLM service, tracks latency, and returns a stable JSON response. I kept provider details inside the service layer so the route remains simple and easier to change later.
 
 ## Trade-offs
-- I kept the setup simple with `requirements.txt` instead of introducing advanced packaging early.
-- I added only the folders needed for V1 so the project does not pretend to have future features before they exist.
-- `/health` does not check external dependencies because readiness checks will come later in the deployment phase.
+- I used `requirements.txt` for simple reproducibility instead of advanced packaging.
+- I used Groq as the default V1 provider because it is easier to test during learning.
+- I used the OpenAI Python SDK because Groq supports OpenAI-compatible chat completions.
+- I kept the V1 response plain text only; structured output belongs to V2.
+- `/health` does not check external dependencies because readiness checks belong to a later deployment phase.
+
