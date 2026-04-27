@@ -4,7 +4,12 @@ from fastapi import APIRouter, HTTPException
 
 from app.config import settings
 from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.structured import StructuredLLMResponse
 from app.services.llm_service import LLMServiceError, generate_answer
+from app.services.structured_llm_service import (
+    StructuredLLMServiceError,
+    generate_structured_answer,
+)
 
 
 router = APIRouter(tags=["chat"])
@@ -35,3 +40,19 @@ def chat(request: ChatRequest) -> ChatResponse:
         latency_ms=round(latency_ms, 2),
         status="success",
     )
+
+
+@router.post("/chat/structured", response_model=StructuredLLMResponse)
+def structured_chat(request: ChatRequest) -> StructuredLLMResponse:
+    try:
+        return generate_structured_answer(request.message)
+    except StructuredLLMServiceError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": {
+                    "code": "STRUCTURED_LLM_SERVICE_ERROR",
+                    "message": str(exc),
+                }
+            },
+        ) from exc
