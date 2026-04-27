@@ -1,4 +1,18 @@
+import pytest
+from pydantic import ValidationError
+
 from app.schemas.chat import ChatRequest, ChatResponse
+
+
+def test_chat_request_trims_message() -> None:
+    request = ChatRequest(message="  Hello  ")
+
+    assert request.message == "Hello"
+
+
+def test_chat_request_rejects_blank_message() -> None:
+    with pytest.raises(ValidationError):
+        ChatRequest(message="   ")
 
 
 def test_chat_request_accepts_message() -> None:
