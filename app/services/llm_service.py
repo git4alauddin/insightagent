@@ -1,4 +1,4 @@
-from openai import OpenAI
+from openai import APIConnectionError, APITimeoutError, OpenAI, OpenAIError
 
 from app.config import settings
 
@@ -17,12 +17,19 @@ def generate_answer(message: str) -> str:
         timeout=settings.llm_timeout_seconds,
     )
 
-    response = client.chat.completions.create(
-        model=settings.llm_model,
-        messages=[
-            {"role": "user", "content": message},
-        ],
-    )
+    try:
+        response = client.chat.completions.create(
+            model=settings.llm_model,
+            messages=[
+                {"role": "user", "content": message},
+            ],
+        )
+    except APITimeoutError as exc:
+        raise LLMServiceError("LLM request timed out.") from exc
+    except APIConnectionError as exc:
+        raise LLMServiceError("LLM provider connection failed.") from exc
+    except OpenAIError as exc:
+        raise LLMServiceError("LLM provider request failed.") from exc
 
     answer = response.choices[0].message.content
 
