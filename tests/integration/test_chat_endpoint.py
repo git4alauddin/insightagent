@@ -5,7 +5,10 @@ from fastapi.testclient import TestClient
 from app.config import settings
 from app.main import app
 from app.services.llm_service import LLMServiceError
-from app.services.structured_llm_service import StructuredLLMServiceError
+from app.services.structured_llm_service import (
+    StructuredLLMServiceError,
+    build_structured_fallback_response,
+)
 
 
 client = TestClient(app)
@@ -68,7 +71,7 @@ def test_structured_chat_returns_structured_answer() -> None:
 def test_structured_chat_returns_controlled_error_when_service_fails() -> None:
     with patch(
         "app.api.routes_chat.generate_structured_answer",
-        side_effect=StructuredLLMServiceError("LLM output was not valid JSON."),
+        side_effect=StructuredLLMServiceError("LLM request timed out."),
     ):
         response = client.post(
             "/chat/structured",
@@ -80,7 +83,24 @@ def test_structured_chat_returns_controlled_error_when_service_fails() -> None:
         "detail": {
             "error": {
                 "code": "STRUCTURED_LLM_SERVICE_ERROR",
-                "message": "LLM output was not valid JSON.",
+                "message": "LLM request timed out.",
             }
         }
     }
+
+
+def test_structured_chat_can_return_fallback_response() -> None:
+    fallback_response = build_structured_fallback_response()
+
+    with patch(
+        "app.api.routes_chat.generate_structured_answer",
+        return_value=fallback_response,
+    ):
+        response = client.post(
+            "/chat/structured",
+            json={"message": "Explain missing values."},
+        )
+
+    assert response.status_code == 200
+    assert response.json()["status"] == "failed"
+    assert response.json()["confidence"] == "low"
