@@ -4,7 +4,6 @@ from app.config import settings
 from app.schemas.common import HealthResponse
 
 
-
 router = APIRouter(tags=["health"])
 
 
