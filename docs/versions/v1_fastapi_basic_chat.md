@@ -9,12 +9,13 @@ In progress. The main V1 backend flow is working locally:
 - `POST /chat`
 - Groq-backed LLM service wrapper
 - Pydantic request and response models
+- blank-message validation for chat input
 - latency tracking for `/chat`
+- basic automated tests
 
 Remaining V1 polish:
-- Add automated tests.
 - Improve controlled exception handling shape.
-- Add clearer `/chat` examples to README.
+- Add clearer V1 completion checklist status.
 
 ## What We Built
 Current structure:
@@ -60,6 +61,11 @@ POST /chat
 }
 ```
 
+Validation:
+- `message` is required.
+- blank or whitespace-only messages are rejected.
+- leading/trailing whitespace is trimmed before processing.
+
 `POST /chat` response shape:
 
 ```json
@@ -74,12 +80,14 @@ POST /chat
 ## Why We Built It
 - `/health` proves the API is alive before adding LLM complexity.
 - `/chat` proves the backend can accept validated input, call an LLM service, and return a stable response.
+- input validation prevents empty messages from wasting LLM calls.
 - Separating routes, schemas, config, logging, and services gives the project a maintainable backend shape.
 - Groq is used as the V1 LLM provider because it is free-tier friendly for learning.
 
 ## Key Concepts Learned
 - FastAPI app creation and router registration.
 - Pydantic request and response models.
+- Pydantic field validation with `field_validator`.
 - Environment-driven configuration with `.env`.
 - Keeping secrets out of code and GitHub.
 - Service-layer separation: route code calls `llm_service`, not the provider client directly.
@@ -100,6 +108,7 @@ Purpose:
 - Return an answer, model name, latency, and status.
 
 Failure behavior:
+- Blank messages fail Pydantic validation before the LLM service is called.
 - If the LLM service raises `LLMServiceError`, the route returns HTTP `503`.
 
 ## Implementation Notes
@@ -111,6 +120,7 @@ Failure behavior:
 - `app/schemas/chat.py` defines chat request and response schemas.
 - `app/services/llm_service.py` owns provider/client interaction.
 - `app/utils/logger.py` centralizes logging setup.
+- `pytest.ini` keeps test discovery focused on `tests/` and avoids local pytest cache permission noise.
 
 ## Testing
 Manual tests performed:
@@ -119,6 +129,20 @@ Manual tests performed:
 - Called `/chat` with PowerShell `Invoke-RestMethod`.
 - Confirmed Groq returned a real answer.
 - Confirmed `.env` is ignored by Git.
+
+Automated tests:
+- `/health` returns the expected service status.
+- `/chat` returns a stable response using a mocked LLM call.
+- `ChatRequest` accepts a normal message.
+- `ChatRequest` trims leading/trailing whitespace.
+- `ChatRequest` rejects blank messages.
+- `ChatResponse` accepts numeric latency.
+
+Current test result:
+
+```text
+6 passed
+```
 
 Manual `/chat` test command:
 
@@ -131,7 +155,7 @@ Invoke-RestMethod `
 ```
 
 ## Interview Explanation
-In V1, I built the FastAPI foundation for InsightAgent. I separated app setup, config, logging, schemas, routes, and LLM service logic. The `/health` endpoint confirms the backend is running, while `/chat` accepts a validated message, calls a Groq-backed LLM service, tracks latency, and returns a stable JSON response. I kept provider details inside the service layer so the route remains simple and easier to change later.
+In V1, I built the FastAPI foundation for InsightAgent. I separated app setup, config, logging, schemas, routes, and LLM service logic. The `/health` endpoint confirms the backend is running, while `/chat` accepts a validated message, rejects blank input, calls a Groq-backed LLM service, tracks latency, and returns a stable JSON response. I kept provider details inside the service layer so the route remains simple and easier to change later.
 
 ## Trade-offs
 - I used `requirements.txt` for simple reproducibility instead of advanced packaging.
@@ -139,4 +163,5 @@ In V1, I built the FastAPI foundation for InsightAgent. I separated app setup, c
 - I used the OpenAI Python SDK because Groq supports OpenAI-compatible chat completions.
 - I kept the V1 response plain text only; structured output belongs to V2.
 - `/health` does not check external dependencies because readiness checks belong to a later deployment phase.
-
+- I avoided testing real LLM calls in automated tests because they depend on external service availability, API keys, latency, and rate limits.
+- I tested `/chat` with a mocked LLM function so endpoint behavior stays deterministic and cost-free.
