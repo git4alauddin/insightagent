@@ -102,3 +102,67 @@ Learning-first, version-by-version implementation.
 
 ### Interview Explanation
 - In V2, I added structured output support. The API now has a `/chat/structured` endpoint that asks the LLM for JSON, parses it, validates it with Pydantic, retries once on invalid output, and returns a fallback structured response if retry still fails. I separated prompt construction, parsing, service logic, and routing so the feature is easier to test and extend.
+
+## V3 Progress
+
+### What We Built
+- Added agent schemas for request, tool decision, and response contracts.
+- Added dedicated tool input schemas.
+- Added a tool registry and controlled initialization path.
+- Added safe `calculator` tool (AST-based, no direct `eval()`).
+- Added `date_time` tool with timezone handling.
+- Added `text_summarizer` tool with deterministic summary behavior.
+- Added `file_analyzer` tool for basic metadata and text stats.
+- Added tool-router prompt template for LLM tool selection.
+- Added tool decision parser with JSON + schema validation.
+- Added agent controller service that orchestrates tool decision and execution.
+- Added `POST /agent/query` endpoint.
+- Added unit and integration tests for all V3 components.
+
+### Why We Built It
+- To move from "LLM answers directly" to a controlled agentic workflow.
+- To separate reasoning (tool selection) from execution (backend-enforced tool calls).
+- To validate tool decisions and tool inputs before any execution.
+- To keep tool usage observable through explicit tool trace fields.
+- To establish a stable foundation for V4/V5/V7 features that depend on tool orchestration.
+
+### Files Added
+- `app/schemas/agent.py`
+- `app/schemas/tools.py`
+- `app/tools/registry.py`
+- `app/tools/calculator.py`
+- `app/tools/date_time.py`
+- `app/tools/text_summarizer.py`
+- `app/tools/file_analyzer.py`
+- `app/prompts/tool_router_v3.py`
+- `app/services/tool_decision_parser.py`
+- `app/services/agent_controller.py`
+- `app/api/routes_agent.py`
+- `tests/unit/test_agent_schemas.py`
+- `tests/unit/test_calculator_tool.py`
+- `tests/unit/test_date_time_tool.py`
+- `tests/unit/test_text_summarizer_tool.py`
+- `tests/unit/test_file_analyzer_tool.py`
+- `tests/unit/test_tool_registry.py`
+- `tests/unit/test_tool_router_prompt.py`
+- `tests/unit/test_tool_decision_parser.py`
+- `tests/unit/test_agent_controller.py`
+- `tests/integration/test_agent_endpoint.py`
+- `docs/versions/v3_tool_calling_agentic.md`
+
+### Tests Performed
+- Ran unit tests for all tool implementations and schema validations.
+- Ran unit tests for tool-router prompt and decision parser.
+- Ran unit tests for agent controller success/failure paths.
+- Ran integration tests for `/agent/query`.
+- Ran full test suite with `74 passed`.
+
+### What I Learned
+- The LLM should propose tool use, not execute tools directly.
+- A registry pattern is key for backend-side tool allowlisting.
+- Tool input validation should be explicit and schema-driven.
+- Tool execution paths need controlled error conversion.
+- Agent responses should include trace fields (`tool_used`, `tool_input`, `tool_output_summary`, `tool_status`) for debugging and interview explainability.
+
+### Interview Explanation
+- In V3, I introduced an agentic tool-calling layer. The LLM is prompted to return a JSON tool decision, which is parsed and validated with Pydantic before execution. The backend then resolves tools through a registry, validates input, executes safely, and returns a structured traceable response through `/agent/query`. This keeps tool execution controlled, testable, and production-oriented.
