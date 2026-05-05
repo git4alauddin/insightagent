@@ -4,6 +4,7 @@ from typing import Any
 from app.schemas.agent import ToolName
 from app.tools.calculator import calculator_tool
 from app.tools.date_time import date_time_tool
+from app.tools.file_analyzer import file_analyzer_tool
 from app.tools.text_summarizer import text_summarizer_tool
 
 
@@ -36,4 +37,5 @@ def initialize_tool_registry() -> None:
     TOOL_REGISTRY.clear()
     register_tool("calculator", calculator_tool)
     register_tool("date_time", date_time_tool)
+    register_tool("file_analyzer", file_analyzer_tool)
     register_tool("text_summarizer", text_summarizer_tool)
