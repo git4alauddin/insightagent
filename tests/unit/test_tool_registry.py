@@ -2,6 +2,7 @@ import pytest
 
 from app.tools.calculator import calculator_tool
 from app.tools.date_time import date_time_tool
+from app.tools.text_summarizer import text_summarizer_tool
 from app.tools.registry import (
     TOOL_REGISTRY,
     ToolRegistryError,
@@ -17,8 +18,10 @@ def test_initialize_tool_registry_registers_tools() -> None:
 
     assert "calculator" in TOOL_REGISTRY
     assert "date_time" in TOOL_REGISTRY
+    assert "text_summarizer" in TOOL_REGISTRY
     assert get_tool("calculator") is calculator_tool
     assert get_tool("date_time") is date_time_tool
+    assert get_tool("text_summarizer") is text_summarizer_tool
 
 
 def test_get_tool_raises_for_unknown_tool() -> None:
