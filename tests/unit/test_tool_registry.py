@@ -1,6 +1,7 @@
 import pytest
 
 from app.tools.calculator import calculator_tool
+from app.tools.date_time import date_time_tool
 from app.tools.registry import (
     TOOL_REGISTRY,
     ToolRegistryError,
@@ -11,10 +12,13 @@ from app.tools.registry import (
 )
 
 
-def test_initialize_tool_registry_registers_calculator() -> None:
+def test_initialize_tool_registry_registers_tools() -> None:
     initialize_tool_registry()
+
     assert "calculator" in TOOL_REGISTRY
+    assert "date_time" in TOOL_REGISTRY
     assert get_tool("calculator") is calculator_tool
+    assert get_tool("date_time") is date_time_tool
 
 
 def test_get_tool_raises_for_unknown_tool() -> None:
@@ -33,4 +37,3 @@ def test_register_tool_adds_new_tool() -> None:
 
     assert "none" in list_registered_tools()
     assert get_tool("none")({"x": 1}) == "ok"
-

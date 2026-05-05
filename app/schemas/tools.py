@@ -14,14 +14,14 @@ class CalculatorInput(BaseModel):
 
 
 class DateTimeInput(BaseModel):
-    query: str = "current_datetime"
+    timezone: str = "UTC"
 
-    @field_validator("query")
+    @field_validator("timezone")
     @classmethod
-    def query_must_not_be_blank(cls, value: str) -> str:
+    def timezone_must_not_be_blank(cls, value: str) -> str:
         cleaned_value = value.strip()
         if not cleaned_value:
-            raise ValueError("Query must not be empty.")
+            raise ValueError("Timezone must not be empty.")
         return cleaned_value
 
 

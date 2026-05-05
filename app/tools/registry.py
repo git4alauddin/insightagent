@@ -3,6 +3,7 @@ from typing import Any
 
 from app.schemas.agent import ToolName
 from app.tools.calculator import calculator_tool
+from app.tools.date_time import date_time_tool
 
 
 ToolFunction = Callable[[dict[str, Any]], str]
@@ -33,3 +34,4 @@ def list_registered_tools() -> list[str]:
 def initialize_tool_registry() -> None:
     TOOL_REGISTRY.clear()
     register_tool("calculator", calculator_tool)
+    register_tool("date_time", date_time_tool)
