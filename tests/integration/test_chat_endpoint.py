@@ -111,6 +111,7 @@ def test_memory_chat_returns_response_with_session_id() -> None:
     mock_response = {
         "session_id": "session-123",
         "answer": "Memory-aware reply.",
+        "context_message_count": 3,
         "status": "success",
     }
 
@@ -140,6 +141,21 @@ def test_memory_chat_returns_controlled_error_when_service_fails() -> None:
             "error": {
                 "code": "MEMORY_CHAT_SERVICE_ERROR",
                 "message": "Session not found: missing-session",
+            }
+        }
+    }
+
+
+def test_memory_chat_returns_controlled_error_when_message_too_long() -> None:
+    long_message = "a" * 5001
+    response = client.post("/chat/memory", json={"message": long_message})
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "detail": {
+            "error": {
+                "code": "MEMORY_CHAT_SERVICE_ERROR",
+                "message": "Message too long.",
             }
         }
     }

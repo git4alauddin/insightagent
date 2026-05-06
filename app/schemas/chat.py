@@ -52,4 +52,5 @@ class MemoryChatRequest(BaseModel):
 class MemoryChatResponse(BaseModel):
     session_id: str
     answer: str
+    context_message_count: int
     status: str
