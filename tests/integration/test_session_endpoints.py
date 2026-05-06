@@ -1,9 +1,11 @@
+from unittest.mock import patch
+
 import app.db.database as database_module
 import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.session_service import append_message, create_session
+from app.services.session_service import SessionServiceError, append_message, create_session
 
 
 client = TestClient(app)
@@ -24,6 +26,24 @@ def test_create_session_returns_session_id() -> None:
     assert data["status"] == "success"
     assert isinstance(data["session_id"], str)
     assert len(data["session_id"]) > 0
+
+
+def test_create_session_returns_controlled_db_error_when_service_fails() -> None:
+    with patch(
+        "app.api.routes_session.create_session",
+        side_effect=SessionServiceError("Database operation failed."),
+    ):
+        response = client.post("/sessions")
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "detail": {
+            "error": {
+                "code": "SESSION_DB_ERROR",
+                "message": "Database operation failed.",
+            }
+        }
+    }
 
 
 def test_get_session_messages_returns_messages() -> None:
@@ -57,3 +77,20 @@ def test_get_session_messages_returns_controlled_error_for_missing_session() -> 
         }
     }
 
+
+def test_get_session_messages_returns_controlled_db_error_for_service_error() -> None:
+    with patch(
+        "app.api.routes_session.get_recent_messages",
+        side_effect=SessionServiceError("Database operation failed."),
+    ):
+        response = client.get("/sessions/session-123/messages")
+
+    assert response.status_code == 503
+    assert response.json() == {
+        "detail": {
+            "error": {
+                "code": "SESSION_DB_ERROR",
+                "message": "Database operation failed.",
+            }
+        }
+    }

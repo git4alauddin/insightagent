@@ -1,3 +1,6 @@
+import sqlite3
+from unittest.mock import patch
+
 import app.db.database as database_module
 import pytest
 
@@ -78,3 +81,8 @@ def test_format_context_for_llm_returns_role_content_only(isolated_db) -> None:
         {"role": "assistant", "content": "Answer."},
     ]
 
+
+def test_create_session_raises_controlled_error_on_db_failure(isolated_db) -> None:
+    with patch("app.services.session_service.db_cursor", side_effect=sqlite3.Error("db down")):
+        with pytest.raises(SessionServiceError, match="Database operation failed"):
+            create_session("session-db-fail")

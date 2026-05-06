@@ -9,7 +9,19 @@ router = APIRouter(tags=["session"])
 
 @router.post("/sessions", response_model=CreateSessionResponse)
 def create_new_session() -> CreateSessionResponse:
-    session_id = create_session()
+    try:
+        session_id = create_session()
+    except SessionServiceError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": {
+                    "code": "SESSION_DB_ERROR",
+                    "message": str(exc),
+                }
+            },
+        ) from exc
+
     return CreateSessionResponse(session_id=session_id, status="success")
 
 
@@ -18,11 +30,22 @@ def get_session_messages(session_id: str) -> SessionMessagesResponse:
     try:
         messages = get_recent_messages(session_id, limit=100)
     except SessionServiceError as exc:
+        if "Session not found" in str(exc):
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "error": {
+                        "code": "SESSION_NOT_FOUND",
+                        "message": str(exc),
+                    }
+                },
+            ) from exc
+
         raise HTTPException(
-            status_code=404,
+            status_code=503,
             detail={
                 "error": {
-                    "code": "SESSION_NOT_FOUND",
+                    "code": "SESSION_DB_ERROR",
                     "message": str(exc),
                 }
             },
@@ -33,4 +56,3 @@ def get_session_messages(session_id: str) -> SessionMessagesResponse:
         messages=messages,
         status="success",
     )
-

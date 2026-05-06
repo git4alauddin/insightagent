@@ -166,3 +166,38 @@ Learning-first, version-by-version implementation.
 
 ### Interview Explanation
 - In V3, I introduced an agentic tool-calling layer. The LLM is prompted to return a JSON tool decision, which is parsed and validated with Pydantic before execution. The backend then resolves tools through a registry, validates input, executes safely, and returns a structured traceable response through `/agent/query`. This keeps tool execution controlled, testable, and production-oriented.
+
+## V4 Progress
+
+### What We Built
+- Added SQLite database foundation under `app/db/`.
+- Added core `sessions` and `messages` tables.
+- Added session service for create/check/store/retrieve context flow.
+- Added memory-aware chat endpoint: `POST /chat/memory`.
+- Added session endpoints:
+  - `POST /sessions`
+  - `GET /sessions/{session_id}/messages`
+- Added memory guardrails:
+  - max context message limit
+  - max message length limit
+  - context message count in memory response
+- Added controlled DB error handling for session service and session endpoints.
+
+### Why We Built It
+- To support multi-turn, session-based conversations.
+- To make memory behavior observable and bounded.
+- To ensure DB failures return controlled API responses instead of raw exceptions.
+
+### Tests Performed
+- Added unit tests for session service and memory chat service.
+- Added integration tests for session endpoints and memory chat endpoint.
+- Added DB failure-path tests for controlled error behavior.
+- Full suite currently passes.
+
+### What I Learned
+- Memory features require both data modeling and operational safety controls.
+- Clear error classification (`not found` vs `db error`) improves client behavior.
+- Context trimming is essential for predictable LLM cost and latency.
+
+### Interview Explanation
+- In V4, I introduced session persistence and memory-aware chat. I created SQLite-backed session/message storage, added session APIs, and wired a memory endpoint that reuses recent context for replies. I also added guardrails and controlled DB error handling to keep the API predictable in failure scenarios.

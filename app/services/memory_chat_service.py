@@ -26,9 +26,17 @@ def run_memory_chat(message: str, session_id: str | None = None) -> MemoryChatRe
         raise MemoryChatServiceError("Message too long.")
 
     if session_id is None:
-        resolved_session_id = create_session()
+        try:
+            resolved_session_id = create_session()
+        except SessionServiceError as exc:
+            raise MemoryChatServiceError(str(exc)) from exc
     else:
-        if not session_exists(session_id):
+        try:
+            exists = session_exists(session_id)
+        except SessionServiceError as exc:
+            raise MemoryChatServiceError(str(exc)) from exc
+
+        if not exists:
             raise MemoryChatServiceError(f"Session not found: {session_id}")
         resolved_session_id = session_id
 
