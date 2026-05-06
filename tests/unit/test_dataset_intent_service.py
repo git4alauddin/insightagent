@@ -29,6 +29,11 @@ def test_detect_unsupported_intent() -> None:
     assert intent == "unsupported"
 
 
+def test_detect_unsupported_intent_does_not_match_substring_tokens() -> None:
+    intent = detect_intent("Who is the prime minister of mars?")
+    assert intent == "unsupported"
+
+
 def test_detect_column_mentions_case_insensitive() -> None:
     columns = ["Age", "Fare", "Passenger_Class"]
     detected = detect_columns_from_question(

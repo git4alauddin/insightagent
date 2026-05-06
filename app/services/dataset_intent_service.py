@@ -17,43 +17,58 @@ def _normalize_text(value: str) -> str:
     return re.sub(r"[^a-z0-9\s]+", " ", lowered)
 
 
+def _contains_any_phrase(text: str, phrases: tuple[str, ...]) -> bool:
+    return any(phrase in text for phrase in phrases)
+
+
+def _contains_any_token(tokens: set[str], candidates: tuple[str, ...]) -> bool:
+    return any(candidate in tokens for candidate in candidates)
+
+
 def detect_intent(question: str) -> str:
     normalized_question = _normalize_text(question)
+    tokens = set(normalized_question.split())
 
     if not normalized_question:
         return "ambiguous"
 
-    if any(
-        keyword in normalized_question
-        for keyword in ("analyze this", "insight please", "what do you think", "help me")
+    if _contains_any_phrase(
+        normalized_question,
+        ("analyze this", "insight please", "what do you think", "help me"),
     ):
         return "ambiguous"
 
     aggregation_keywords = ("average", "mean", "sum", "count", "min", "max")
     if (
         " by " in f" {normalized_question} "
-        and any(keyword in normalized_question for keyword in aggregation_keywords)
+        and _contains_any_token(tokens, aggregation_keywords)
     ):
         return "groupby_aggregation"
 
-    if any(keyword in normalized_question for keyword in ("missing", "null", "na values")):
+    if _contains_any_phrase(normalized_question, ("na values",)) or _contains_any_token(
+        tokens,
+        ("missing", "null"),
+    ):
         return "missing_value_analysis"
 
-    if any(keyword in normalized_question for keyword in ("value counts", "frequency")):
+    if _contains_any_phrase(normalized_question, ("value counts",)) or _contains_any_token(
+        tokens,
+        ("frequency", "frequencies"),
+    ):
         return "value_counts"
 
-    if any(
-        keyword in normalized_question
-        for keyword in ("statistics", "stats", "distribution", "describe", "std dev")
+    if _contains_any_phrase(normalized_question, ("std dev",)) or _contains_any_token(
+        tokens,
+        ("statistics", "stats", "distribution", "describe"),
     ) or (
-        any(keyword in normalized_question for keyword in aggregation_keywords)
+        _contains_any_token(tokens, aggregation_keywords)
         and " by " not in f" {normalized_question} "
     ):
         return "column_stats"
 
-    if any(
-        keyword in normalized_question
-        for keyword in ("summary", "overview", "shape", "column names", "dataset info")
+    if _contains_any_phrase(normalized_question, ("column names", "dataset info")) or _contains_any_token(
+        tokens,
+        ("summary", "overview", "shape"),
     ):
         return "dataset_summary"
 
