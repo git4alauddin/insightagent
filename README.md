@@ -3,11 +3,13 @@
 InsightAgent is a learning-first, production-style FastAPI backend for AI-powered data and document analysis.
 
 ## Current Version
-V3 - Tool calling + agentic query flow.
+V4 - Memory + context handling.
 
 Detailed V1 notes: [docs/versions/v1_fastapi_basic_chat.md](docs/versions/v1_fastapi_basic_chat.md)
 Detailed V2 notes: [docs/versions/v2_structured_output.md](docs/versions/v2_structured_output.md)
 Detailed V3 notes: [docs/versions/v3_tool_calling_agentic.md](docs/versions/v3_tool_calling_agentic.md)
+Detailed V4 notes: [docs/versions/v4_memory_context.md](docs/versions/v4_memory_context.md)
+V4 commit tracking: [docs/versions/v4_commit_log.md](docs/versions/v4_commit_log.md)
 
 ## Project Structure
 ```text
@@ -18,6 +20,10 @@ app/
     routes_health.py
     routes_chat.py
     routes_agent.py
+    routes_session.py
+  db/
+    database.py
+    schema.py
   prompts/
     structured_v2.py
     tool_router_v3.py
@@ -33,6 +39,8 @@ app/
     structured_parser.py
     tool_decision_parser.py
     agent_controller.py
+    session_service.py
+    memory_chat_service.py
   tools/
     calculator.py
     date_time.py
@@ -49,6 +57,7 @@ docs/
     v1_fastapi_basic_chat.md
     v2_structured_output.md
     v3_tool_calling_agentic.md
+    v4_memory_context.md
 ```
 
 ## Run Locally
@@ -108,4 +117,30 @@ Invoke-RestMethod `
   -Method Post `
   -ContentType "application/json" `
   -Body '{"message":"What is 25 * 18?"}'
+```
+
+Send a memory chat request:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/chat/memory" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body '{"message":"Hello, this is my first memory message."}'
+```
+
+Create a session explicitly:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/sessions" `
+  -Method Post
+```
+
+Get session message history:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/sessions/<session_id>/messages" `
+  -Method Get
 ```

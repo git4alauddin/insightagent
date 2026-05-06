@@ -172,6 +172,7 @@ Learning-first, version-by-version implementation.
 ### What We Built
 - Added SQLite database foundation under `app/db/`.
 - Added core `sessions` and `messages` tables.
+- Added migration-safe session metadata columns (`title`, `status`).
 - Added session service for create/check/store/retrieve context flow.
 - Added memory-aware chat endpoint: `POST /chat/memory`.
 - Added session endpoints:
@@ -183,6 +184,20 @@ Learning-first, version-by-version implementation.
   - context message count in memory response
 - Added controlled DB error handling for session service and session endpoints.
 
+### Files Added
+- `app/db/database.py`
+- `app/db/schema.py`
+- `app/schemas/session.py`
+- `app/services/session_service.py`
+- `app/services/memory_chat_service.py`
+- `app/api/routes_session.py`
+- `tests/unit/test_session_service.py`
+- `tests/unit/test_memory_chat_service.py`
+- `tests/integration/test_session_endpoints.py`
+- `tests/integration/test_memory_chat_flow.py`
+- `docs/versions/v4_memory_context.md`
+- `docs/versions/v4_technical_walkthrough.md`
+
 ### Why We Built It
 - To support multi-turn, session-based conversations.
 - To make memory behavior observable and bounded.
@@ -192,7 +207,8 @@ Learning-first, version-by-version implementation.
 - Added unit tests for session service and memory chat service.
 - Added integration tests for session endpoints and memory chat endpoint.
 - Added DB failure-path tests for controlled error behavior.
-- Full suite currently passes.
+- Added multi-turn memory flow integration coverage.
+- Full suite currently passes (`93 passed`).
 
 ### What I Learned
 - Memory features require both data modeling and operational safety controls.
