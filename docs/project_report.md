@@ -217,3 +217,65 @@ Learning-first, version-by-version implementation.
 
 ### Interview Explanation
 - In V4, I introduced session persistence and memory-aware chat. I created SQLite-backed session/message storage, added session APIs, and wired a memory endpoint that reuses recent context for replies. I also added guardrails and controlled DB error handling to keep the API predictable in failure scenarios.
+
+## V5 Progress
+
+### What We Built
+- Added dataset upload contracts and validation guardrails.
+- Added `POST /datasets/upload` with safe file persistence.
+- Added dataset registry metadata in SQLite (`datasets` table).
+- Added `GET /datasets/{dataset_id}/summary`.
+- Added dataset ask schemas and analysis trace contract.
+- Added intent routing foundation for natural-language dataset questions.
+- Added safe analysis tools:
+  - dataset summary
+  - missing value analysis
+  - column stats
+  - value counts
+  - groupby aggregation
+- Added execution orchestration service for safe tool dispatch.
+- Added `POST /datasets/{dataset_id}/ask`.
+- Added safe fallback behavior for unsupported/ambiguous questions.
+
+### Why We Built It
+- To evolve InsightAgent from general LLM backend into practical data analysis backend.
+- To keep data analysis execution safe and deterministic.
+- To separate routing logic from execution logic for easier testing and debugging.
+- To expose traceable analysis behavior for interviews and future observability layers.
+
+### Files Added
+- `app/schemas/dataset.py`
+- `app/api/routes_datasets.py`
+- `app/services/dataset_service.py`
+- `app/services/dataset_registry_service.py`
+- `app/services/dataset_intent_service.py`
+- `app/services/dataset_analysis_router.py`
+- `app/services/dataset_tools_service.py`
+- `app/services/dataset_execution_service.py`
+- `app/services/dataset_answer_service.py`
+- `tests/integration/test_dataset_upload_endpoint.py`
+- `tests/integration/test_dataset_summary_endpoint.py`
+- `tests/integration/test_dataset_ask_endpoint.py`
+- `tests/unit/test_dataset_intent_service.py`
+- `tests/unit/test_dataset_analysis_router.py`
+- `tests/unit/test_dataset_tools_service.py`
+- `tests/unit/test_dataset_execution_service.py`
+- `docs/versions/v5_data_analysis_assistant.md`
+- `docs/versions/v5_technical_walkthrough.md`
+- `docs/versions/v5_commit_log.md`
+
+### Tests Performed
+- Added integration tests for upload, summary, and ask endpoints.
+- Added unit tests for intent detection, routing, tool behavior, and execution service.
+- Added regression case for intent false-positive prevention (`"minister"` vs `"min"` token matching).
+- Full suite status after V5 closeout: `126 passed`.
+
+### What I Learned
+- Safety comes from backend control, not prompt instructions alone.
+- Dataset analysis needs strict validation before any processing.
+- Intent routing can produce subtle NLP bugs unless token/phrase matching is carefully designed.
+- Structured traces (`intent`, `tool_used`, `columns_used`, `operation`) make analysis flows explainable.
+- Clear layer boundaries (registry/routing/execution/answer) keep growth manageable.
+
+### Interview Explanation
+- In V5, I implemented a safe CSV analysis architecture. Users can upload datasets, fetch summaries, and ask natural-language questions against stored datasets. The backend maps questions to allowlisted analysis tools and executes pandas operations through controlled services, with structured output and analysis trace. Unsupported questions return safe fallback responses, and no arbitrary Python execution path exists.

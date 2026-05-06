@@ -3,13 +3,18 @@
 InsightAgent is a learning-first, production-style FastAPI backend for AI-powered data and document analysis.
 
 ## Current Version
-V4 - Memory + context handling.
+V5 - CSV data analysis assistant.
 
 Detailed V1 notes: [docs/versions/v1_fastapi_basic_chat.md](docs/versions/v1_fastapi_basic_chat.md)
+V1 commit tracking: [docs/versions/v1_commit_log.md](docs/versions/v1_commit_log.md)
 Detailed V2 notes: [docs/versions/v2_structured_output.md](docs/versions/v2_structured_output.md)
+V2 commit tracking: [docs/versions/v2_commit_log.md](docs/versions/v2_commit_log.md)
 Detailed V3 notes: [docs/versions/v3_tool_calling_agentic.md](docs/versions/v3_tool_calling_agentic.md)
+V3 commit tracking: [docs/versions/v3_commit_log.md](docs/versions/v3_commit_log.md)
 Detailed V4 notes: [docs/versions/v4_memory_context.md](docs/versions/v4_memory_context.md)
 V4 commit tracking: [docs/versions/v4_commit_log.md](docs/versions/v4_commit_log.md)
+Detailed V5 notes: [docs/versions/v5_data_analysis_assistant.md](docs/versions/v5_data_analysis_assistant.md)
+V5 commit tracking: [docs/versions/v5_commit_log.md](docs/versions/v5_commit_log.md)
 
 ## Project Structure
 ```text
@@ -21,6 +26,7 @@ app/
     routes_chat.py
     routes_agent.py
     routes_session.py
+    routes_datasets.py
   db/
     database.py
     schema.py
@@ -33,6 +39,7 @@ app/
     structured.py
     agent.py
     tools.py
+    dataset.py
   services/
     llm_service.py
     structured_llm_service.py
@@ -41,6 +48,13 @@ app/
     agent_controller.py
     session_service.py
     memory_chat_service.py
+    dataset_service.py
+    dataset_registry_service.py
+    dataset_intent_service.py
+    dataset_analysis_router.py
+    dataset_tools_service.py
+    dataset_execution_service.py
+    dataset_answer_service.py
   tools/
     calculator.py
     date_time.py
@@ -58,6 +72,7 @@ docs/
     v2_structured_output.md
     v3_tool_calling_agentic.md
     v4_memory_context.md
+    v5_data_analysis_assistant.md
 ```
 
 ## Run Locally
@@ -143,4 +158,31 @@ Get session message history:
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/sessions/<session_id>/messages" `
   -Method Get
+```
+
+Upload a CSV dataset:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/datasets/upload" `
+  -Method Post `
+  -Form @{ file = Get-Item ".\sample.csv" }
+```
+
+Get dataset summary:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/datasets/<dataset_id>/summary" `
+  -Method Get
+```
+
+Ask a dataset question:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/datasets/<dataset_id>/ask" `
+  -Method Post `
+  -ContentType "application/json" `
+  -Body '{"question":"Which column has the most missing values?"}'
 ```
