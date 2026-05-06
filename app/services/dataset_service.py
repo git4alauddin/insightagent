@@ -1,3 +1,4 @@
+import csv
 from pathlib import Path
 
 import pandas as pd
@@ -26,6 +27,22 @@ def validate_csv_file(file_name: str, file_size_bytes: int) -> None:
 
 def load_csv_with_checks(temp_path: str) -> DataFrame:
     try:
+        with open(temp_path, encoding="utf-8", newline="") as csv_file:
+            reader = csv.reader(csv_file)
+            header = next(reader, None)
+    except OSError as exc:
+        raise DatasetServiceError("CSV file could not be read.") from exc
+    except UnicodeDecodeError as exc:
+        raise DatasetServiceError("CSV encoding is not supported (use UTF-8).") from exc
+
+    if not header:
+        raise DatasetServiceError("CSV file is empty.")
+
+    normalized_header = [column.strip() for column in header]
+    if len(normalized_header) != len(set(normalized_header)):
+        raise DatasetServiceError("CSV contains duplicate column names.")
+
+    try:
         dataframe = pd.read_csv(temp_path)
     except EmptyDataError as exc:
         raise DatasetServiceError("CSV file is empty.") from exc
@@ -38,9 +55,6 @@ def load_csv_with_checks(temp_path: str) -> DataFrame:
 
     if dataframe.empty:
         raise DatasetServiceError("CSV contains no data rows.")
-
-    if dataframe.columns.duplicated().any():
-        raise DatasetServiceError("CSV contains duplicate column names.")
 
     if dataframe.shape[0] > settings.csv_max_rows:
         raise DatasetServiceError(
