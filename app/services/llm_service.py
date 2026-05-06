@@ -7,7 +7,7 @@ class LLMServiceError(Exception):
     pass
 
 
-def generate_answer(message: str) -> str:
+def generate_answer_from_messages(messages: list[dict[str, str]]) -> str:
     if not settings.llm_api_key:
         raise LLMServiceError("LLM API key is not configured.")
 
@@ -20,9 +20,7 @@ def generate_answer(message: str) -> str:
     try:
         response = client.chat.completions.create(
             model=settings.llm_model,
-            messages=[
-                {"role": "user", "content": message},
-            ],
+            messages=messages,
         )
     except APITimeoutError as exc:
         raise LLMServiceError("LLM request timed out.") from exc
@@ -37,3 +35,7 @@ def generate_answer(message: str) -> str:
         raise LLMServiceError("LLM returned an empty response.")
 
     return answer
+
+
+def generate_answer(message: str) -> str:
+    return generate_answer_from_messages([{"role": "user", "content": message}])

@@ -3,9 +3,10 @@ import time
 from fastapi import APIRouter, HTTPException
 
 from app.config import settings
-from app.schemas.chat import ChatRequest, ChatResponse
+from app.schemas.chat import ChatRequest, ChatResponse, MemoryChatRequest, MemoryChatResponse
 from app.schemas.structured import StructuredLLMResponse
 from app.services.llm_service import LLMServiceError, generate_answer
+from app.services.memory_chat_service import MemoryChatServiceError, run_memory_chat
 from app.services.structured_llm_service import (
     StructuredLLMServiceError,
     generate_structured_answer,
@@ -52,6 +53,25 @@ def structured_chat(request: ChatRequest) -> StructuredLLMResponse:
             detail={
                 "error": {
                     "code": "STRUCTURED_LLM_SERVICE_ERROR",
+                    "message": str(exc),
+                }
+            },
+        ) from exc
+
+
+@router.post("/chat/memory", response_model=MemoryChatResponse)
+def memory_chat(request: MemoryChatRequest) -> MemoryChatResponse:
+    try:
+        return run_memory_chat(
+            message=request.message,
+            session_id=request.session_id,
+        )
+    except MemoryChatServiceError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": {
+                    "code": "MEMORY_CHAT_SERVICE_ERROR",
                     "message": str(exc),
                 }
             },
