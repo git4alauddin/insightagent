@@ -4,3 +4,4 @@ pydantic-settings
 openai
 pytest
 httpx
+pandas

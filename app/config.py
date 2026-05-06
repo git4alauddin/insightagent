@@ -12,6 +12,12 @@ class Settings(BaseSettings):
     llm_base_url: str | None = "https://api.groq.com/openai/v1"
     llm_timeout_seconds: float = 30.0
 
+    csv_max_file_size_mb: int = 10
+    csv_max_rows: int = 100000
+    csv_max_columns: int = 200
+    upload_dir: str = "uploads"
+    allowed_dataset_extensions: tuple[str, ...] = (".csv",)
+
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
 
