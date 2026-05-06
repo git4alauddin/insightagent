@@ -14,3 +14,14 @@ class ErrorDetail(BaseModel):
 
 class ErrorResponse(BaseModel):
     error: ErrorDetail
+
+
+class DependencyStatus(BaseModel):
+    name: str
+    status: str
+    detail: str
+
+
+class ReadinessResponse(BaseModel):
+    status: str
+    checks: list[DependencyStatus]
