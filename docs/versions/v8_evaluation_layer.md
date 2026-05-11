@@ -13,9 +13,9 @@ The target flow is:
 
 ## Current Progress
 
-Status: foundation started.
+Status: scoring layer expanding.
 
-This first V8 chunk creates the evaluation dataset and runner foundation. It does not yet implement full relevance, groundedness, tool-correctness, or citation-accuracy scoring.
+V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, and deterministic scoring for format, tool correctness, CSV intent, citations, relevance, and basic groundedness. It does not yet implement token/cost tracking or semantic citation accuracy.
 
 ## Evaluation Dataset
 
@@ -52,10 +52,12 @@ Current checks:
 - HTTP status
 - format validity through required top-level keys
 - response `status` value
+- answer relevance through expected answer terms
 - expected tool selection
 - expected CSV analysis intent
 - RAG citation presence
 - RAG source filename match
+- RAG groundedness through configured terms checked against answer and reference document text
 - insufficient-context safety through no returned citations
 - failure category output
 
@@ -119,7 +121,8 @@ It verifies:
 - setup uploads create the needed dataset/document ids
 - placeholder endpoints are replaced before the ask request
 - CSV analysis scoring passes for missing-value intent and tool selection
-- RAG scoring passes for citation/source presence
+- CSV relevance scoring passes for expected answer terms
+- RAG scoring passes for citation/source presence, relevance, and groundedness
 - summary generation reports a clean pass rate
 - result saving writes the expected JSON summary
 
@@ -127,8 +130,6 @@ This proves the runner can execute real API flows without starting a separate se
 
 ## Deferred On Purpose
 Not built in this first V8 chunk:
-- relevance scoring
-- groundedness scoring
 - token/cost tracking
 - semantic citation accuracy beyond filename/source presence
 
@@ -139,6 +140,8 @@ Added unit tests for:
 - format-validity scoring
 - tool-correctness scoring
 - citation-presence scoring
+- relevance scoring
+- groundedness scoring
 - insufficient-context safety scoring
 - analysis-intent scoring
 - missing-key failure detection
@@ -153,8 +156,8 @@ Added unit tests for:
 
 Latest suite:
 ```text
-222 passed
+226 passed
 ```
 
 ## Interview Explanation
-In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify basic citation presence, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.
+In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify basic RAG citation presence, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later semantic citation accuracy and token/cost tracking.

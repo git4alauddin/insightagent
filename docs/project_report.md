@@ -448,7 +448,7 @@ Status: foundation started.
 - Added `scripts/run_eval.py`.
 - Added setup upload support for dataset and document evaluation cases.
 - Added basic status/shape scoring.
-- Added rule-based scoring for tool correctness, CSV intent, citations, and insufficient-context safety.
+- Added rule-based scoring for relevance, tool correctness, CSV intent, citations, groundedness, and insufficient-context safety.
 - Added failure category summaries.
 - Added regression comparison against previous eval results.
 - Added in-process eval execution against FastAPI `TestClient`.
@@ -469,13 +469,15 @@ Status: foundation started.
 - To make failures easier to debug by categorizing scoring failures.
 - To detect pass-rate changes and newly failing cases across eval runs.
 - To prove upload-dependent eval cases can execute against the real API in automated tests.
+- To add deterministic answer-quality checks before introducing model-assisted evaluation.
 
 ### Tests Performed
 - Added unit tests for the eval runner foundation.
 - Added unit tests for scoring rules and failure categories.
+- Added unit tests for relevance and groundedness scoring.
 - Added unit tests for regression comparison behavior.
 - Added in-process integration coverage for CSV and RAG eval execution.
-- Full suite status after V8 eval runner integration proof: `222 passed`.
+- Full suite status after V8 relevance and groundedness scoring: `226 passed`.
 
 ### What I Learned
 - Evaluation needs a stable dataset format before scoring gets sophisticated.
@@ -484,6 +486,7 @@ Status: foundation started.
 - Rule-based scoring can catch important regressions before introducing model-assisted evaluation.
 - Comparing current and previous result files helps separate new regressions from known failures.
 - Testing the runner against FastAPI `TestClient` catches wiring issues that unit-level scoring tests cannot see.
+- Basic groundedness can be measured deterministically by checking expected terms against both the answer and reference text.
 
 ### Interview Explanation
-- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, regression comparison, and an in-process integration proof. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, score tool correctness, check CSV analysis intent, verify basic RAG citation presence, validate insufficient-context safety, save a JSON result summary with failure categories, compare current results against a previous run to identify pass-rate delta/new failures/new passes/added cases/removed cases, and run deterministic CSV/RAG eval cases against FastAPI `TestClient` in automated tests. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.
+- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, regression comparison, and an in-process integration proof. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, verify answer relevance through expected terms, score tool correctness, check CSV analysis intent, verify basic RAG citation presence, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, save a JSON result summary with failure categories, compare current results against a previous run to identify pass-rate delta/new failures/new passes/added cases/removed cases, and run deterministic CSV/RAG eval cases against FastAPI `TestClient` in automated tests. This creates the foundation for later semantic citation accuracy and token/cost tracking.

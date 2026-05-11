@@ -115,6 +115,43 @@ def test_score_eval_response_checks_tool_correctness() -> None:
     assert result["scores"]["tool_correctness"]["actual"] == "date_time"
 
 
+def test_score_eval_response_checks_relevance_terms() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "csv_analysis",
+            "expected_status": 200,
+            "expected_keys": ["answer"],
+            "scoring": {"expected_answer_contains": ["missing values", "city"]},
+        },
+        200,
+        {"answer": "The city column has the most missing values."},
+        12.5,
+    )
+
+    assert result["passed"] is True
+    assert result["scores"]["relevance"]["missing_terms"] == []
+
+
+def test_score_eval_response_fails_when_relevance_terms_are_missing() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "csv_analysis",
+            "expected_status": 200,
+            "expected_keys": ["answer"],
+            "scoring": {"expected_answer_contains": ["missing values", "city"]},
+        },
+        200,
+        {"answer": "The age column has one blank value."},
+        12.5,
+    )
+
+    assert result["passed"] is False
+    assert result["failure_categories"] == ["relevance"]
+    assert result["scores"]["relevance"]["missing_terms"] == ["missing values", "city"]
+
+
 def test_score_eval_response_checks_citation_presence() -> None:
     result = score_eval_response(
         {
@@ -137,6 +174,70 @@ def test_score_eval_response_checks_citation_presence() -> None:
 
     assert result["passed"] is True
     assert result["scores"]["citation_presence"]["citation_count"] == 1
+
+
+def test_score_eval_response_checks_groundedness_against_reference_text() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "rag",
+            "expected_status": 200,
+            "expected_keys": ["answer", "sources"],
+            "setup": {
+                "upload_document": {
+                    "filename": "policy.txt",
+                    "content": "Refunds are available within 7 days.",
+                    "content_type": "text/plain",
+                }
+            },
+            "scoring": {
+                "groundedness_terms": ["Refunds are available within 7 days"]
+            },
+        },
+        200,
+        {
+            "answer": "Refunds are available within 7 days.",
+            "sources": [{"filename": "policy.txt", "chunk_id": "chunk_1"}],
+        },
+        12.5,
+    )
+
+    assert result["passed"] is True
+    assert result["scores"]["groundedness"]["missing_from_answer"] == []
+    assert result["scores"]["groundedness"]["missing_from_reference"] == []
+
+
+def test_score_eval_response_fails_when_groundedness_terms_are_not_in_reference() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "rag",
+            "expected_status": 200,
+            "expected_keys": ["answer", "sources"],
+            "setup": {
+                "upload_document": {
+                    "filename": "policy.txt",
+                    "content": "Shipping takes 3 days.",
+                    "content_type": "text/plain",
+                }
+            },
+            "scoring": {
+                "groundedness_terms": ["Refunds are available within 7 days"]
+            },
+        },
+        200,
+        {
+            "answer": "Refunds are available within 7 days.",
+            "sources": [{"filename": "policy.txt", "chunk_id": "chunk_1"}],
+        },
+        12.5,
+    )
+
+    assert result["passed"] is False
+    assert result["failure_categories"] == ["groundedness"]
+    assert result["scores"]["groundedness"]["missing_from_reference"] == [
+        "Refunds are available within 7 days"
+    ]
 
 
 def test_score_eval_response_checks_insufficient_context_safety() -> None:

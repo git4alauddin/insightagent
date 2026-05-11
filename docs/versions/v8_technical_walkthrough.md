@@ -10,7 +10,9 @@ The evaluation layer should eventually answer:
 - did the API return the right shape?
 - did the agent choose the right tool?
 - did CSV analysis use the right operation?
+- did the answer include the expected task-specific content?
 - did RAG answers cite evidence?
+- did RAG answers stay grounded in uploaded reference text?
 - did unsupported questions avoid confident answers?
 - did latency regress?
 
@@ -69,10 +71,12 @@ Current scoring is intentionally simple:
 - expected HTTP status must match
 - expected top-level keys must exist
 - optional response `status` must match
+- optional expected answer terms must appear in the answer
 - optional `tool_used` must match
 - optional CSV `analysis_trace.intent` must match
 - optional RAG citations must be present
 - optional RAG source filename must match
+- optional groundedness terms must appear in both the answer and reference text
 - optional insufficient-context cases must return no citations
 
 This gives us deterministic rule-based scoring before adding subjective or model-assisted scoring.
@@ -95,10 +99,24 @@ Supported checks:
 - `http_status`
 - `format_validity`
 - `response_status`
+- `relevance`
 - `tool_correctness`
 - `analysis_intent`
 - `citation_presence`
+- `groundedness`
 - `insufficient_context_safety`
+
+### `score_relevance(...)`
+Checks configured `expected_answer_contains` terms against the response `answer`.
+
+This is deterministic and intentionally simple. It catches obvious answer-quality regressions without requiring a model judge.
+
+### `score_groundedness(...)`
+Checks configured `groundedness_terms` against:
+- the response `answer`
+- the uploaded document text from the eval case setup, or explicit `reference_text`
+
+This gives RAG cases a basic groundedness signal before adding semantic citation accuracy.
 
 ### `build_failure_categories(...)`
 Returns the failed score names for each case.
@@ -157,7 +175,8 @@ The test covers:
 - protected endpoint API-key headers
 - CSV missing-value ask flow
 - RAG grounded ask flow
-- scoring and pass-rate summary
+- relevance and groundedness scoring
+- pass-rate summary
 - saved result JSON output
 
 ## 8. Result Output
@@ -192,6 +211,8 @@ Verifies:
 - response shape scoring fails when expected keys are missing
 - tool correctness is checked
 - citation presence is checked
+- relevance scoring passes and fails correctly
+- groundedness scoring passes and fails correctly
 - insufficient-context safety is checked
 - CSV analysis intent is checked
 - summary pass/fail counts and pass rate are correct
@@ -205,6 +226,7 @@ Verifies:
 Verifies:
 - the runner executes upload-dependent CSV and RAG cases against FastAPI `TestClient`
 - eval scoring passes against real API responses
+- relevance and groundedness checks pass against deterministic CSV/RAG responses
 - result summaries and saved output are generated from integration results
 
 ## 10. Checklist Mapping
@@ -222,14 +244,14 @@ Verifies:
 - pass-rate summary: basic done
 - failure-category summary: basic done
 - regression comparison note: basic done
+- relevance scoring: basic done
+- groundedness scoring: basic done
 - tool correctness scoring: basic done
 - format validity scoring: basic done
 - citation presence scoring: basic done
 - insufficient-context safety scoring: basic done
-- relevance scoring: pending
-- groundedness scoring: pending
 - citation semantic accuracy scoring: pending
 - token/cost tracking: pending
 
 ## 11. Interview Summary
-I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, regression comparison, and in-process integration proof. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify tool selection, check CSV analysis intent, check basic citation presence, validate insufficient-context safety, save a result summary with failure categories, compare the current run against previous results to identify pass-rate delta/new failures/new passes/added cases/removed cases, and run deterministic CSV/RAG cases against FastAPI `TestClient` during automated tests. This creates the measurement layer that can later grow into groundedness, semantic citation accuracy, and token/cost tracking.
+I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, regression comparison, and in-process integration proof. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify answer relevance through expected terms, verify tool selection, check CSV analysis intent, check basic citation presence, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, save a result summary with failure categories, compare the current run against previous results to identify pass-rate delta/new failures/new passes/added cases/removed cases, and run deterministic CSV/RAG cases against FastAPI `TestClient` during automated tests. This creates the measurement layer that can later grow into semantic citation accuracy and token/cost tracking.

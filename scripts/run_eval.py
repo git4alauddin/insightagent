@@ -202,6 +202,9 @@ def build_score_breakdown(
     if "expected_response_status" in scoring:
         scores["response_status"] = score_response_status(scoring, response_body)
 
+    if "expected_answer_contains" in scoring:
+        scores["relevance"] = score_relevance(scoring, response_body)
+
     if "expected_tool_used" in scoring:
         scores["tool_correctness"] = score_tool_correctness(scoring, response_body)
 
@@ -210,6 +213,9 @@ def build_score_breakdown(
 
     if scoring.get("require_citations"):
         scores["citation_presence"] = score_citation_presence(scoring, response_body)
+
+    if "groundedness_terms" in scoring:
+        scores["groundedness"] = score_groundedness(case, scoring, response_body)
 
     if scoring.get("require_no_citations"):
         scores["insufficient_context_safety"] = score_no_citations(response_body)
@@ -248,6 +254,24 @@ def score_response_status(
         "passed": actual_status == expected_status,
         "expected": expected_status,
         "actual": actual_status,
+    }
+
+
+def score_relevance(
+    scoring: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    expected_terms = normalize_expected_terms(scoring["expected_answer_contains"])
+    answer = extract_answer_text(response_body)
+    normalized_answer = normalize_text(answer)
+    missing_terms = [
+        term for term in expected_terms if normalize_text(term) not in normalized_answer
+    ]
+
+    return {
+        "passed": not missing_terms,
+        "expected_terms": expected_terms,
+        "missing_terms": missing_terms,
     }
 
 
@@ -305,6 +329,29 @@ def score_citation_presence(
     }
 
 
+def score_groundedness(
+    case: dict[str, Any],
+    scoring: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    groundedness_terms = normalize_expected_terms(scoring["groundedness_terms"])
+    answer = normalize_text(extract_answer_text(response_body))
+    reference_text = normalize_text(extract_reference_text(case, scoring))
+    missing_from_answer = [
+        term for term in groundedness_terms if normalize_text(term) not in answer
+    ]
+    missing_from_reference = [
+        term for term in groundedness_terms if normalize_text(term) not in reference_text
+    ]
+
+    return {
+        "passed": not missing_from_answer and not missing_from_reference,
+        "expected_terms": groundedness_terms,
+        "missing_from_answer": missing_from_answer,
+        "missing_from_reference": missing_from_reference,
+    }
+
+
 def score_no_citations(response_body: Any) -> dict[str, Any]:
     sources = response_body.get("sources", []) if isinstance(response_body, dict) else []
     valid_sources = sources if isinstance(sources, list) else []
@@ -312,6 +359,46 @@ def score_no_citations(response_body: Any) -> dict[str, Any]:
         "passed": valid_sources == [],
         "citation_count": len(valid_sources),
     }
+
+
+def normalize_expected_terms(value: Any) -> list[str]:
+    if isinstance(value, str):
+        return [value]
+
+    if isinstance(value, list):
+        return [str(term) for term in value]
+
+    return [str(value)]
+
+
+def extract_answer_text(response_body: Any) -> str:
+    if not isinstance(response_body, dict):
+        return ""
+
+    answer = response_body.get("answer", "")
+    return answer if isinstance(answer, str) else str(answer)
+
+
+def extract_reference_text(
+    case: dict[str, Any],
+    scoring: dict[str, Any],
+) -> str:
+    if "reference_text" in scoring:
+        return str(scoring["reference_text"])
+
+    setup = case.get("setup", {})
+    if not isinstance(setup, dict):
+        return ""
+
+    upload_document = setup.get("upload_document", {})
+    if isinstance(upload_document, dict):
+        return str(upload_document.get("content", ""))
+
+    return ""
+
+
+def normalize_text(value: str) -> str:
+    return " ".join(value.lower().split())
 
 
 def build_failure_categories(scores: dict[str, dict[str, Any]]) -> list[str]:

@@ -55,7 +55,7 @@ This file maps each V8 commit heading to:
 - Added the first regression signal for V8.
 - Helped identify which cases got worse, improved, were added, or disappeared.
 
-### `<pending>` - `v8: add eval runner integration proof`
+### `ae44872` - `v8: add eval runner integration proof`
 **What we did**
 - Added an eval runner helper that can execute cases with an existing client.
 - Kept the normal CLI path working through the same runner helper.
@@ -66,6 +66,20 @@ This file maps each V8 commit heading to:
 - Proved the evaluator can drive real API flows without requiring a separate uvicorn process in tests.
 - Covered upload-dependent evaluation cases end-to-end.
 - Made the eval runner safer to refactor because API execution is now tested beyond unit-level scoring.
+
+### `<pending>` - `v8: add relevance and groundedness scoring`
+**What we did**
+- Added answer relevance scoring through expected answer terms.
+- Added RAG groundedness scoring through configured terms checked against both answer text and reference document text.
+- Added relevance and groundedness metadata to deterministic CSV/RAG eval cases.
+- Added unit tests for passing and failing relevance checks.
+- Added unit tests for passing and failing groundedness checks.
+- Extended the in-process eval proof to exercise relevance and groundedness scoring.
+
+**What it solved / took care of**
+- Started measuring whether answers contain expected task-specific content.
+- Added a deterministic groundedness signal for RAG without using model-assisted judging.
+- Made eval failure categories more useful for answer-quality regressions.
 
 ## Reusable Entry Template
 
