@@ -10,6 +10,7 @@ from app.services.dataset_registry_service import DatasetRegistryError, get_data
 
 
 client = TestClient(app)
+client.headers.update({"x-api-key": "test-api-key"})
 
 
 @pytest.fixture(autouse=True)

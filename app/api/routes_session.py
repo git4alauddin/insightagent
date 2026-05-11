@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app.api.dependencies import require_api_key
 from app.schemas.session import CreateSessionResponse, SessionMessagesResponse
 from app.services.session_service import SessionServiceError, create_session, get_recent_messages
 
 
-router = APIRouter(tags=["session"])
+router = APIRouter(tags=["session"], dependencies=[Depends(require_api_key)])
 
 
 @router.post("/sessions", response_model=CreateSessionResponse)

@@ -1,7 +1,8 @@
 import time
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app.api.dependencies import require_api_key
 from app.config import settings
 from app.schemas.chat import ChatRequest, ChatResponse, MemoryChatRequest, MemoryChatResponse
 from app.schemas.structured import StructuredLLMResponse
@@ -13,7 +14,7 @@ from app.services.structured_llm_service import (
 )
 
 
-router = APIRouter(tags=["chat"])
+router = APIRouter(tags=["chat"], dependencies=[Depends(require_api_key)])
 
 
 @router.post("/chat", response_model=ChatResponse)

@@ -9,6 +9,7 @@ from app.services.session_service import SessionServiceError, append_message, cr
 
 
 client = TestClient(app)
+client.headers.update({"x-api-key": "test-api-key"})
 
 
 @pytest.fixture(autouse=True)

@@ -10,6 +10,7 @@ from app.services.dataset_registry_service import get_dataset_metadata
 
 
 client = TestClient(app)
+client.headers.update({"x-api-key": "test-api-key"})
 
 
 @pytest.fixture(autouse=True)

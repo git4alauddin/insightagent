@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app.api.dependencies import require_api_key
 from app.schemas.agent import AgentQueryRequest, AgentQueryResponse
 from app.services.agent_controller import AgentControllerError, run_agent_query
 
 
-router = APIRouter(tags=["agent"])
+router = APIRouter(tags=["agent"], dependencies=[Depends(require_api_key)])
 
 
 @router.post("/agent/query", response_model=AgentQueryResponse)
@@ -21,4 +22,3 @@ def agent_query(request: AgentQueryRequest) -> AgentQueryResponse:
                 }
             },
         ) from exc
-

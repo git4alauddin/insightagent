@@ -3,7 +3,7 @@
 InsightAgent is a learning-first, production-style FastAPI backend for AI-powered data and document analysis.
 
 ## Current Version
-V5 - CSV data analysis assistant.
+V6 - Backend maturity and deployment hardening.
 
 Detailed V1 notes: [docs/versions/v1_fastapi_basic_chat.md](docs/versions/v1_fastapi_basic_chat.md)
 V1 commit tracking: [docs/versions/v1_commit_log.md](docs/versions/v1_commit_log.md)
@@ -15,6 +15,7 @@ Detailed V4 notes: [docs/versions/v4_memory_context.md](docs/versions/v4_memory_
 V4 commit tracking: [docs/versions/v4_commit_log.md](docs/versions/v4_commit_log.md)
 Detailed V5 notes: [docs/versions/v5_data_analysis_assistant.md](docs/versions/v5_data_analysis_assistant.md)
 V5 commit tracking: [docs/versions/v5_commit_log.md](docs/versions/v5_commit_log.md)
+Detailed V6 notes: [docs/versions/v6_backend_maturity.md](docs/versions/v6_backend_maturity.md)
 
 ## Project Structure
 ```text
@@ -22,6 +23,7 @@ app/
   main.py
   config.py
   api/
+    dependencies.py
     routes_health.py
     routes_chat.py
     routes_agent.py
@@ -104,12 +106,27 @@ Expected response:
 }
 ```
 
+Check readiness:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/ready" `
+  -Method Get
+```
+
+Protected endpoints require an API key:
+
+```powershell
+$headers = @{ "x-api-key" = "your-service-api-key-here" }
+```
+
 Send a chat request:
 
 ```powershell
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/chat" `
   -Method Post `
+  -Headers $headers `
   -ContentType "application/json" `
   -Body '{"message":"Explain what a CSV file is in one sentence."}'
 ```
@@ -120,6 +137,7 @@ Send a structured chat request:
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/chat/structured" `
   -Method Post `
+  -Headers $headers `
   -ContentType "application/json" `
   -Body '{"message":"Explain missing values in a dataset in simple words."}'
 ```
@@ -130,6 +148,7 @@ Send an agent query request:
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/agent/query" `
   -Method Post `
+  -Headers $headers `
   -ContentType "application/json" `
   -Body '{"message":"What is 25 * 18?"}'
 ```
@@ -140,6 +159,7 @@ Send a memory chat request:
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/chat/memory" `
   -Method Post `
+  -Headers $headers `
   -ContentType "application/json" `
   -Body '{"message":"Hello, this is my first memory message."}'
 ```
@@ -149,7 +169,8 @@ Create a session explicitly:
 ```powershell
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/sessions" `
-  -Method Post
+  -Method Post `
+  -Headers $headers
 ```
 
 Get session message history:
@@ -157,7 +178,8 @@ Get session message history:
 ```powershell
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/sessions/<session_id>/messages" `
-  -Method Get
+  -Method Get `
+  -Headers $headers
 ```
 
 Upload a CSV dataset:
@@ -166,6 +188,7 @@ Upload a CSV dataset:
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/datasets/upload" `
   -Method Post `
+  -Headers $headers `
   -Form @{ file = Get-Item ".\sample.csv" }
 ```
 
@@ -174,7 +197,8 @@ Get dataset summary:
 ```powershell
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/datasets/<dataset_id>/summary" `
-  -Method Get
+  -Method Get `
+  -Headers $headers
 ```
 
 Ask a dataset question:
@@ -183,6 +207,7 @@ Ask a dataset question:
 Invoke-RestMethod `
   -Uri "http://127.0.0.1:8000/datasets/<dataset_id>/ask" `
   -Method Post `
+  -Headers $headers `
   -ContentType "application/json" `
   -Body '{"question":"Which column has the most missing values?"}'
 ```

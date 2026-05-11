@@ -13,6 +13,7 @@ from app.services.structured_llm_service import (
 
 
 client = TestClient(app)
+client.headers.update({"x-api-key": "test-api-key"})
 
 
 def test_chat_returns_llm_answer() -> None:

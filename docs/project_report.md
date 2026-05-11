@@ -279,3 +279,33 @@ Learning-first, version-by-version implementation.
 
 ### Interview Explanation
 - In V5, I implemented a safe CSV analysis architecture. Users can upload datasets, fetch summaries, and ask natural-language questions against stored datasets. The backend maps questions to allowlisted analysis tools and executes pandas operations through controlled services, with structured output and analysis trace. Unsupported questions return safe fallback responses, and no arbitrary Python execution path exists.
+
+## V6 Progress
+
+### What We Built
+- Added `GET /ready` for dependency readiness checks.
+- Added Docker runtime files.
+- Added API key configuration through `API_KEY`.
+- Added shared `x-api-key` auth dependency.
+- Protected chat, agent, session, and dataset endpoints.
+- Kept `/health` and `/ready` public.
+- Added tests for missing, invalid, and unconfigured API key behavior.
+
+### Why We Built It
+- To protect costly LLM and data endpoints.
+- To avoid exposing private API behavior during deployment.
+- To keep deployment health checks publicly reachable.
+- To fail closed when authentication is not configured.
+
+### Tests Performed
+- Ran the full test suite after auth changes.
+- Current suite status: `133 passed`.
+
+### What I Learned
+- Authentication can be centralized as a FastAPI dependency.
+- Router-level dependencies are useful when an entire endpoint group should be protected.
+- Health/readiness endpoints usually stay public for infrastructure checks.
+- Missing auth configuration should be treated as a deployment error, not as permission to expose the API.
+
+### Interview Explanation
+- In V6, I started hardening the backend for deployment. I added readiness checks, containerized the service, and introduced API key authentication using an `x-api-key` header. Private routes are protected at the router level, while `/health` and `/ready` stay public for deployment and monitoring systems.

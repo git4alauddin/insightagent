@@ -8,6 +8,7 @@ from app.main import app
 
 
 client = TestClient(app)
+client.headers.update({"x-api-key": "test-api-key"})
 
 
 @pytest.fixture(autouse=True)

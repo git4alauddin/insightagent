@@ -7,6 +7,7 @@ from app.services.agent_controller import AgentControllerError
 
 
 client = TestClient(app)
+client.headers.update({"x-api-key": "test-api-key"})
 
 
 def test_agent_query_returns_success_response() -> None:
@@ -43,4 +44,3 @@ def test_agent_query_returns_controlled_error_when_controller_fails() -> None:
             }
         }
     }
-
