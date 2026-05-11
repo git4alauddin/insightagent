@@ -32,7 +32,7 @@ This file maps each V7 commit heading to:
 - Persisted raw uploaded files safely with generated document IDs.
 - Stored document metadata for later parsing/chunking/retrieval.
 
-### `<pending>` - `v7: add text extraction for uploaded documents`
+### `1bdfdeb` - `v7: add text extraction for uploaded documents`
 **What we did**
 - Added `pypdf` dependency.
 - Added document text extraction service.
@@ -43,6 +43,19 @@ This file maps each V7 commit heading to:
 **What it solved / took care of**
 - Converted stored document files into text for the future chunking pipeline.
 - Added safe extraction failure behavior before retrieval/answer generation.
+
+### `<pending>` - `v7: add document chunking service`
+**What we did**
+- Added chunk size and chunk overlap configuration.
+- Added `DocumentChunk` schema with source metadata.
+- Added text cleaning for whitespace normalization.
+- Added deterministic overlapping chunk generation.
+- Added chunking unit tests for metadata, overlap, empty text, and invalid config.
+
+**What it solved / took care of**
+- Converted extracted text into retrievable chunk units.
+- Preserved document/source metadata needed for later citations.
+- Added guardrails so invalid chunk settings fail before indexing.
 
 ## Reusable Entry Template
 

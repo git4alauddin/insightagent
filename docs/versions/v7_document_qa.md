@@ -27,6 +27,8 @@ Models:
 Added document upload guardrail settings:
 - `DOCUMENT_MAX_FILE_SIZE_MB`
 - `ALLOWED_DOCUMENT_EXTENSIONS`
+- `DOCUMENT_CHUNK_SIZE`
+- `DOCUMENT_CHUNK_OVERLAP`
 
 Default supported extensions:
 - `.pdf`
@@ -60,8 +62,18 @@ Behavior:
 - empty extracted text returns a controlled extraction error
 - unsupported extraction extensions are rejected
 
+### Document Chunking Service
+Added chunking for extracted document text.
+
+Behavior:
+- normalizes whitespace before chunking
+- splits text into deterministic overlapping chunks
+- uses configurable chunk size and overlap values
+- attaches chunk metadata: `chunk_id`, `document_id`, `filename`, `chunk_index`, and optional `page`
+- rejects empty cleaned text and invalid chunk settings
+
 ## Why This Matters
-The first V7 chunk defines the API contract before implementation details.
+The early V7 chunks define the API contract and indexing foundation before retrieval and answer generation.
 
 This keeps the RAG build controlled:
 - no parsing before upload contracts are clear
@@ -108,8 +120,7 @@ POST /documents/{document_id}/ask
 ```
 
 ## Deferred On Purpose
-Not built in this first V7 chunk:
-- chunking
+Not built yet:
 - embeddings
 - vector store
 - retrieval
@@ -136,10 +147,17 @@ Added text extraction unit tests for:
 - missing file handling
 - unsupported extraction extension handling
 
+Added chunking unit tests for:
+- whitespace cleaning
+- single-chunk documents
+- overlapping multi-chunk documents
+- empty cleaned text handling
+- invalid chunk size/overlap handling
+
 Latest suite:
 ```text
-166 passed
+173 passed
 ```
 
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, and introducing text extraction. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, and extract text from TXT, Markdown, and PDF files. Chunking, embeddings, retrieval, and grounded answers are intentionally deferred to later V7 chunks.
+In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, and adding deterministic text chunking. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, then split extracted text into overlapping chunks with citation-ready metadata. Embeddings, retrieval, and grounded answers are intentionally deferred to later V7 chunks.

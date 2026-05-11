@@ -16,8 +16,10 @@ The important design rule:
 Added:
 - `document_max_file_size_mb`
 - `allowed_document_extensions`
+- `document_chunk_size`
+- `document_chunk_overlap`
 
-These settings prepare upload validation for PDF, TXT, and Markdown files.
+These settings prepare upload validation and deterministic chunking for PDF, TXT, and Markdown files.
 
 ## 3. Database Metadata
 
@@ -62,11 +64,15 @@ Validation guardrails:
 ### `app/schemas/document.py`
 Main models:
 - `DocumentUploadResponse`
+- `DocumentChunk`
 - `DocumentAskRequest`
 - `SourceCitation`
 - `DocumentAskResponse`
 
 Key behaviors:
+- `DocumentChunk.text` rejects blank chunk text.
+- `DocumentChunk.chunk_index` must be zero or greater.
+- `DocumentChunk.page` is optional but must be positive when present.
 - `DocumentAskRequest.question` trims and rejects blank input.
 - `SourceCitation.similarity_score` must be between `0.0` and `1.0`.
 - `SourceCitation.page` is optional but must be positive when present.
@@ -112,7 +118,38 @@ Behavior:
 - empty extracted text returns `DocumentTextExtractionError`.
 - unsupported extensions return `DocumentTextExtractionError`.
 
-## 8. Tests Added
+## 8. Text Cleaning and Chunking
+
+### `app/services/document_chunking_service.py`
+Core functions:
+- `clean_document_text(text)`
+- `chunk_document_text(...)`
+
+Behavior:
+- collapses repeated whitespace into single spaces
+- rejects empty text after cleaning
+- validates chunk size and overlap settings
+- creates deterministic overlapping chunks
+- attaches metadata for document ID, filename, chunk index, chunk ID, and optional page
+
+Chunk ID format:
+```text
+<document_id>_chunk_<zero_padded_index>
+```
+
+Example:
+```json
+{
+  "chunk_id": "doc_123_chunk_0000",
+  "document_id": "doc_123",
+  "filename": "policy.pdf",
+  "chunk_index": 0,
+  "text": "Refund policy...",
+  "page": null
+}
+```
+
+## 9. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -139,7 +176,16 @@ Verifies:
 - missing file handling
 - unsupported extraction extension handling
 
-## 9. Checklist Mapping
+### `tests/unit/test_document_chunking_service.py`
+Verifies:
+- whitespace cleaning
+- single-chunk metadata
+- overlapping multi-chunk output
+- empty cleaned text handling
+- invalid chunk size handling
+- invalid chunk overlap handling
+
+## 10. Checklist Mapping
 - document upload endpoint: done
 - supported document extensions config: done
 - unsupported document-type handling: done
@@ -149,11 +195,15 @@ Verifies:
 - document metadata storage: done
 - text extraction: done
 - empty text extraction handling: done
-- chunking: pending
+- text cleaning: done
+- chunking: done
+- chunk size configuration: done
+- chunk overlap configuration: done
+- chunk metadata: done
 - embeddings: pending
 - vector store: pending
 - retrieval: pending
 - grounded answer generation: pending
 
-## 10. Interview Summary
-I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, and adding text extraction. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, and returns controlled errors for unreadable or empty text. This creates the foundation for the later RAG pipeline: chunking, embeddings, retrieval, and grounded answer generation.
+## 11. Interview Summary
+I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, and adding deterministic document chunking. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, and splits it into overlapping chunks with source metadata. This creates the foundation for the later RAG pipeline: embeddings, retrieval, and grounded answer generation.

@@ -362,8 +362,11 @@ Learning-first, version-by-version implementation.
 - Added document metadata table and registry service.
 - Added safe raw document persistence.
 - Added text extraction service for TXT, Markdown, and PDF files.
+- Added text cleaning and deterministic document chunking.
+- Added document chunk metadata with document ID, filename, chunk index, chunk ID, and optional page.
 - Added unit tests for document schemas.
 - Added integration tests for document upload.
+- Added unit tests for document text extraction and chunking.
 - Added V7 documentation files:
   - `docs/versions/v7_document_qa.md`
   - `docs/versions/v7_technical_walkthrough.md`
@@ -375,18 +378,21 @@ Learning-first, version-by-version implementation.
 - To keep weak-context and grounded-answer behavior explicit before answer generation is implemented.
 - To create the document lifecycle entrypoint before text extraction and indexing.
 - To convert stored documents into text before chunking and retrieval.
+- To convert extracted text into citation-ready chunks before embeddings and retrieval.
 
 ### Tests Performed
 - Added unit tests for document schemas.
 - Added integration tests for upload success and failure paths.
 - Added unit tests for document text extraction.
-- Full suite status after document text extraction: `166 passed`.
+- Added unit tests for document chunking behavior and invalid settings.
+- Full suite status after document chunking: `173 passed`.
 
 ### What I Learned
 - RAG systems need source/citation contracts early, not as an afterthought.
 - Response schemas help define what “grounded answer” means before model logic is added.
 - Upload and metadata persistence should be stable before parsing/chunking logic is introduced.
 - Text extraction needs controlled failure behavior because unreadable or empty documents are common in real RAG systems.
+- Chunking needs deterministic output and metadata because retrieval and citations depend on stable source units.
 
 ### Interview Explanation
-- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, and implementing text extraction. I added schemas for document uploads, document questions, source citations, and grounded answer responses, implemented safe raw document upload persistence with SQLite metadata, and added extraction paths for TXT, Markdown, and PDF files. This sets up the future RAG pipeline to chunk, embed, retrieve, and answer with citations.
+- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, and adding deterministic chunking. I added schemas for document uploads, document questions, source citations, grounded answer responses, and document chunks, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, and split cleaned text into overlapping metadata-rich chunks. This sets up the future RAG pipeline to embed, retrieve, and answer with citations.

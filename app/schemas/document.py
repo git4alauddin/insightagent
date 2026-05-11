@@ -9,6 +9,23 @@ class DocumentUploadResponse(BaseModel):
     status: Literal["uploaded", "indexed"]
 
 
+class DocumentChunk(BaseModel):
+    chunk_id: str
+    document_id: str
+    filename: str
+    chunk_index: int = Field(ge=0)
+    text: str
+    page: int | None = Field(default=None, ge=1)
+
+    @field_validator("text")
+    @classmethod
+    def text_must_not_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+        if not cleaned_value:
+            raise ValueError("Chunk text must not be empty.")
+        return cleaned_value
+
+
 class DocumentAskRequest(BaseModel):
     question: str
 

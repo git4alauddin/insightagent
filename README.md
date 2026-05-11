@@ -71,6 +71,8 @@ app/
     dataset_answer_service.py
     document_service.py
     document_registry_service.py
+    document_text_service.py
+    document_chunking_service.py
   tools/
     calculator.py
     date_time.py
