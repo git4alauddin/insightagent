@@ -57,6 +57,7 @@ Core functions:
 - `load_eval_cases(dataset_path)`
 - `validate_eval_case(case, line_number)`
 - `run_eval_cases(cases, base_url, api_key, timeout_seconds)`
+- `run_eval_cases_with_client(cases, client, api_key)`
 - `run_eval_case(client, case, api_key)`
 - `prepare_case(client, case, api_key)`
 - `upload_setup_file(...)`
@@ -135,7 +136,31 @@ Use:
 
 When comparison is enabled, the saved result file includes a top-level `comparison` object.
 
-## 7. Result Output
+## 7. In-Process Integration Proof
+
+### `run_eval_cases_with_client(...)`
+Runs evaluation cases with an already-created client.
+
+This keeps the production CLI path and the integration-test path aligned:
+```text
+CLI creates httpx.Client -> run_eval_cases_with_client(...)
+Test creates TestClient -> run_eval_cases_with_client(...)
+```
+
+### `tests/integration/test_eval_runner_flow.py`
+Verifies the evaluator can drive real API flows without launching a server.
+
+The test covers:
+- CSV setup upload
+- document setup upload
+- endpoint placeholder replacement
+- protected endpoint API-key headers
+- CSV missing-value ask flow
+- RAG grounded ask flow
+- scoring and pass-rate summary
+- saved result JSON output
+
+## 8. Result Output
 
 Default output:
 ```text
@@ -157,7 +182,7 @@ The output includes:
 
 `evals/results/` is ignored by Git so local eval runs do not create commit noise.
 
-## 8. Tests Added
+## 9. Tests Added
 
 ### `tests/unit/test_eval_runner.py`
 Verifies:
@@ -176,7 +201,13 @@ Verifies:
 - regression and improvement comparison works
 - saved result files can include comparison output
 
-## 9. Checklist Mapping
+### `tests/integration/test_eval_runner_flow.py`
+Verifies:
+- the runner executes upload-dependent CSV and RAG cases against FastAPI `TestClient`
+- eval scoring passes against real API responses
+- result summaries and saved output are generated from integration results
+
+## 10. Checklist Mapping
 - evaluation dataset JSONL: started
 - chat/structured-output test cases: started
 - tool-calling test cases: started
@@ -184,7 +215,7 @@ Verifies:
 - RAG test cases: started
 - negative/insufficient-context cases: started
 - `scripts/run_eval.py`: started
-- call local/deployed API from eval runner: local API supported
+- call local/deployed API from eval runner: local API supported, in-process API proven
 - capture response: done
 - track latency: done
 - save evaluation result file: done
@@ -200,5 +231,5 @@ Verifies:
 - citation semantic accuracy scoring: pending
 - token/cost tracking: pending
 
-## 10. Interview Summary
-I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, and regression comparison. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify tool selection, check CSV analysis intent, check basic citation presence, validate insufficient-context safety, save a result summary with failure categories, and compare the current run against previous results to identify pass-rate delta, new failures, new passes, added cases, and removed cases. This creates the measurement layer that can later grow into groundedness, semantic citation accuracy, and token/cost tracking.
+## 11. Interview Summary
+I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, regression comparison, and in-process integration proof. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify tool selection, check CSV analysis intent, check basic citation presence, validate insufficient-context safety, save a result summary with failure categories, compare the current run against previous results to identify pass-rate delta/new failures/new passes/added cases/removed cases, and run deterministic CSV/RAG cases against FastAPI `TestClient` during automated tests. This creates the measurement layer that can later grow into groundedness, semantic citation accuracy, and token/cost tracking.

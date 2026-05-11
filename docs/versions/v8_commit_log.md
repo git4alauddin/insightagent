@@ -39,7 +39,7 @@ This file maps each V8 commit heading to:
 - Started detecting wrong tool selection and missing citations.
 - Added failure categories that can support later debugging and regression tracking.
 
-### `<pending>` - `v8: add eval regression comparison`
+### `243deaa` - `v8: add eval regression comparison`
 **What we did**
 - Added previous result loading.
 - Added eval result comparison helper.
@@ -54,6 +54,18 @@ This file maps each V8 commit heading to:
 - Made eval runs comparable over time.
 - Added the first regression signal for V8.
 - Helped identify which cases got worse, improved, were added, or disappeared.
+
+### `<pending>` - `v8: add eval runner integration proof`
+**What we did**
+- Added an eval runner helper that can execute cases with an existing client.
+- Kept the normal CLI path working through the same runner helper.
+- Added an in-process FastAPI integration test for CSV and RAG eval cases.
+- Verified setup uploads, placeholder endpoint replacement, scoring, summary generation, and result saving together.
+
+**What it solved / took care of**
+- Proved the evaluator can drive real API flows without requiring a separate uvicorn process in tests.
+- Covered upload-dependent evaluation cases end-to-end.
+- Made the eval runner safer to refactor because API execution is now tested beyond unit-level scoring.
 
 ## Reusable Entry Template
 

@@ -451,9 +451,11 @@ Status: foundation started.
 - Added rule-based scoring for tool correctness, CSV intent, citations, and insufficient-context safety.
 - Added failure category summaries.
 - Added regression comparison against previous eval results.
+- Added in-process eval execution against FastAPI `TestClient`.
 - Added latency capture.
 - Added JSON result output under `evals/results/`.
 - Added unit tests for eval case loading, validation, scoring, and summary generation.
+- Added an integration test proving CSV and RAG eval cases can run end-to-end through the evaluator.
 - Added V8 documentation files:
   - `docs/versions/v8_evaluation_layer.md`
   - `docs/versions/v8_technical_walkthrough.md`
@@ -466,12 +468,14 @@ Status: foundation started.
 - To build a runner foundation before adding advanced scoring.
 - To make failures easier to debug by categorizing scoring failures.
 - To detect pass-rate changes and newly failing cases across eval runs.
+- To prove upload-dependent eval cases can execute against the real API in automated tests.
 
 ### Tests Performed
 - Added unit tests for the eval runner foundation.
 - Added unit tests for scoring rules and failure categories.
 - Added unit tests for regression comparison behavior.
-- Full suite status after V8 regression comparison: `221 passed`.
+- Added in-process integration coverage for CSV and RAG eval execution.
+- Full suite status after V8 eval runner integration proof: `222 passed`.
 
 ### What I Learned
 - Evaluation needs a stable dataset format before scoring gets sophisticated.
@@ -479,6 +483,7 @@ Status: foundation started.
 - Even simple status/shape scoring is useful as a first regression signal.
 - Rule-based scoring can catch important regressions before introducing model-assisted evaluation.
 - Comparing current and previous result files helps separate new regressions from known failures.
+- Testing the runner against FastAPI `TestClient` catches wiring issues that unit-level scoring tests cannot see.
 
 ### Interview Explanation
-- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, and regression comparison. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, score tool correctness, check CSV analysis intent, verify basic RAG citation presence, validate insufficient-context safety, save a JSON result summary with failure categories, and compare current results against a previous run to identify pass-rate delta, new failures, new passes, added cases, and removed cases. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.
+- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, regression comparison, and an in-process integration proof. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, score tool correctness, check CSV analysis intent, verify basic RAG citation presence, validate insufficient-context safety, save a JSON result summary with failure categories, compare current results against a previous run to identify pass-rate delta/new failures/new passes/added cases/removed cases, and run deterministic CSV/RAG eval cases against FastAPI `TestClient` in automated tests. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.

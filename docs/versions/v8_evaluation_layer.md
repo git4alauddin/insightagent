@@ -73,6 +73,7 @@ Current behavior:
 - sends `x-api-key`
 - handles dataset/document setup uploads
 - calls target endpoints
+- can run against an existing in-process test client
 - captures latency
 - checks expected status code
 - checks expected top-level response keys
@@ -105,6 +106,25 @@ Comparison output includes:
 - added cases
 - removed cases
 
+## In-Process Integration Proof
+
+Added:
+```text
+tests/integration/test_eval_runner_flow.py
+```
+
+This test runs deterministic CSV and RAG evaluation cases through FastAPI `TestClient`.
+
+It verifies:
+- setup uploads create the needed dataset/document ids
+- placeholder endpoints are replaced before the ask request
+- CSV analysis scoring passes for missing-value intent and tool selection
+- RAG scoring passes for citation/source presence
+- summary generation reports a clean pass rate
+- result saving writes the expected JSON summary
+
+This proves the runner can execute real API flows without starting a separate server during automated tests.
+
 ## Deferred On Purpose
 Not built in this first V8 chunk:
 - relevance scoring
@@ -128,11 +148,13 @@ Added unit tests for:
 - regression comparison
 - new failure/new pass detection
 - added/removed case detection
+- in-process CSV and RAG eval execution
+- eval result saving through an integration test
 
 Latest suite:
 ```text
-221 passed
+222 passed
 ```
 
 ## Interview Explanation
-In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, and regression comparison. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify basic citation presence, detect insufficient-context safety, save a pass-rate summary with failure categories, and compare current results against a previous run. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.
+In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify basic citation presence, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.

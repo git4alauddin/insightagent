@@ -61,16 +61,24 @@ def run_eval_cases(
     api_key: str,
     timeout_seconds: float = 30.0,
 ) -> list[dict[str, Any]]:
-    results: list[dict[str, Any]] = []
     with httpx.Client(base_url=base_url, timeout=timeout_seconds) as client:
-        for case in cases:
-            results.append(run_eval_case(client, case, api_key=api_key))
+        return run_eval_cases_with_client(cases, client, api_key=api_key)
 
+
+def run_eval_cases_with_client(
+    cases: list[dict[str, Any]],
+    client: Any,
+    *,
+    api_key: str,
+) -> list[dict[str, Any]]:
+    results: list[dict[str, Any]] = []
+    for case in cases:
+        results.append(run_eval_case(client, case, api_key=api_key))
     return results
 
 
 def run_eval_case(
-    client: httpx.Client,
+    client: Any,
     case: dict[str, Any],
     *,
     api_key: str,
@@ -94,7 +102,7 @@ def run_eval_case(
 
 
 def prepare_case(
-    client: httpx.Client,
+    client: Any,
     case: dict[str, Any],
     *,
     api_key: str,
@@ -130,7 +138,7 @@ def prepare_case(
 
 
 def upload_setup_file(
-    client: httpx.Client,
+    client: Any,
     endpoint: str,
     upload_spec: dict[str, str],
     *,
