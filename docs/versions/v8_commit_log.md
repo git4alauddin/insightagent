@@ -109,7 +109,7 @@ This file maps each V8 commit heading to:
 - Made eval results easier to interpret without reading the runner code.
 - Clarified what the current eval layer measures and what is still pending.
 
-### `<pending>` - `v8: add token and cost metadata to eval results`
+### `f78e310` - `v8: add token and cost metadata to eval results`
 **What we did**
 - Added per-case optional usage metadata to eval results.
 - Added token/cost extraction from common response shapes.
@@ -123,6 +123,19 @@ This file maps each V8 commit heading to:
 - Covered the V8 checklist item for tracking token/cost if available.
 - Made eval results future-ready for endpoints that expose provider usage.
 - Kept current deterministic endpoints honest by marking usage unavailable instead of inventing estimates.
+
+### `<pending>` - `v8: close out evaluation layer documentation`
+**What we did**
+- Marked V8 as complete in the version documentation.
+- Added a V8 closeout summary.
+- Tightened checklist mapping from started/basic to done where implementation is complete.
+- Documented honest limitations for live LLM evals, deployed evals, and model-assisted judging.
+- Updated the project report with V8 completion status.
+
+**What it solved / took care of**
+- Closed the version cleanly before moving to V9.
+- Made it clear what V8 proves today and what remains future work.
+- Preserved an honest portfolio story instead of overstating evaluation maturity.
 
 ## Reusable Entry Template
 

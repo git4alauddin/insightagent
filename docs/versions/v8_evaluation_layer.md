@@ -13,9 +13,9 @@ The target flow is:
 
 ## Current Progress
 
-Status: documented evaluation layer.
+Status: complete.
 
-V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, optional token/cost metadata, and deterministic scoring for format, tool correctness, CSV intent, citation presence, citation accuracy, relevance, basic groundedness, and insufficient-context safety. It does not yet implement model-assisted semantic judging.
+V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, optional token/cost metadata, and deterministic scoring for format, tool correctness, CSV intent, citation presence, citation accuracy, relevance, basic groundedness, and insufficient-context safety. The version is complete with model-assisted semantic judging intentionally deferred.
 
 ## Evaluation Dataset
 
@@ -215,10 +215,41 @@ It verifies:
 
 This proves the runner can execute real API flows without starting a separate server during automated tests.
 
-## Deferred On Purpose
-Not built in this first V8 chunk:
-- token/cost tracking
-- model-assisted semantic judging
+## V8 Closeout
+
+V8 is complete for the planned evaluation layer scope.
+
+Completed:
+- evaluation dataset in JSONL
+- eval runner script
+- local API eval execution
+- setup uploads for CSV/RAG eval cases
+- response capture
+- latency tracking
+- token/cost metadata tracking when response usage is available
+- result saving
+- pass/fail per case
+- pass-rate summary
+- failure-category summary
+- regression comparison
+- format validity scoring
+- relevance scoring
+- groundedness scoring
+- tool correctness scoring
+- CSV intent scoring
+- citation presence scoring
+- citation accuracy scoring
+- insufficient-context safety checks
+- tests for missing citations
+- tests for unsupported confident/cited answers
+- README/docs evaluation workflow
+
+Honest limitations:
+- Full bundled eval execution requires a running API and valid API key.
+- LLM-backed chat/structured/tool cases may vary depending on provider/model behavior.
+- The automated integration proof focuses on deterministic upload-dependent CSV/RAG eval execution.
+- Model-assisted semantic judging is deferred; V8 uses deterministic rule-based checks.
+- Deployed API evaluation is supported by `--base-url`, but Cloud Run deployment remains deferred from V6.
 
 ## Testing Status
 Added unit tests for:
@@ -259,6 +290,7 @@ Current documented eval status:
 - pass-rate and failure-category summaries are generated
 - token/cost metadata is tracked when available
 - evaluation covers chat, tool, CSV, and RAG flows
+- evaluation results are documented in README/docs
 
 ## Interview Explanation
-In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, optional token/cost metadata, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, extract token/cost usage when endpoints provide it, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify RAG citation presence, check citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later model-assisted judging.
+In V8, I built the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, optional token/cost metadata, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, extract token/cost usage when endpoints provide it, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify RAG citation presence, check citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. V8 is intentionally rule-based and leaves model-assisted semantic judging for a future improvement.

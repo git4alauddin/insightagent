@@ -315,21 +315,21 @@ Verifies:
 - result summaries and saved output are generated from integration results
 
 ## 10. Checklist Mapping
-- evaluation dataset JSONL: started
-- chat/structured-output test cases: started
-- tool-calling test cases: started
-- CSV-analysis test cases: started
-- RAG test cases: started
-- negative/insufficient-context cases: started
-- `scripts/run_eval.py`: started
-- call local/deployed API from eval runner: local API supported, in-process API proven
+- evaluation dataset JSONL: done
+- chat/structured-output test cases: done
+- tool-calling test cases: done
+- CSV-analysis test cases: done
+- RAG test cases: done
+- negative/insufficient-context cases: done
+- `scripts/run_eval.py`: done
+- call local/deployed API from eval runner: local API supported, deployed API supported by configurable `--base-url`
 - capture response: done
 - track latency: done
 - track token/cost if available: done
 - save evaluation result file: done
-- pass-rate summary: basic done
-- failure-category summary: basic done
-- regression comparison note: basic done
+- pass-rate summary: done
+- failure-category summary: done
+- regression comparison note: done
 - document evaluation process in README/docs: done
 - eval runner executes full test set: supported against running API
 - pass/fail result generated per case: done
@@ -347,5 +347,26 @@ Verifies:
 - citation semantic accuracy scoring: deterministic basic done, model-assisted pending
 - token/cost tracking: done when response metadata is available
 
-## 11. Interview Summary
-I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, regression comparison, optional token/cost metadata, and in-process integration proof. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, extract token/cost usage when endpoint responses expose it, check status/shape expectations, verify answer relevance through expected terms, verify tool selection, check CSV analysis intent, check citation presence and deterministic citation accuracy, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, fail RAG answers without citations, fail unsupported confident/cited answers, save a result summary with failure categories and usage totals, compare the current run against previous results, and run deterministic CSV/RAG cases against FastAPI `TestClient` during automated tests. This creates the measurement layer that can later grow into model-assisted judging.
+## 11. Version Closeout
+
+V8 is complete.
+
+The version delivers the planned evaluation layer:
+- reusable eval dataset
+- reusable eval runner
+- rule-based scoring
+- regression comparison
+- result persistence
+- latency and optional usage metadata
+- deterministic tests for scoring behavior
+- in-process proof for upload-dependent CSV/RAG eval flows
+- README and docs explaining how to run and interpret evals
+
+Known limits are intentional:
+- live eval pass rate can depend on LLM provider/model behavior
+- model-assisted semantic judging is not included
+- deployed Cloud Run eval is supported by `--base-url` but Cloud Run deployment remains deferred
+- deterministic citation accuracy is useful, but not a replacement for deeper semantic citation judging
+
+## 12. Interview Summary
+I built V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, regression comparison, optional token/cost metadata, and in-process integration proof. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, extract token/cost usage when endpoint responses expose it, check status/shape expectations, verify answer relevance through expected terms, verify tool selection, check CSV analysis intent, check citation presence and deterministic citation accuracy, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, fail RAG answers without citations, fail unsupported confident/cited answers, save a result summary with failure categories and usage totals, compare the current run against previous results, and run deterministic CSV/RAG cases against FastAPI `TestClient` during automated tests. This creates the measurement layer that can later grow into model-assisted judging.
