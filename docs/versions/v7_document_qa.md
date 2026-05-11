@@ -48,6 +48,18 @@ Current behavior:
 - stores metadata in SQLite
 - returns a stable `document_id`
 
+### Text Extraction Service
+Added text extraction for:
+- `.txt`
+- `.md`
+- `.pdf`
+
+Behavior:
+- TXT/MD files are read as UTF-8 text
+- PDF text is extracted with `pypdf`
+- empty extracted text returns a controlled extraction error
+- unsupported extraction extensions are rejected
+
 ## Why This Matters
 The first V7 chunk defines the API contract before implementation details.
 
@@ -97,7 +109,6 @@ POST /documents/{document_id}/ask
 
 ## Deferred On Purpose
 Not built in this first V7 chunk:
-- PDF/TXT/MD parsing
 - chunking
 - embeddings
 - vector store
@@ -117,10 +128,18 @@ Added upload endpoint integration tests for:
 - empty document rejection
 - database failure handling
 
+Added text extraction unit tests for:
+- TXT extraction
+- Markdown extraction
+- PDF extraction path
+- empty extracted text handling
+- missing file handling
+- unsupported extraction extension handling
+
 Latest suite:
 ```text
-159 passed
+166 passed
 ```
 
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts and adding the document upload lifecycle. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, and return a stable `document_id`. Parsing, chunking, embeddings, retrieval, and grounded answers are intentionally deferred to later V7 chunks.
+In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, and introducing text extraction. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, and extract text from TXT, Markdown, and PDF files. Chunking, embeddings, retrieval, and grounded answers are intentionally deferred to later V7 chunks.

@@ -18,7 +18,7 @@ This file maps each V7 commit heading to:
 - Established the RAG API contract before implementation.
 - Made citations and weak-context response shape explicit early.
 
-### `<pending>` - `v7: add document upload endpoint and safe persistence`
+### `363b8f2` - `v7: add document upload endpoint and safe persistence`
 **What we did**
 - Added `documents` metadata table.
 - Added document registry service.
@@ -31,6 +31,18 @@ This file maps each V7 commit heading to:
 - Created the document lifecycle entrypoint.
 - Persisted raw uploaded files safely with generated document IDs.
 - Stored document metadata for later parsing/chunking/retrieval.
+
+### `<pending>` - `v7: add text extraction for uploaded documents`
+**What we did**
+- Added `pypdf` dependency.
+- Added document text extraction service.
+- Supported TXT, Markdown, and PDF extraction paths.
+- Added controlled errors for missing, unreadable, empty, and unsupported extraction cases.
+- Added document text extraction unit tests.
+
+**What it solved / took care of**
+- Converted stored document files into text for the future chunking pipeline.
+- Added safe extraction failure behavior before retrieval/answer generation.
 
 ## Reusable Entry Template
 

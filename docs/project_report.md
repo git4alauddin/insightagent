@@ -361,6 +361,7 @@ Learning-first, version-by-version implementation.
 - Added `POST /documents/upload`.
 - Added document metadata table and registry service.
 - Added safe raw document persistence.
+- Added text extraction service for TXT, Markdown, and PDF files.
 - Added unit tests for document schemas.
 - Added integration tests for document upload.
 - Added V7 documentation files:
@@ -373,16 +374,19 @@ Learning-first, version-by-version implementation.
 - To make citations part of the response design from the beginning.
 - To keep weak-context and grounded-answer behavior explicit before answer generation is implemented.
 - To create the document lifecycle entrypoint before text extraction and indexing.
+- To convert stored documents into text before chunking and retrieval.
 
 ### Tests Performed
 - Added unit tests for document schemas.
 - Added integration tests for upload success and failure paths.
-- Full suite status after document upload endpoint: `159 passed`.
+- Added unit tests for document text extraction.
+- Full suite status after document text extraction: `166 passed`.
 
 ### What I Learned
 - RAG systems need source/citation contracts early, not as an afterthought.
 - Response schemas help define what “grounded answer” means before model logic is added.
 - Upload and metadata persistence should be stable before parsing/chunking logic is introduced.
+- Text extraction needs controlled failure behavior because unreadable or empty documents are common in real RAG systems.
 
 ### Interview Explanation
-- In V7, I started the document Q&A layer by defining contracts and adding the upload lifecycle. I added schemas for document uploads, document questions, source citations, and grounded answer responses, then implemented safe raw document upload persistence with SQLite metadata. This sets up the future RAG pipeline to parse, chunk, embed, retrieve, and answer with citations.
+- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, and implementing text extraction. I added schemas for document uploads, document questions, source citations, and grounded answer responses, implemented safe raw document upload persistence with SQLite metadata, and added extraction paths for TXT, Markdown, and PDF files. This sets up the future RAG pipeline to chunk, embed, retrieve, and answer with citations.

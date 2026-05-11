@@ -94,7 +94,25 @@ Controlled errors:
 ### `app/main.py`
 Includes document router.
 
-## 7. Tests Added
+## 7. Text Extraction
+
+### `app/services/document_text_service.py`
+Core function:
+- `extract_document_text(storage_path, file_extension)`
+
+Supported extraction paths:
+- `.txt`
+- `.md`
+- `.pdf`
+
+Behavior:
+- TXT and Markdown files are read as UTF-8.
+- PDF files are read with `pypdf.PdfReader`.
+- missing/unreadable files return `DocumentTextExtractionError`.
+- empty extracted text returns `DocumentTextExtractionError`.
+- unsupported extensions return `DocumentTextExtractionError`.
+
+## 8. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -112,7 +130,16 @@ Verifies:
 - empty document rejection
 - controlled DB error handling
 
-## 8. Checklist Mapping
+### `tests/unit/test_document_text_service.py`
+Verifies:
+- TXT extraction
+- Markdown extraction
+- PDF extraction path
+- empty extracted text handling
+- missing file handling
+- unsupported extraction extension handling
+
+## 9. Checklist Mapping
 - document upload endpoint: done
 - supported document extensions config: done
 - unsupported document-type handling: done
@@ -120,12 +147,13 @@ Verifies:
 - document ask request/response contracts: done
 - raw document persistence: done
 - document metadata storage: done
-- text extraction: pending
+- text extraction: done
+- empty text extraction handling: done
 - chunking: pending
 - embeddings: pending
 - vector store: pending
 - retrieval: pending
 - grounded answer generation: pending
 
-## 9. Interview Summary
-I started V7 by defining the document Q&A contracts and implementing safe document upload persistence. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, and returns stable upload responses. This creates the foundation for the later RAG pipeline: parsing, chunking, embeddings, retrieval, and grounded answer generation.
+## 10. Interview Summary
+I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, and adding text extraction. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, and returns controlled errors for unreadable or empty text. This creates the foundation for the later RAG pipeline: chunking, embeddings, retrieval, and grounded answer generation.
