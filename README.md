@@ -39,6 +39,7 @@ app/
     routes_agent.py
     routes_session.py
     routes_datasets.py
+    routes_documents.py
   db/
     database.py
     schema.py
@@ -68,6 +69,8 @@ app/
     dataset_tools_service.py
     dataset_execution_service.py
     dataset_answer_service.py
+    document_service.py
+    document_registry_service.py
   tools/
     calculator.py
     date_time.py
@@ -127,7 +130,7 @@ Important production environment variables:
 
 ```text
 APP_ENV=production
-APP_VERSION=v6
+APP_VERSION=v7
 DOCS_ENABLED=false
 API_KEY=<service-api-key>
 LLM_API_KEY=<provider-api-key>
@@ -149,7 +152,7 @@ Expected response:
 {
   "status": "ok",
   "service": "InsightAgent",
-  "version": "v6"
+  "version": "v7"
 }
 ```
 
@@ -257,4 +260,14 @@ Invoke-RestMethod `
   -Headers $headers `
   -ContentType "application/json" `
   -Body '{"question":"Which column has the most missing values?"}'
+```
+
+Upload a document:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/documents/upload" `
+  -Method Post `
+  -Headers $headers `
+  -Form @{ file = Get-Item ".\policy.txt" }
 ```

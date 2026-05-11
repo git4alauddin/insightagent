@@ -35,6 +35,32 @@ def _ensure_datasets_columns(cursor) -> None:
         cursor.execute("ALTER TABLE datasets ADD COLUMN uploaded_at TEXT NOT NULL DEFAULT ''")
 
 
+def _ensure_documents_columns(cursor) -> None:
+    cursor.execute("PRAGMA table_info(documents)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    if "session_id" not in existing_columns:
+        cursor.execute("ALTER TABLE documents ADD COLUMN session_id TEXT")
+
+    if "filename" not in existing_columns:
+        cursor.execute("ALTER TABLE documents ADD COLUMN filename TEXT NOT NULL DEFAULT ''")
+
+    if "storage_path" not in existing_columns:
+        cursor.execute("ALTER TABLE documents ADD COLUMN storage_path TEXT NOT NULL DEFAULT ''")
+
+    if "file_extension" not in existing_columns:
+        cursor.execute("ALTER TABLE documents ADD COLUMN file_extension TEXT NOT NULL DEFAULT ''")
+
+    if "file_size_bytes" not in existing_columns:
+        cursor.execute("ALTER TABLE documents ADD COLUMN file_size_bytes INTEGER NOT NULL DEFAULT 0")
+
+    if "status" not in existing_columns:
+        cursor.execute("ALTER TABLE documents ADD COLUMN status TEXT NOT NULL DEFAULT 'uploaded'")
+
+    if "uploaded_at" not in existing_columns:
+        cursor.execute("ALTER TABLE documents ADD COLUMN uploaded_at TEXT NOT NULL DEFAULT ''")
+
+
 def create_tables() -> None:
     with db_cursor() as cursor:
         cursor.execute(
@@ -80,3 +106,20 @@ def create_tables() -> None:
         )
 
         _ensure_datasets_columns(cursor)
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS documents (
+                document_id TEXT PRIMARY KEY,
+                session_id TEXT,
+                filename TEXT NOT NULL,
+                storage_path TEXT NOT NULL,
+                file_extension TEXT NOT NULL,
+                file_size_bytes INTEGER NOT NULL,
+                status TEXT NOT NULL,
+                uploaded_at TEXT NOT NULL
+            )
+            """
+        )
+
+        _ensure_documents_columns(cursor)

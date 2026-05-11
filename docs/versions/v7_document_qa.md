@@ -33,6 +33,21 @@ Default supported extensions:
 - `.txt`
 - `.md`
 
+### Document Upload Endpoint
+Added:
+```http
+POST /documents/upload
+```
+
+Current behavior:
+- validates file name
+- validates extension
+- validates non-empty file
+- validates file size
+- stores the raw file under `uploads/documents/...`
+- stores metadata in SQLite
+- returns a stable `document_id`
+
 ## Why This Matters
 The first V7 chunk defines the API contract before implementation details.
 
@@ -46,6 +61,15 @@ This keeps the RAG build controlled:
 Upload document:
 ```http
 POST /documents/upload
+```
+
+Current upload response:
+```json
+{
+  "document_id": "doc_123",
+  "filename": "policy.txt",
+  "status": "uploaded"
+}
 ```
 
 Ask document:
@@ -73,8 +97,6 @@ POST /documents/{document_id}/ask
 
 ## Deferred On Purpose
 Not built in this first V7 chunk:
-- document upload route
-- file persistence
 - PDF/TXT/MD parsing
 - chunking
 - embeddings
@@ -89,5 +111,16 @@ Added schema unit tests for:
 - citation similarity score validation
 - document answer response contract
 
+Added upload endpoint integration tests for:
+- successful TXT upload
+- unsupported type rejection
+- empty document rejection
+- database failure handling
+
+Latest suite:
+```text
+159 passed
+```
+
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts first. I added schemas for document uploads, document questions, source citations, and grounded answers. This gives the backend a clear response shape with citations before implementing parsing, embeddings, retrieval, and answer generation.
+In V7, I started the RAG layer by defining document Q&A contracts and adding the document upload lifecycle. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, and return a stable `document_id`. Parsing, chunking, embeddings, retrieval, and grounded answers are intentionally deferred to later V7 chunks.

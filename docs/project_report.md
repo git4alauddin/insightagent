@@ -358,7 +358,11 @@ Learning-first, version-by-version implementation.
 - Added document Q&A schema contracts.
 - Added source citation schema.
 - Added document upload guardrail config.
+- Added `POST /documents/upload`.
+- Added document metadata table and registry service.
+- Added safe raw document persistence.
 - Added unit tests for document schemas.
+- Added integration tests for document upload.
 - Added V7 documentation files:
   - `docs/versions/v7_document_qa.md`
   - `docs/versions/v7_technical_walkthrough.md`
@@ -368,13 +372,17 @@ Learning-first, version-by-version implementation.
 - To start RAG with stable API contracts before parsing, chunking, embeddings, and retrieval.
 - To make citations part of the response design from the beginning.
 - To keep weak-context and grounded-answer behavior explicit before answer generation is implemented.
+- To create the document lifecycle entrypoint before text extraction and indexing.
 
 ### Tests Performed
 - Added unit tests for document schemas.
+- Added integration tests for upload success and failure paths.
+- Full suite status after document upload endpoint: `159 passed`.
 
 ### What I Learned
 - RAG systems need source/citation contracts early, not as an afterthought.
 - Response schemas help define what “grounded answer” means before model logic is added.
+- Upload and metadata persistence should be stable before parsing/chunking logic is introduced.
 
 ### Interview Explanation
-- In V7, I started the document Q&A layer by defining contracts first. I added schemas for document uploads, document questions, source citations, and grounded answer responses. This sets up the future RAG pipeline to return answers with citations and controlled confidence/status values.
+- In V7, I started the document Q&A layer by defining contracts and adding the upload lifecycle. I added schemas for document uploads, document questions, source citations, and grounded answer responses, then implemented safe raw document upload persistence with SQLite metadata. This sets up the future RAG pipeline to parse, chunk, embed, retrieve, and answer with citations.

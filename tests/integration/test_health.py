@@ -13,5 +13,5 @@ def test_health_returns_service_status() -> None:
     assert response.json() == {
         "status": "ok",
         "service": "InsightAgent",
-        "version": "v6",
+        "version": "v7",
     }

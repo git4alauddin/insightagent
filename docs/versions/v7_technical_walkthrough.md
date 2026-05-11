@@ -19,7 +19,45 @@ Added:
 
 These settings prepare upload validation for PDF, TXT, and Markdown files.
 
-## 3. Data Contracts
+## 3. Database Metadata
+
+### `app/db/schema.py`
+Adds `documents` table:
+- `document_id`
+- `session_id`
+- `filename`
+- `storage_path`
+- `file_extension`
+- `file_size_bytes`
+- `status`
+- `uploaded_at`
+
+The table includes migration-safe column checks through `_ensure_documents_columns(...)`.
+
+### `app/services/document_registry_service.py`
+Core functions:
+- `register_document_metadata(...)`
+- `get_document_metadata(document_id)`
+
+Responsibilities:
+- create tables before metadata operations
+- store document metadata in SQLite
+- convert SQLite failures into `DocumentRegistryError`
+- return explicit not-found errors for missing document IDs
+
+## 4. Upload Validation and Response Service
+
+### `app/services/document_service.py`
+Core functions:
+- `validate_document_file(file_name, file_size_bytes)`
+- `build_document_upload_response(...)`
+
+Validation guardrails:
+- extension must be `.pdf`, `.txt`, or `.md`
+- file must not be empty
+- file size must stay under `DOCUMENT_MAX_FILE_SIZE_MB`
+
+## 5. Data Contracts
 
 ### `app/schemas/document.py`
 Main models:
@@ -34,7 +72,29 @@ Key behaviors:
 - `SourceCitation.page` is optional but must be positive when present.
 - `DocumentAskResponse.answer` must not be blank.
 
-## 4. Tests Added
+## 6. API Layer
+
+### `app/api/routes_documents.py`
+Adds:
+- `POST /documents/upload`
+
+Flow:
+1. Read uploaded file bytes.
+2. Validate file name, extension, size, and empty content.
+3. Generate a `doc_<uuid>` document ID.
+4. Store the raw file under `uploads/documents/<session_or_standalone>/`.
+5. Register document metadata in SQLite.
+6. Return `DocumentUploadResponse`.
+
+Controlled errors:
+- `DOCUMENT_VALIDATION_ERROR` (`400`)
+- `DOCUMENT_DB_ERROR` (`503`)
+- `DOCUMENT_STORAGE_ERROR` (`503`)
+
+### `app/main.py`
+Includes document router.
+
+## 7. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -44,11 +104,22 @@ Verifies:
 - answer response contract
 - blank answer rejection
 
-## 5. Checklist Mapping
-- document upload endpoint: pending
-- supported document extensions config: started
+### `tests/integration/test_document_upload_endpoint.py`
+Verifies:
+- successful document upload
+- metadata persistence
+- unsupported type rejection
+- empty document rejection
+- controlled DB error handling
+
+## 8. Checklist Mapping
+- document upload endpoint: done
+- supported document extensions config: done
+- unsupported document-type handling: done
 - citation schema: done
 - document ask request/response contracts: done
+- raw document persistence: done
+- document metadata storage: done
 - text extraction: pending
 - chunking: pending
 - embeddings: pending
@@ -56,5 +127,5 @@ Verifies:
 - retrieval: pending
 - grounded answer generation: pending
 
-## 6. Interview Summary
-I started V7 by defining the document Q&A contracts before implementing the RAG pipeline. The schemas make the expected upload response, question input, citation format, and grounded answer response explicit, which reduces ambiguity before adding parsing, chunking, embeddings, and retrieval.
+## 9. Interview Summary
+I started V7 by defining the document Q&A contracts and implementing safe document upload persistence. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, and returns stable upload responses. This creates the foundation for the later RAG pipeline: parsing, chunking, embeddings, retrieval, and grounded answer generation.
