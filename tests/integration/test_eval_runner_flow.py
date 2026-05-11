@@ -69,6 +69,7 @@ def test_eval_runner_executes_csv_and_rag_cases_in_process(tmp_path: Path) -> No
                 "expected_response_status": "success",
                 "require_citations": True,
                 "expected_source_filename": "policy.txt",
+                "expected_citation_terms": ["Refunds are available within 7 days"],
                 "expected_answer_contains": ["Refunds are available within 7 days"],
                 "groundedness_terms": ["Refunds are available within 7 days"],
             },

@@ -15,7 +15,7 @@ The target flow is:
 
 Status: scoring layer expanding.
 
-V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, and deterministic scoring for format, tool correctness, CSV intent, citations, relevance, and basic groundedness. It does not yet implement token/cost tracking or semantic citation accuracy.
+V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, and deterministic scoring for format, tool correctness, CSV intent, citation presence, citation accuracy, relevance, basic groundedness, and insufficient-context safety. It does not yet implement token/cost tracking or model-assisted semantic judging.
 
 ## Evaluation Dataset
 
@@ -56,7 +56,7 @@ Current checks:
 - expected tool selection
 - expected CSV analysis intent
 - RAG citation presence
-- RAG source filename match
+- RAG citation accuracy through expected filenames, chunk id prefixes, and citation terms
 - RAG groundedness through configured terms checked against answer and reference document text
 - insufficient-context safety through no returned citations
 - failure category output
@@ -122,7 +122,7 @@ It verifies:
 - placeholder endpoints are replaced before the ask request
 - CSV analysis scoring passes for missing-value intent and tool selection
 - CSV relevance scoring passes for expected answer terms
-- RAG scoring passes for citation/source presence, relevance, and groundedness
+- RAG scoring passes for citation presence, citation accuracy, relevance, and groundedness
 - summary generation reports a clean pass rate
 - result saving writes the expected JSON summary
 
@@ -131,7 +131,7 @@ This proves the runner can execute real API flows without starting a separate se
 ## Deferred On Purpose
 Not built in this first V8 chunk:
 - token/cost tracking
-- semantic citation accuracy beyond filename/source presence
+- model-assisted semantic judging
 
 ## Testing Status
 Added unit tests for:
@@ -140,9 +140,12 @@ Added unit tests for:
 - format-validity scoring
 - tool-correctness scoring
 - citation-presence scoring
+- citation-accuracy scoring
 - relevance scoring
 - groundedness scoring
 - insufficient-context safety scoring
+- missing-citation failure detection
+- unsupported confident/cited answer failure detection
 - analysis-intent scoring
 - missing-key failure detection
 - pass-rate summary generation
@@ -156,8 +159,8 @@ Added unit tests for:
 
 Latest suite:
 ```text
-226 passed
+230 passed
 ```
 
 ## Interview Explanation
-In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify basic RAG citation presence, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later semantic citation accuracy and token/cost tracking.
+In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify RAG citation presence, check citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later model-assisted judging and token/cost tracking.

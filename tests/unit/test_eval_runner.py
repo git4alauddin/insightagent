@@ -176,6 +176,114 @@ def test_score_eval_response_checks_citation_presence() -> None:
     assert result["scores"]["citation_presence"]["citation_count"] == 1
 
 
+def test_score_eval_response_fails_when_required_citations_are_missing() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "rag",
+            "expected_status": 200,
+            "expected_keys": ["answer", "sources"],
+            "scoring": {"require_citations": True},
+        },
+        200,
+        {"answer": "Refunds are available.", "sources": []},
+        12.5,
+    )
+
+    assert result["passed"] is False
+    assert result["failure_categories"] == ["citation_presence"]
+    assert result["scores"]["citation_presence"]["citation_count"] == 0
+
+
+def test_score_eval_response_checks_citation_accuracy() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "rag",
+            "expected_status": 200,
+            "expected_keys": ["answer", "sources"],
+            "setup": {
+                "upload_document": {
+                    "filename": "policy.txt",
+                    "content": "Refunds are available within 7 days.",
+                    "content_type": "text/plain",
+                }
+            },
+            "scoring": {
+                "require_citations": True,
+                "expected_source_filename": "policy.txt",
+                "expected_citation_chunk_prefix": "doc_1_chunk_",
+                "expected_citation_terms": ["Refunds are available within 7 days"],
+            },
+        },
+        200,
+        {
+            "answer": "Refunds are available within 7 days.",
+            "sources": [
+                {
+                    "filename": "policy.txt",
+                    "chunk_id": "doc_1_chunk_0",
+                    "similarity_score": 0.92,
+                }
+            ],
+        },
+        12.5,
+    )
+
+    assert result["passed"] is True
+    assert result["scores"]["citation_accuracy"]["missing_filenames"] == []
+    assert result["scores"]["citation_accuracy"]["invalid_chunk_ids"] == []
+    assert result["scores"]["citation_accuracy"]["missing_reference_terms"] == []
+
+
+def test_score_eval_response_fails_when_citation_accuracy_is_wrong() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "rag",
+            "expected_status": 200,
+            "expected_keys": ["answer", "sources"],
+            "setup": {
+                "upload_document": {
+                    "filename": "policy.txt",
+                    "content": "Shipping takes 3 days.",
+                    "content_type": "text/plain",
+                }
+            },
+            "scoring": {
+                "require_citations": True,
+                "expected_source_filename": "policy.txt",
+                "expected_citation_chunk_prefix": "doc_1_chunk_",
+                "expected_citation_terms": ["Refunds are available within 7 days"],
+            },
+        },
+        200,
+        {
+            "answer": "Refunds are available within 7 days.",
+            "sources": [
+                {
+                    "filename": "wrong.txt",
+                    "chunk_id": "other_doc_chunk_0",
+                    "similarity_score": 0.92,
+                }
+            ],
+        },
+        12.5,
+    )
+
+    assert result["passed"] is False
+    assert result["failure_categories"] == ["citation_accuracy"]
+    assert result["scores"]["citation_accuracy"]["missing_filenames"] == [
+        "policy.txt"
+    ]
+    assert result["scores"]["citation_accuracy"]["invalid_chunk_ids"] == [
+        "other_doc_chunk_0"
+    ]
+    assert result["scores"]["citation_accuracy"]["missing_reference_terms"] == [
+        "Refunds are available within 7 days"
+    ]
+
+
 def test_score_eval_response_checks_groundedness_against_reference_text() -> None:
     result = score_eval_response(
         {
@@ -263,6 +371,36 @@ def test_score_eval_response_checks_insufficient_context_safety() -> None:
 
     assert result["passed"] is True
     assert result["scores"]["insufficient_context_safety"]["citation_count"] == 0
+
+
+def test_score_eval_response_fails_unsupported_confident_answer_with_citations() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "rag",
+            "expected_status": 200,
+            "expected_keys": ["answer", "sources", "status"],
+            "scoring": {
+                "expected_response_status": "insufficient_context",
+                "require_no_citations": True,
+            },
+        },
+        200,
+        {
+            "answer": "The warranty lasts for two years.",
+            "sources": [{"filename": "policy.txt", "chunk_id": "chunk_1"}],
+            "status": "success",
+        },
+        12.5,
+    )
+
+    assert result["passed"] is False
+    assert result["failure_categories"] == [
+        "response_status",
+        "insufficient_context_safety",
+    ]
+    assert result["scores"]["response_status"]["actual"] == "success"
+    assert result["scores"]["insufficient_context_safety"]["citation_count"] == 1
 
 
 def test_build_score_breakdown_checks_analysis_intent() -> None:

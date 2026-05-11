@@ -214,6 +214,13 @@ def build_score_breakdown(
     if scoring.get("require_citations"):
         scores["citation_presence"] = score_citation_presence(scoring, response_body)
 
+    if has_citation_accuracy_expectations(scoring):
+        scores["citation_accuracy"] = score_citation_accuracy(
+            case,
+            scoring,
+            response_body,
+        )
+
     if "groundedness_terms" in scoring:
         scores["groundedness"] = score_groundedness(case, scoring, response_body)
 
@@ -311,21 +318,62 @@ def score_citation_presence(
     response_body: Any,
 ) -> dict[str, Any]:
     sources = response_body.get("sources", []) if isinstance(response_body, dict) else []
-    expected_filename = scoring.get("expected_source_filename")
     valid_sources = sources if isinstance(sources, list) else []
     has_citations = bool(valid_sources)
-    filename_matches = (
-        expected_filename is None
-        or any(
-            isinstance(source, dict) and source.get("filename") == expected_filename
-            for source in valid_sources
-        )
-    )
 
     return {
-        "passed": has_citations and filename_matches,
+        "passed": has_citations,
         "citation_count": len(valid_sources),
-        "expected_source_filename": expected_filename,
+    }
+
+
+def score_citation_accuracy(
+    case: dict[str, Any],
+    scoring: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    sources = response_body.get("sources", []) if isinstance(response_body, dict) else []
+    valid_sources = [source for source in sources if isinstance(source, dict)]
+    expected_filenames = get_expected_citation_filenames(scoring)
+    actual_filenames = {
+        str(source.get("filename"))
+        for source in valid_sources
+        if source.get("filename") is not None
+    }
+    missing_filenames = [
+        filename for filename in expected_filenames if filename not in actual_filenames
+    ]
+
+    expected_chunk_prefix = scoring.get("expected_citation_chunk_prefix")
+    invalid_chunk_ids: list[str] = []
+    if expected_chunk_prefix is not None:
+        prefix = str(expected_chunk_prefix)
+        invalid_chunk_ids = [
+            str(source.get("chunk_id"))
+            for source in valid_sources
+            if not str(source.get("chunk_id", "")).startswith(prefix)
+        ]
+
+    expected_terms = normalize_expected_terms(scoring.get("expected_citation_terms", []))
+    reference_text = normalize_text(extract_reference_text(case, scoring))
+    missing_reference_terms = [
+        term for term in expected_terms if normalize_text(term) not in reference_text
+    ]
+
+    return {
+        "passed": (
+            bool(valid_sources)
+            and not missing_filenames
+            and not invalid_chunk_ids
+            and not missing_reference_terms
+        ),
+        "expected_filenames": expected_filenames,
+        "actual_filenames": sorted(actual_filenames),
+        "missing_filenames": missing_filenames,
+        "expected_chunk_prefix": expected_chunk_prefix,
+        "invalid_chunk_ids": invalid_chunk_ids,
+        "expected_terms": expected_terms,
+        "missing_reference_terms": missing_reference_terms,
     }
 
 
@@ -362,6 +410,9 @@ def score_no_citations(response_body: Any) -> dict[str, Any]:
 
 
 def normalize_expected_terms(value: Any) -> list[str]:
+    if value is None:
+        return []
+
     if isinstance(value, str):
         return [value]
 
@@ -369,6 +420,29 @@ def normalize_expected_terms(value: Any) -> list[str]:
         return [str(term) for term in value]
 
     return [str(value)]
+
+
+def has_citation_accuracy_expectations(scoring: dict[str, Any]) -> bool:
+    return any(
+        key in scoring
+        for key in (
+            "expected_source_filename",
+            "expected_citation_filenames",
+            "expected_citation_chunk_prefix",
+            "expected_citation_terms",
+        )
+    )
+
+
+def get_expected_citation_filenames(scoring: dict[str, Any]) -> list[str]:
+    filenames: list[str] = []
+    if "expected_source_filename" in scoring:
+        filenames.extend(normalize_expected_terms(scoring["expected_source_filename"]))
+
+    if "expected_citation_filenames" in scoring:
+        filenames.extend(normalize_expected_terms(scoring["expected_citation_filenames"]))
+
+    return list(dict.fromkeys(filenames))
 
 
 def extract_answer_text(response_body: Any) -> str:

@@ -67,7 +67,7 @@ This file maps each V8 commit heading to:
 - Covered upload-dependent evaluation cases end-to-end.
 - Made the eval runner safer to refactor because API execution is now tested beyond unit-level scoring.
 
-### `<pending>` - `v8: add relevance and groundedness scoring`
+### `e907a91` - `v8: add relevance and groundedness scoring`
 **What we did**
 - Added answer relevance scoring through expected answer terms.
 - Added RAG groundedness scoring through configured terms checked against both answer text and reference document text.
@@ -80,6 +80,20 @@ This file maps each V8 commit heading to:
 - Started measuring whether answers contain expected task-specific content.
 - Added a deterministic groundedness signal for RAG without using model-assisted judging.
 - Made eval failure categories more useful for answer-quality regressions.
+
+### `<pending>` - `v8: add citation accuracy and safety failure tests`
+**What we did**
+- Split RAG citation scoring into citation presence and citation accuracy.
+- Added deterministic citation accuracy checks for expected filenames, chunk id prefixes, and expected citation terms.
+- Added citation-term metadata to the positive RAG eval case.
+- Added tests proving RAG answers without citations fail.
+- Added tests proving unsupported confident/cited answers fail.
+- Extended the in-process eval proof to exercise citation accuracy metadata.
+
+**What it solved / took care of**
+- Made citation failures easier to diagnose.
+- Covered V8 checklist items for missing citations and unsafe unsupported answers.
+- Added a stricter citation accuracy signal before adding semantic citation judging.
 
 ## Reusable Entry Template
 
