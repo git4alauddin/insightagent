@@ -3,100 +3,38 @@
 InsightAgent is a learning-first, production-style FastAPI backend for AI-powered data and document analysis.
 
 ## Current Version
-V7 - RAG document Q&A.
+**V7 – RAG document Q&A**
 
 Cloud Run deployment is intentionally deferred until the local/containerized backend is fully closed out and ready for an external runtime.
 
-Detailed V1 notes: [docs/versions/v1_fastapi_basic_chat.md](docs/versions/v1_fastapi_basic_chat.md)
-V1 commit tracking: [docs/versions/v1_commit_log.md](docs/versions/v1_commit_log.md)
-Detailed V2 notes: [docs/versions/v2_structured_output.md](docs/versions/v2_structured_output.md)
-V2 commit tracking: [docs/versions/v2_commit_log.md](docs/versions/v2_commit_log.md)
-Detailed V3 notes: [docs/versions/v3_tool_calling_agentic.md](docs/versions/v3_tool_calling_agentic.md)
-V3 commit tracking: [docs/versions/v3_commit_log.md](docs/versions/v3_commit_log.md)
-Detailed V4 notes: [docs/versions/v4_memory_context.md](docs/versions/v4_memory_context.md)
-V4 commit tracking: [docs/versions/v4_commit_log.md](docs/versions/v4_commit_log.md)
-Detailed V5 notes: [docs/versions/v5_data_analysis_assistant.md](docs/versions/v5_data_analysis_assistant.md)
-V5 commit tracking: [docs/versions/v5_commit_log.md](docs/versions/v5_commit_log.md)
-Detailed V6 notes: [docs/versions/v6_backend_maturity.md](docs/versions/v6_backend_maturity.md)
-V6 technical walkthrough: [docs/versions/v6_technical_walkthrough.md](docs/versions/v6_technical_walkthrough.md)
-V6 commit tracking: [docs/versions/v6_commit_log.md](docs/versions/v6_commit_log.md)
-Detailed V7 notes: [docs/versions/v7_document_qa.md](docs/versions/v7_document_qa.md)
-V7 technical walkthrough: [docs/versions/v7_technical_walkthrough.md](docs/versions/v7_technical_walkthrough.md)
-V7 commit tracking: [docs/versions/v7_commit_log.md](docs/versions/v7_commit_log.md)
+Version notes:
+- [V1 – FastAPI Basic Chat](docs/versions/v1_fastapi_basic_chat.md)
+- [V2 – Structured Output](docs/versions/v2_structured_output.md)
+- [V3 – Tool Calling / Agentic Layer](docs/versions/v3_tool_calling_agentic.md)
+- [V4 – Memory and Context](docs/versions/v4_memory_context.md)
+- [V5 – Data Analysis Assistant](docs/versions/v5_data_analysis_assistant.md)
+- [V6 – Backend Maturity](docs/versions/v6_backend_maturity.md)
+- [V7 – Document Q&A](docs/versions/v7_document_qa.md)
 
 ## Project Structure
 ```text
-app/
-  main.py
-  config.py
-  api/
-    cors.py
-    dependencies.py
-    middleware.py
-    rate_limit.py
-    routes_health.py
-    routes_chat.py
-    routes_agent.py
-    routes_session.py
-    routes_datasets.py
-    routes_documents.py
-  db/
-    database.py
-    schema.py
-  prompts/
-    structured_v2.py
-    tool_router_v3.py
-  schemas/
-    common.py
-    chat.py
-    structured.py
-    agent.py
-    tools.py
-    dataset.py
-    document.py
-  services/
-    llm_service.py
-    structured_llm_service.py
-    structured_parser.py
-    tool_decision_parser.py
-    agent_controller.py
-    session_service.py
-    memory_chat_service.py
-    dataset_service.py
-    dataset_registry_service.py
-    dataset_intent_service.py
-    dataset_analysis_router.py
-    dataset_tools_service.py
-    dataset_execution_service.py
-    dataset_answer_service.py
-    document_service.py
-    document_registry_service.py
-    document_text_service.py
-    document_chunking_service.py
-  tools/
-    calculator.py
-    date_time.py
-    text_summarizer.py
-    file_analyzer.py
-  utils/
-    logger.py
-tests/
-  integration/
-  unit/
-docs/
-  project_report.md
-  versions/
-    v1_fastapi_basic_chat.md
-    v2_structured_output.md
-    v3_tool_calling_agentic.md
-    v4_memory_context.md
-    v5_data_analysis_assistant.md
-    v6_backend_maturity.md
-    v6_technical_walkthrough.md
-    v6_commit_log.md
-    v7_document_qa.md
-    v7_technical_walkthrough.md
-    v7_commit_log.md
+app/                  # Core FastAPI application
+  api/                # Route handlers, middleware, auth, CORS, rate limiting
+  db/                 # SQLite setup and schema definitions
+  prompts/            # Versioned prompt templates for structured and agent flows
+  schemas/            # Pydantic request/response contracts
+  services/           # Business logic for LLM, memory, datasets, and documents
+  tools/              # Allowlisted backend tools used by the agent layer
+  utils/              # Shared utilities such as logging
+  main.py             # FastAPI app entrypoint
+  config.py           # Environment-driven configuration
+
+tests/                # Unit and integration test suites
+
+docs/                 # Project report and version-wise build notes
+
+requirements.txt      # Python dependencies
+Dockerfile            # Container runtime definition
 ```
 
 ## Run Locally
