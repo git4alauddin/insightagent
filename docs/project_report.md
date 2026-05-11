@@ -298,6 +298,7 @@ Learning-first, version-by-version implementation.
 - Added `x-request-id` response headers.
 - Added `request_id` to structured error responses.
 - Added structured request logging with request ID, method, path, status code, and latency.
+- Added environment-aware CORS configuration.
 
 ### Why We Built It
 - To protect costly LLM and data endpoints.
@@ -308,13 +309,15 @@ Learning-first, version-by-version implementation.
 - To prevent internal exception details from leaking in responses.
 - To make requests traceable across client responses and future logs.
 - To make each API request easier to debug during deployment.
+- To allow browser clients safely without using wildcard CORS in production.
 
 ### Tests Performed
 - Ran the full test suite after auth changes.
 - Ran the full test suite after global exception handling.
 - Ran the full test suite after request ID middleware.
 - Ran the full test suite after structured request logging.
-- Current suite status: `139 passed`.
+- Ran the full test suite after CORS configuration.
+- Current suite status: `142 passed`.
 
 ### What I Learned
 - Authentication can be centralized as a FastAPI dependency.
@@ -325,6 +328,7 @@ Learning-first, version-by-version implementation.
 - Unexpected errors should be logged internally and returned as safe generic API errors.
 - Request IDs are a small feature that make debugging much easier once logs and metrics grow.
 - Structured logs can start simple and grow later into a fuller observability layer.
+- CORS should be environment-aware because development and production have different safety needs.
 
 ### Interview Explanation
-- In V6, I started hardening the backend for deployment. I added readiness checks, containerized the service, introduced API key authentication, centralized exception handling, request IDs, and structured request logging. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.
+- In V6, I started hardening the backend for deployment. I added readiness checks, containerized the service, environment-aware CORS, API key authentication, centralized exception handling, request IDs, and structured request logging. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.

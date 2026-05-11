@@ -12,8 +12,36 @@ The current V6 work focuses on:
 4. Consistent structured API errors.
 5. Request IDs for traceability.
 6. Structured request logging.
+7. Environment-aware CORS.
 
-## 2. Readiness Layer
+## 2. CORS Configuration
+
+### `app/config.py`
+Adds:
+- `app_env`
+- `cors_allowed_origins`
+- `get_cors_allowed_origins()`
+
+`get_cors_allowed_origins()` parses the comma-separated origin list and rejects `*` when `APP_ENV=production`.
+
+### `app/api/cors.py`
+Core function:
+- `register_cors_middleware(app)`
+
+This adds FastAPI/Starlette `CORSMiddleware` with:
+- configured allowed origins
+- `GET`, `POST`, and `OPTIONS` methods
+- custom headers such as `x-api-key`
+
+### `app/main.py`
+Calls:
+```python
+register_cors_middleware(app)
+```
+
+This keeps browser-origin rules centralized during app startup.
+
+## 3. Readiness Layer
 
 ### `app/api/routes_health.py`
 Adds:
@@ -32,7 +60,7 @@ Core checks:
 
 This keeps deployment dependency checks outside the route layer.
 
-## 3. API Key Authentication
+## 4. API Key Authentication
 
 ### `app/config.py`
 Adds:
@@ -62,7 +90,7 @@ Router-level dependency protection was added to:
 Public routes remain in:
 - `app/api/routes_health.py`
 
-## 4. Global Error Handling
+## 5. Global Error Handling
 
 ### `app/api/error_handlers.py`
 Core functions:
@@ -96,7 +124,7 @@ register_exception_handlers(app)
 
 This attaches the handlers once during app startup.
 
-## 5. Request ID Middleware
+## 6. Request ID Middleware
 
 ### `app/api/middleware.py`
 Core function:
@@ -144,7 +172,13 @@ Calls:
 register_request_id_middleware(app)
 ```
 
-## 6. Tests Added/Extended
+## 7. Tests Added/Extended
+
+### CORS Tests
+`tests/integration/test_cors_config.py` verifies:
+- configured origins are allowed
+- unconfigured origins are rejected
+- wildcard origins are rejected in production
 
 ### Auth Tests
 `tests/integration/test_auth_dependency.py` verifies:
@@ -178,11 +212,12 @@ Existing tests were updated to expect the new V6 error shape:
 }
 ```
 
-## 7. Checklist Mapping
+## 8. Checklist Mapping
 - `/ready` endpoint: done
 - dependency readiness checks: done
 - Dockerfile: done
 - `.dockerignore`: done
+- CORS config: done
 - API key config: done
 - private endpoint protection: done
 - global exception handling: done
@@ -190,7 +225,6 @@ Existing tests were updated to expect the new V6 error shape:
 - request ID middleware: done
 - structured request logging: done
 - rate limiting: pending
-- CORS config: pending
 
-## 8. Interview Summary
-In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, API key protection for private endpoints, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
+## 9. Interview Summary
+In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, environment-aware CORS, API key protection for private endpoints, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.

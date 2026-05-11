@@ -94,6 +94,20 @@ Example fields:
 
 This creates a simple request audit trail and prepares the project for V9 observability metrics.
 
+### Environment-Aware CORS
+Added CORS configuration in `app/api/cors.py`.
+
+Config values:
+- `APP_ENV`
+- `CORS_ALLOWED_ORIGINS`
+
+Behavior:
+- allows configured frontend origins
+- rejects unconfigured origins
+- rejects wildcard `*` origins in production
+
+This keeps local frontend development possible without leaving production CORS overly permissive.
+
 ## Why This Matters
 V6 protects costly and state-changing endpoints while keeping health/readiness checks available for uptime checks and deployment platforms.
 
@@ -105,11 +119,13 @@ Request IDs make each API call traceable across responses, logs, and later obser
 
 Structured request logs make latency, status codes, and request paths visible without adding a full observability stack yet.
 
+CORS config keeps browser access controlled and environment-aware.
+
 ## Testing Status
-Latest suite after structured request logging:
+Latest suite after CORS configuration:
 
 ```text
-139 passed
+142 passed
 ```
 
 ## Current V6 Checklist Status
@@ -124,9 +140,9 @@ Latest suite after structured request logging:
 - Structured error response: done.
 - Request ID middleware: done.
 - Structured logging upgrade: done.
+- CORS config: done.
 - Rate limiting: pending.
-- CORS config: pending.
 - Cloud Run deployment: pending.
 
 ## Interview Explanation
-In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, and introduced structured request logs with method, path, status, and latency. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.
+In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, and configured environment-aware CORS. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.

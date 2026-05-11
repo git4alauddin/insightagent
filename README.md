@@ -25,6 +25,7 @@ app/
   main.py
   config.py
   api/
+    cors.py
     dependencies.py
     middleware.py
     routes_health.py

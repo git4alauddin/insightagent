@@ -62,7 +62,7 @@ This file maps each V6 commit heading to:
 - Made each request traceable.
 - Prepared the backend for structured logging and observability.
 
-### `<pending>` - `v6: add structured request logging`
+### `2ffc014` - `v6: add structured request logging`
 **What we did**
 - Added structured JSON request logs in the request middleware.
 - Logged request ID, method, path, status code, and latency.
@@ -71,6 +71,18 @@ This file maps each V6 commit heading to:
 **What it solved / took care of**
 - Made request behavior easier to debug.
 - Started the V6 structured logging upgrade without introducing a new logging library.
+
+### `<pending>` - `v6: add environment-aware CORS configuration`
+**What we did**
+- Added CORS settings for app environment and allowed origins.
+- Added CORS middleware registration.
+- Allowed configured frontend origins.
+- Rejected wildcard origins in production.
+- Added CORS integration tests.
+
+**What it solved / took care of**
+- Prepared the backend for browser-based frontend access.
+- Avoided permissive production CORS defaults.
 
 ## Reusable Entry Template
 

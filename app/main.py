@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 
+from app.api.cors import register_cors_middleware
 from app.api.error_handlers import register_exception_handlers
 from app.api.middleware import register_request_id_middleware
 from app.api.routes_agent import router as agent_router
@@ -18,6 +19,7 @@ app = FastAPI(
     version=settings.app_version,
 )
 
+register_cors_middleware(app)
 register_exception_handlers(app)
 register_request_id_middleware(app)
 
