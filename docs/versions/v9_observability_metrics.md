@@ -15,7 +15,7 @@ The target flow is:
 
 Status: started.
 
-V9 now has the version boundary, documentation scaffold, and enriched request completion logs. Runtime tracing will continue in small follow-up chunks.
+V9 now has the version boundary, documentation scaffold, enriched request completion logs, and agent tool trace logs. Runtime tracing will continue in small follow-up chunks.
 
 ## Planned Scope
 
@@ -76,6 +76,25 @@ Session id is optional and is read from:
 - `x-session-id` header
 - `session_id` query parameter
 
+## Agent Tool Trace Logs
+
+Agent queries now emit a dedicated tool trace log after the agent controller returns.
+
+Current agent tool log shape:
+
+```json
+{
+  "event": "agent_tool_completed",
+  "request_id": "req_123",
+  "tool_used": "calculator",
+  "tool_status": "success",
+  "agent_status": "success",
+  "tool_output_summary": "450"
+}
+```
+
+This creates the first API -> agent -> tool trace signal and gives the later metrics summary script a stable event for tool usage frequency and tool success/failure reporting.
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented in this scaffold chunk:
@@ -89,6 +108,7 @@ The scaffold will be verified through:
 - focused health endpoint test
 - full test suite
 - focused request ID middleware tests
+- focused agent endpoint trace tests
 
 ## Interview Explanation
-In V9, I started the observability layer by creating the version boundary and documentation scaffold. This prepares the project to add request-level tracing, structured runtime logs, tool and error metrics, token/cost visibility, and a metrics summary workflow without mixing observability work into the completed V8 evaluation layer.
+In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, and agent tool trace logs. This prepares the project to add deeper request-level tracing, structured runtime logs, tool and error metrics, token/cost visibility, and a metrics summary workflow without mixing observability work into the completed V8 evaluation layer.

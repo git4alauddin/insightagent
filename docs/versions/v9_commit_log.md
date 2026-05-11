@@ -32,7 +32,7 @@ This file maps each V9 commit heading to:
 - Removed IDE/Pylance diagnostics around typed exception handler registration.
 - Preserved existing structured error response behavior.
 
-### `<pending>` - `v9: enrich request completion logs`
+### `e6acfb3` - `v9: enrich request completion logs`
 **What we did**
 - Added request status to completion logs.
 - Added endpoint field while keeping the existing path field.
@@ -45,6 +45,18 @@ This file maps each V9 commit heading to:
 - Started the V9 runtime observability layer beyond request IDs.
 - Made every request log easier to summarize by status and error category.
 - Added a foundation for later metrics summary and request lifecycle examples.
+
+### `<pending>` - `v9: add tool trace fields to agent logs`
+**What we did**
+- Added structured `agent_tool_completed` logs for agent queries.
+- Logged request id, tool used, tool status, agent status, and tool output summary.
+- Validated agent controller responses before logging.
+- Added integration coverage for agent tool trace logs.
+
+**What it solved / took care of**
+- Started API -> agent -> tool tracing.
+- Covered the first tool-used and tool-status observability fields.
+- Prepared agent logs for later tool usage frequency and success/failure metrics.
 
 ## Reusable Entry Template
 

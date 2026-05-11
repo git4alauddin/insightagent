@@ -89,7 +89,35 @@ The target trace shape is:
 }
 ```
 
-## 5. Checklist Mapping
+## 5. Agent Tool Trace
+
+### `app/api/routes_agent.py`
+V9 adds a structured agent tool trace after successful agent controller execution.
+
+Current fields:
+- `event`
+- `request_id`
+- `tool_used`
+- `tool_status`
+- `agent_status`
+- `tool_output_summary`
+
+Current event:
+
+```json
+{
+  "event": "agent_tool_completed",
+  "request_id": "agent-log-request-123",
+  "tool_used": "calculator",
+  "tool_status": "success",
+  "agent_status": "success",
+  "tool_output_summary": "450"
+}
+```
+
+This is intentionally route-level for now because the route has access to the request id and the validated response object.
+
+## 6. Checklist Mapping
 
 Started:
 - V9 version boundary
@@ -101,10 +129,12 @@ Started:
 - latency tracking
 - basic error categorization
 - optional session id tracking
+- API -> agent -> tool tracing
+- tool used tracking
+- tool status tracking
 
 Pending:
-- request tracing across API -> agent -> tool
-- tool tracking
+- deeper service-level tool execution tracing
 - token/cost tracking in runtime logs
 - tool usage summary
 - metrics summary script
@@ -112,7 +142,7 @@ Pending:
 - request lifecycle trace example
 - observability section in README
 
-## 6. Tests Added
+## 7. Tests Added
 
 ### `tests/integration/test_request_id_middleware.py`
 Verifies:
@@ -122,5 +152,11 @@ Verifies:
 - successful request completion logs include trace fields
 - failed request completion logs include status and error category
 
-## 7. Interview Summary
-I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. This creates the runtime trace foundation needed for later tool metrics, log summaries, and request lifecycle examples.
+### `tests/integration/test_agent_endpoint.py`
+Verifies:
+- agent query success response
+- controlled agent errors
+- agent tool trace log includes request id, tool used, tool status, agent status, and output summary
+
+## 8. Interview Summary
+I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs and agent tool trace logs. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. This creates the runtime trace foundation needed for later tool metrics, log summaries, and request lifecycle examples.
