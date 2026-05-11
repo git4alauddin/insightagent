@@ -95,6 +95,22 @@ Start the API:
 uvicorn app.main:app --reload
 ```
 
+## Run With Docker
+Build the image:
+
+```powershell
+docker build -t insightagent:v6 .
+```
+
+Run the container:
+
+```powershell
+docker run --rm -p 8000:8000 `
+  -e API_KEY=your-service-api-key-here `
+  -e LLM_API_KEY=your-llm-api-key-here `
+  insightagent:v6
+```
+
 Check health:
 
 ```bash

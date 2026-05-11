@@ -27,6 +27,19 @@ Added:
 
 The container runs the FastAPI app through Uvicorn and prepares the upload directory.
 
+Docker verification performed:
+```powershell
+docker build -t insightagent:v6-verify .
+docker run -d --name insightagent-v6-verify -p 18000:8000 `
+  -e API_KEY=test-api-key `
+  -e LLM_API_KEY=test-llm-key `
+  insightagent:v6-verify
+```
+
+Verified endpoints:
+- `GET http://127.0.0.1:18000/health` -> `status: ok`
+- `GET http://127.0.0.1:18000/ready` -> `status: ready`
+
 ### API Key Authentication
 Added a shared auth dependency in `app/api/dependencies.py`.
 
@@ -141,15 +154,25 @@ CORS config keeps browser access controlled and environment-aware.
 Rate limiting reduces accidental loops and basic abuse risk on costly or state-changing endpoints.
 
 ## Testing Status
-Latest suite after rate limiting:
+Latest automated test suite after rate limiting:
 
 ```text
 145 passed
 ```
 
+Docker verification:
+```text
+image build: passed
+container runtime: passed
+/health: ok
+/ready: ready
+```
+
 ## Current V6 Checklist Status
 - Dockerfile: done.
 - `.dockerignore`: done.
+- Docker image build verified: done.
+- Docker runtime verified: done.
 - `/ready` endpoint: done.
 - Readiness checks for LLM, database, and storage: done.
 - API key authentication: done.
@@ -164,4 +187,4 @@ Latest suite after rate limiting:
 - Cloud Run deployment: pending.
 
 ## Interview Explanation
-In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, configured environment-aware CORS, and added basic in-memory rate limiting. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.
+In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized and verified the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, configured environment-aware CORS, and added basic in-memory rate limiting. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.

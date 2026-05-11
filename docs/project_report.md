@@ -285,6 +285,7 @@ Learning-first, version-by-version implementation.
 ### What We Built
 - Added `GET /ready` for dependency readiness checks.
 - Added Docker runtime files.
+- Verified Docker image build and runtime.
 - Added API key configuration through `API_KEY`.
 - Added shared `x-api-key` auth dependency.
 - Protected chat, agent, session, and dataset endpoints.
@@ -305,6 +306,7 @@ Learning-first, version-by-version implementation.
 - To protect costly LLM and data endpoints.
 - To avoid exposing private API behavior during deployment.
 - To keep deployment health checks publicly reachable.
+- To prove the containerized backend can actually start and serve health/readiness endpoints.
 - To fail closed when authentication is not configured.
 - To give API clients one predictable error contract.
 - To prevent internal exception details from leaking in responses.
@@ -321,6 +323,10 @@ Learning-first, version-by-version implementation.
 - Ran the full test suite after CORS configuration.
 - Ran the full test suite after rate limiting.
 - Current suite status: `145 passed`.
+- Built Docker image `insightagent:v6-verify`.
+- Ran a temporary container on host port `18000`.
+- Verified `/health` returned `ok`.
+- Verified `/ready` returned `ready`.
 
 ### What I Learned
 - Authentication can be centralized as a FastAPI dependency.
@@ -333,6 +339,7 @@ Learning-first, version-by-version implementation.
 - Structured logs can start simple and grow later into a fuller observability layer.
 - CORS should be environment-aware because development and production have different safety needs.
 - In-memory rate limiting is enough for local V6 learning, while Redis or a gateway would be better for multi-instance production.
+- Docker verification should test the running container, not only whether the Dockerfile exists.
 
 ### Interview Explanation
-- In V6, I started hardening the backend for deployment. I added readiness checks, containerized the service, environment-aware CORS, API key authentication, rate limiting, centralized exception handling, request IDs, and structured request logging. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.
+- In V6, I started hardening the backend for deployment. I added readiness checks, verified Docker runtime support, environment-aware CORS, API key authentication, rate limiting, centralized exception handling, request IDs, and structured request logging. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.

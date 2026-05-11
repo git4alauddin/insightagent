@@ -84,7 +84,7 @@ This file maps each V6 commit heading to:
 - Prepared the backend for browser-based frontend access.
 - Avoided permissive production CORS defaults.
 
-### `<pending>` - `v6: add basic in-memory rate limiting`
+### `b23c53b` - `v6: add basic in-memory rate limiting`
 **What we did**
 - Added rate limit settings.
 - Added in-memory rate limit enforcement.
@@ -95,6 +95,18 @@ This file maps each V6 commit heading to:
 **What it solved / took care of**
 - Protected costly/private endpoints from accidental loops and basic abuse.
 - Kept `/health` and `/ready` outside rate limiting.
+
+### `<pending>` - `v6: verify Docker build and runtime`
+**What we did**
+- Built the Docker image locally.
+- Started a temporary container with test environment variables.
+- Verified `/health` returned `ok`.
+- Verified `/ready` returned `ready`.
+- Documented Docker build and run commands.
+
+**What it solved / took care of**
+- Confirmed the Dockerfile works beyond static inspection.
+- Proved the containerized app can serve health/readiness endpoints.
 
 ## Reusable Entry Template
 

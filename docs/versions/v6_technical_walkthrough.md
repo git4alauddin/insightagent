@@ -61,7 +61,42 @@ Core checks:
 
 This keeps deployment dependency checks outside the route layer.
 
-## 4. API Key Authentication
+## 4. Docker Runtime Verification
+
+### `Dockerfile`
+The Docker image:
+- starts from `python:3.13-slim`
+- installs dependencies from `requirements.txt`
+- copies the app package into `/app/app`
+- creates `/app/uploads`
+- exposes port `8000`
+- starts Uvicorn with `app.main:app`
+
+### `.dockerignore`
+The Docker build excludes:
+- Git metadata
+- local virtualenv
+- `.env`
+- SQLite runtime database
+- uploads
+- cache folders
+- tests and docs
+
+### Verification
+The image was built and run locally:
+```powershell
+docker build -t insightagent:v6-verify .
+docker run -d --name insightagent-v6-verify -p 18000:8000 `
+  -e API_KEY=test-api-key `
+  -e LLM_API_KEY=test-llm-key `
+  insightagent:v6-verify
+```
+
+Verified:
+- `/health` returned `status: ok`
+- `/ready` returned `status: ready`
+
+## 5. API Key Authentication
 
 ### `app/config.py`
 Adds:
@@ -91,7 +126,7 @@ Router-level dependency protection was added to:
 Public routes remain in:
 - `app/api/routes_health.py`
 
-## 5. Rate Limiting
+## 6. Rate Limiting
 
 ### `app/config.py`
 Adds:
@@ -125,7 +160,7 @@ Rate limiting is attached alongside API key auth to:
 
 Public health routes are not rate limited.
 
-## 6. Global Error Handling
+## 7. Global Error Handling
 
 ### `app/api/error_handlers.py`
 Core functions:
@@ -159,7 +194,7 @@ register_exception_handlers(app)
 
 This attaches the handlers once during app startup.
 
-## 7. Request ID Middleware
+## 8. Request ID Middleware
 
 ### `app/api/middleware.py`
 Core function:
@@ -207,7 +242,7 @@ Calls:
 register_request_id_middleware(app)
 ```
 
-## 8. Tests Added/Extended
+## 9. Tests Added/Extended
 
 ### CORS Tests
 `tests/integration/test_cors_config.py` verifies:
@@ -253,11 +288,13 @@ Existing tests were updated to expect the new V6 error shape:
 }
 ```
 
-## 9. Checklist Mapping
+## 10. Checklist Mapping
 - `/ready` endpoint: done
 - dependency readiness checks: done
 - Dockerfile: done
 - `.dockerignore`: done
+- Docker image build: done
+- Docker runtime verification: done
 - CORS config: done
 - API key config: done
 - private endpoint protection: done
@@ -267,5 +304,5 @@ Existing tests were updated to expect the new V6 error shape:
 - structured request logging: done
 - rate limiting: done
 
-## 10. Interview Summary
-In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, environment-aware CORS, API key protection for private endpoints, basic rate limiting, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
+## 11. Interview Summary
+In V6, I added production-style backend hardening. The service now has readiness checks, verified Docker runtime support, environment-aware CORS, API key protection for private endpoints, basic rate limiting, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
