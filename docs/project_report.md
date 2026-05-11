@@ -439,7 +439,7 @@ V7 is implemented and verified through automated end-to-end upload-to-ask RAG te
 
 ## V8 Progress
 
-Status: foundation started.
+Status: documented evaluation layer.
 
 ### What We Built
 - Updated app version reporting to V8.
@@ -452,6 +452,7 @@ Status: foundation started.
 - Added failure category summaries.
 - Added regression comparison against previous eval results.
 - Added in-process eval execution against FastAPI `TestClient`.
+- Added README documentation for local eval execution, result structure, comparison workflow, and current coverage.
 - Added latency capture.
 - Added JSON result output under `evals/results/`.
 - Added unit tests for eval case loading, validation, scoring, and summary generation.
@@ -471,6 +472,7 @@ Status: foundation started.
 - To prove upload-dependent eval cases can execute against the real API in automated tests.
 - To add deterministic answer-quality checks before introducing model-assisted evaluation.
 - To make RAG citation failures more specific than simple source presence.
+- To make evaluation usable from the README without reading the runner internals.
 
 ### Tests Performed
 - Added unit tests for the eval runner foundation.
@@ -479,6 +481,7 @@ Status: foundation started.
 - Added unit tests for citation accuracy, missing citation failures, and unsupported confident/cited answer failures.
 - Added unit tests for regression comparison behavior.
 - Added in-process integration coverage for CSV and RAG eval execution.
+- Documented the evaluation workflow and current results in README/docs.
 - Full suite status after V8 citation accuracy and safety failure tests: `230 passed`.
 
 ### What I Learned
@@ -490,6 +493,7 @@ Status: foundation started.
 - Testing the runner against FastAPI `TestClient` catches wiring issues that unit-level scoring tests cannot see.
 - Basic groundedness can be measured deterministically by checking expected terms against both the answer and reference text.
 - Splitting citation presence from citation accuracy makes eval failures easier to diagnose.
+- Good evaluation docs need to explain both how to run the tool and how to interpret the result JSON.
 
 ### Interview Explanation
-- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, regression comparison, and an in-process integration proof. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, verify answer relevance through expected terms, score tool correctness, check CSV analysis intent, verify RAG citation presence, check deterministic citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, fail RAG answers without citations, fail unsupported confident/cited answers, save a JSON result summary with failure categories, compare current results against previous runs, and run deterministic CSV/RAG eval cases against FastAPI `TestClient` in automated tests. This creates the foundation for later model-assisted judging and token/cost tracking.
+- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, regression comparison, an in-process integration proof, and README-level evaluation workflow documentation. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, verify answer relevance through expected terms, score tool correctness, check CSV analysis intent, verify RAG citation presence, check deterministic citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, fail RAG answers without citations, fail unsupported confident/cited answers, save a JSON result summary with failure categories, compare current results against previous runs, and run deterministic CSV/RAG eval cases against FastAPI `TestClient` in automated tests. The README now explains how to run evals, compare results, and interpret the saved result JSON.

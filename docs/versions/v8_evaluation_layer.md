@@ -13,7 +13,7 @@ The target flow is:
 
 ## Current Progress
 
-Status: scoring layer expanding.
+Status: documented evaluation layer.
 
 V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, and deterministic scoring for format, tool correctness, CSV intent, citation presence, citation accuracy, relevance, basic groundedness, and insufficient-context safety. It does not yet implement token/cost tracking or model-assisted semantic judging.
 
@@ -108,6 +108,66 @@ Comparison output includes:
 - added cases
 - removed cases
 
+## How To Evaluate Locally
+
+1. Start the API:
+```powershell
+uvicorn app.main:app --reload
+```
+
+2. Run the eval dataset:
+```powershell
+.\.venv\Scripts\python scripts\run_eval.py `
+  --base-url "http://127.0.0.1:8000" `
+  --api-key "your-service-api-key-here"
+```
+
+3. Review the result file:
+```text
+evals/results/latest_eval_results.json
+```
+
+4. Compare against a previous result file:
+```powershell
+.\.venv\Scripts\python scripts\run_eval.py `
+  --base-url "http://127.0.0.1:8000" `
+  --api-key "your-service-api-key-here" `
+  --compare-to "evals/results/previous_eval_results.json"
+```
+
+## Result Structure
+
+Saved eval output includes:
+- summary total, passed, failed, and pass rate
+- summary failure category counts
+- per-case id, flow, status code, expected status, and latency
+- per-case pass/fail result
+- per-case score breakdown
+- per-case failure categories
+- raw response body for debugging
+- optional comparison output
+
+Local results are written under `evals/results/`, which is ignored by Git.
+
+## Current Coverage
+
+The V8 dataset covers:
+- chat
+- structured output
+- tool calling
+- CSV analysis
+- RAG document Q&A
+- negative insufficient-context RAG behavior
+
+The current automated test suite verifies:
+- eval case loading
+- scoring rules
+- result saving
+- regression comparison
+- in-process CSV/RAG eval execution
+- missing citation failure detection
+- unsupported confident/cited answer failure detection
+
 ## In-Process Integration Proof
 
 Added:
@@ -161,6 +221,14 @@ Latest suite:
 ```text
 230 passed
 ```
+
+Current documented eval status:
+- eval runner executes the bundled dataset against a running API
+- in-process integration test proves upload-dependent CSV/RAG eval execution
+- results are saved as JSON
+- pass/fail is generated per case
+- pass-rate and failure-category summaries are generated
+- evaluation covers chat, tool, CSV, and RAG flows
 
 ## Interview Explanation
 In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify RAG citation presence, check citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later model-assisted judging and token/cost tracking.

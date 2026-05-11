@@ -227,7 +227,7 @@ Invoke-RestMethod `
 ```
 
 ## Run Evaluations
-Start the API locally, then run:
+Start the API locally, then run the V8 evaluation dataset:
 
 ```powershell
 .\.venv\Scripts\python scripts\run_eval.py `
@@ -235,7 +235,24 @@ Start the API locally, then run:
   --api-key "your-service-api-key-here"
 ```
 
-The initial V8 runner loads `evals/evaluation_dataset.jsonl`, calls the configured API cases, captures latency, checks response status/shape, and writes results under `evals/results/`.
+The runner loads `evals/evaluation_dataset.jsonl`, calls the configured API cases, captures latency, scores each response, and writes results under `evals/results/`.
+
+Current V8 coverage:
+- chat and structured chat response shape
+- tool calling correctness
+- CSV analysis intent and answer relevance
+- RAG citation presence, citation accuracy, groundedness, and insufficient-context safety
+- negative cases for missing citations and unsupported confident answers
+
+The saved result file includes:
+- `summary.total`
+- `summary.passed`
+- `summary.failed`
+- `summary.pass_rate`
+- `summary.failure_categories`
+- per-case HTTP status, latency, pass/fail result, score breakdown, failure categories, and response body
+
+`evals/results/` is ignored by Git so local evaluation runs do not create commit noise.
 
 Compare against a previous run:
 
@@ -244,4 +261,12 @@ Compare against a previous run:
   --base-url "http://127.0.0.1:8000" `
   --api-key "your-service-api-key-here" `
   --compare-to "evals/results/previous_eval_results.json"
+```
+
+Comparison output reports pass-rate delta, newly failing cases, newly passing cases, added cases, and removed cases.
+
+Current automated verification:
+
+```text
+230 passed
 ```

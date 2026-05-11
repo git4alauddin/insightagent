@@ -81,7 +81,7 @@ This file maps each V8 commit heading to:
 - Added a deterministic groundedness signal for RAG without using model-assisted judging.
 - Made eval failure categories more useful for answer-quality regressions.
 
-### `<pending>` - `v8: add citation accuracy and safety failure tests`
+### `c8dac7c` - `v8: add citation accuracy and safety failure tests`
 **What we did**
 - Split RAG citation scoring into citation presence and citation accuracy.
 - Added deterministic citation accuracy checks for expected filenames, chunk id prefixes, and expected citation terms.
@@ -94,6 +94,20 @@ This file maps each V8 commit heading to:
 - Made citation failures easier to diagnose.
 - Covered V8 checklist items for missing citations and unsafe unsupported answers.
 - Added a stricter citation accuracy signal before adding semantic citation judging.
+
+### `<pending>` - `v8: document evaluation workflow and results`
+**What we did**
+- Expanded README evaluation instructions.
+- Documented local eval execution and regression comparison commands.
+- Documented current V8 eval coverage.
+- Documented saved result file structure.
+- Documented current automated verification status.
+- Updated V8 docs and project report with evaluation workflow/results guidance.
+
+**What it solved / took care of**
+- Covered the V8 checklist item for documenting the evaluation process.
+- Made eval results easier to interpret without reading the runner code.
+- Clarified what the current eval layer measures and what is still pending.
 
 ## Reusable Entry Template
 

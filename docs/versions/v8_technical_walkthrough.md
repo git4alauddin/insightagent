@@ -165,6 +165,14 @@ Comparison output:
 Use:
 ```powershell
 .\.venv\Scripts\python scripts\run_eval.py `
+  --base-url "http://127.0.0.1:8000" `
+  --api-key "your-service-api-key-here"
+```
+
+Use regression comparison:
+```powershell
+.\.venv\Scripts\python scripts\run_eval.py `
+  --base-url "http://127.0.0.1:8000" `
   --api-key "your-service-api-key-here" `
   --compare-to "evals/results/previous_eval_results.json"
 ```
@@ -209,6 +217,7 @@ The output includes:
 - passed count
 - failed count
 - pass rate
+- failure category counts
 - per-case status
 - latency
 - response body
@@ -218,6 +227,22 @@ The output includes:
 - optional regression comparison
 
 `evals/results/` is ignored by Git so local eval runs do not create commit noise.
+
+### Example Summary Shape
+```json
+{
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "pass_rate": 1.0,
+    "failure_categories": {}
+  },
+  "results": []
+}
+```
+
+The exact pass count depends on the live API, API keys, and model behavior for LLM-backed cases. The automated local suite currently verifies the deterministic runner/scoring behavior with `230 passed`.
 
 ## 9. Tests Added
 
@@ -266,6 +291,11 @@ Verifies:
 - pass-rate summary: basic done
 - failure-category summary: basic done
 - regression comparison note: basic done
+- document evaluation process in README/docs: done
+- eval runner executes full test set: supported against running API
+- pass/fail result generated per case: done
+- evaluation covers chat, tool, CSV, and RAG flows: done
+- evaluation results documented: done
 - relevance scoring: basic done
 - groundedness scoring: basic done
 - tool correctness scoring: basic done
