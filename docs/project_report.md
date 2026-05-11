@@ -368,11 +368,15 @@ Learning-first, version-by-version implementation.
 - Added SQLite-backed chunk/vector storage.
 - Added semantic retrieval over indexed document chunks.
 - Added retrieval trace metadata with top-k, similarity threshold, candidate count, and scored chunks.
+- Added grounded document answer prompt builder.
+- Added citation builder and weak-context fallback.
+- Added service-level grounded document answer response generation.
 - Added unit tests for document schemas.
 - Added integration tests for document upload.
 - Added unit tests for document text extraction and chunking.
 - Added unit tests for embedding generation and vector store behavior.
 - Added unit tests for semantic retrieval behavior.
+- Added unit tests for grounded answer behavior.
 - Added V7 documentation files:
   - `docs/versions/v7_document_qa.md`
   - `docs/versions/v7_technical_walkthrough.md`
@@ -387,6 +391,7 @@ Learning-first, version-by-version implementation.
 - To convert extracted text into citation-ready chunks before embeddings and retrieval.
 - To persist chunk vectors locally before adding semantic retrieval and answer generation.
 - To retrieve evidence chunks before allowing the backend to generate grounded answers.
+- To convert retrieval evidence into citations and safe answer responses before exposing a public ask endpoint.
 
 ### Tests Performed
 - Added unit tests for document schemas.
@@ -395,7 +400,8 @@ Learning-first, version-by-version implementation.
 - Added unit tests for document chunking behavior and invalid settings.
 - Added unit tests for local embedding and vector store behavior.
 - Added unit tests for semantic retrieval ranking, thresholding, and validation.
-- Full suite status after semantic retrieval: `191 passed`.
+- Added unit tests for grounded prompts, citations, answer responses, and weak-context fallback.
+- Full suite status after grounded document answer service: `199 passed`.
 
 ### What I Learned
 - RAG systems need source/citation contracts early, not as an afterthought.
@@ -407,6 +413,8 @@ Learning-first, version-by-version implementation.
 - Vector storage needs replacement behavior so a document can be safely re-indexed.
 - Retrieval should expose trace metadata so answer quality can be debugged before the LLM generation step.
 - Similarity thresholds are the basis for weak-context fallback.
+- Citations should be built from backend retrieval metadata, not invented by the answer layer.
+- Weak-context fallback should happen before any confident answer is returned.
 
 ### Interview Explanation
-- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, deterministic chunking, local embeddings, vector persistence, and semantic retrieval. I added schemas for document uploads, document questions, source citations, grounded answer responses, document chunks, and retrieval results, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, split cleaned text into overlapping metadata-rich chunks, generated deterministic local embeddings, stored vectors in SQLite, and retrieved ranked evidence chunks with similarity scores. This sets up the future RAG pipeline to answer with citations.
+- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, deterministic chunking, local embeddings, vector persistence, semantic retrieval, and grounded answer generation. I added schemas for document uploads, document questions, source citations, grounded answer responses, document chunks, and retrieval results, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, split cleaned text into overlapping metadata-rich chunks, generated deterministic local embeddings, stored vectors in SQLite, retrieved ranked evidence chunks with similarity scores, built citations from retrieved chunks, and added weak-context fallback so unsupported questions do not produce confident answers.

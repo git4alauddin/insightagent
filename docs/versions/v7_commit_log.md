@@ -71,7 +71,7 @@ This file maps each V7 commit heading to:
 - Created a local vector index foundation without external embedding API dependency.
 - Prepared the backend for semantic retrieval and citation-backed answers.
 
-### `<pending>` - `v7: add semantic retrieval over document chunks`
+### `a18689b` - `v7: add semantic retrieval over document chunks`
 **What we did**
 - Added retrieval top-k and similarity threshold configuration.
 - Added retrieved chunk and retrieval result schemas.
@@ -84,6 +84,20 @@ This file maps each V7 commit heading to:
 - Made stored document vectors searchable by question.
 - Added the retrieval evidence layer needed before grounded answer generation.
 - Prepared citation building by returning source chunk metadata with similarity scores.
+
+### `<pending>` - `v7: add grounded document answer service`
+**What we did**
+- Added grounded document Q&A prompt builder.
+- Added citation builder from retrieved chunks.
+- Added service-level document answer builder.
+- Added weak-context fallback with `insufficient_context` response.
+- Added extractive grounded answer text based only on retrieved chunk text.
+- Added unit tests for citations, grounded prompt, successful answers, weak-context fallback, and retrieval error conversion.
+
+**What it solved / took care of**
+- Converted retrieval results into the final document answer response shape.
+- Ensured unsupported questions do not produce confident answers.
+- Prepared the answer logic for the future `/documents/{document_id}/ask` endpoint.
 
 ## Reusable Entry Template
 

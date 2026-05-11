@@ -118,6 +118,19 @@ Behavior:
 - returns the top `DOCUMENT_RETRIEVAL_TOP_K` matches
 - returns retrieval trace metadata: top-k, threshold, candidate count, chunks, and scores
 
+### Grounded Answer Service
+Added service-level grounded document answer generation.
+
+Behavior:
+- builds a grounded prompt from retrieved document chunks
+- formats retrieved chunk metadata into the prompt context
+- builds citations from retrieved chunks
+- returns `insufficient_context` when retrieval finds no usable chunks
+- returns an extractive answer using only retrieved chunk text
+- converts retrieval errors into controlled answer-service errors
+
+This is intentionally service-level. The public `/documents/{document_id}/ask` endpoint will be wired after the answer behavior is stable and tested.
+
 ## Why This Matters
 The early V7 chunks define the API contract, indexing foundation, and retrieval layer before answer generation.
 
@@ -167,7 +180,8 @@ POST /documents/{document_id}/ask
 
 ## Deferred On Purpose
 Not built yet:
-- grounded answer generation
+- `/documents/{document_id}/ask` endpoint
+- end-to-end manual RAG API test
 
 ## Testing Status
 Added schema unit tests for:
@@ -214,10 +228,18 @@ Added semantic retrieval unit tests for:
 - invalid retrieval settings
 - vector dimension validation
 
+Added grounded answer unit tests for:
+- citation building
+- successful grounded answer response
+- weak-context fallback
+- extractive answer text
+- grounded prompt content
+- retrieval error conversion
+
 Latest suite:
 ```text
-191 passed
+199 passed
 ```
 
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, creating a local vector indexing foundation, and adding semantic retrieval. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, persist chunk vectors in SQLite, and retrieve the most relevant chunks for a question. Grounded answer generation is intentionally deferred to later V7 chunks.
+In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, creating a local vector indexing foundation, adding semantic retrieval, and building the grounded answer service. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, persist chunk vectors in SQLite, retrieve the most relevant chunks for a question, build citations, and return weak-context fallback when evidence is missing. The public document ask endpoint is intentionally deferred to the next V7 chunk.

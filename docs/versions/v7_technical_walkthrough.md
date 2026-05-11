@@ -223,7 +223,37 @@ Retrieval result includes:
 
 This gives the later answer endpoint a concrete evidence set and retrieval trace before any LLM answer is generated.
 
-## 11. Tests Added
+## 11. Grounded Answer Service
+
+### `app/prompts/document_qa_v7.py`
+Core values/functions:
+- `DOCUMENT_QA_PROMPT_VERSION`
+- `DOCUMENT_QA_SYSTEM_PROMPT`
+- `build_grounded_document_prompt(question, retrieved_chunks)`
+
+Behavior:
+- instructs the assistant to answer only from retrieved context
+- tells the assistant to admit insufficient context
+- formats chunk ID, filename, page, score, and text into context blocks
+- avoids invented citations by making source chunks explicit
+
+### `app/services/document_answer_service.py`
+Core functions:
+- `answer_document_question(document_id, question)`
+- `build_answer_from_retrieval(retrieval_result)`
+- `build_citations(retrieved_chunks)`
+- `build_grounded_answer_text(retrieved_chunks)`
+- `build_grounded_prompt_from_retrieval(retrieval_result)`
+
+Behavior:
+- calls semantic retrieval for the document/question pair
+- returns `insufficient_context` when no chunks pass retrieval
+- builds `SourceCitation` objects from retrieved chunk metadata
+- returns a grounded extractive answer using retrieved chunk text only
+- maps top similarity score to low/medium/high confidence
+- converts retrieval failures into `DocumentAnswerError`
+
+## 12. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -288,7 +318,17 @@ Verifies:
 - invalid threshold rejection
 - vector dimension validation
 
-## 12. Checklist Mapping
+### `tests/unit/test_document_answer_service.py`
+Verifies:
+- citation building from retrieved chunks
+- successful grounded answer response
+- insufficient-context fallback
+- extractive grounded answer text
+- grounded prompt contents
+- retrieval service orchestration
+- retrieval error conversion
+
+## 13. Checklist Mapping
 - document upload endpoint: done
 - supported document extensions config: done
 - unsupported document-type handling: done
@@ -309,10 +349,13 @@ Verifies:
 - top-k retrieval: done
 - similarity threshold: done
 - retrieval log with chunks/scores: done
-- grounded answer generation: pending
-- citation builder: pending
-- weak-context fallback: pending
+- grounded answer prompt: done
+- answer generated only from retrieved context: done
+- citation builder: done
+- weak-context fallback: done
 - `/documents/{document_id}/ask` endpoint: pending
+- insufficient-context test questions: service-level done
+- citation examples in docs: done
 
-## 13. Interview Summary
-I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, and semantic retrieval. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, and retrieves the most relevant chunks for a question using top-k and similarity threshold controls. This creates the evidence layer needed for grounded answer generation.
+## 14. Interview Summary
+I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, semantic retrieval, and a grounded answer service. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, retrieves the most relevant chunks for a question using top-k and similarity threshold controls, builds citations from retrieved chunks, and returns insufficient-context fallback when evidence is missing. This creates the complete service-level RAG flow before the public ask endpoint is wired.
