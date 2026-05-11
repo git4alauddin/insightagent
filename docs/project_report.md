@@ -436,3 +436,40 @@ V7 is implemented and verified through automated end-to-end upload-to-ask RAG te
 
 ### Interview Explanation
 - In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, deterministic chunking, local embeddings, vector persistence, semantic retrieval, grounded answer generation, the public document ask endpoint, and automatic upload-time indexing. I added schemas for document uploads, document questions, source citations, grounded answer responses, document chunks, and retrieval results, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, split cleaned text into overlapping metadata-rich chunks, generated deterministic local embeddings, stored vectors in SQLite, retrieved ranked evidence chunks with similarity scores, built citations from retrieved chunks, added weak-context fallback so unsupported questions do not produce confident answers, exposed the flow through `POST /documents/{document_id}/ask`, and made upload-to-ask work end-to-end in automated tests.
+
+## V8 Progress
+
+Status: foundation started.
+
+### What We Built
+- Updated app version reporting to V8.
+- Added `evals/evaluation_dataset.jsonl`.
+- Added initial evaluation cases for chat, structured output, tool calling, CSV analysis, RAG, and insufficient-context RAG.
+- Added `scripts/run_eval.py`.
+- Added setup upload support for dataset and document evaluation cases.
+- Added basic status/shape scoring.
+- Added latency capture.
+- Added JSON result output under `evals/results/`.
+- Added unit tests for eval case loading, validation, scoring, and summary generation.
+- Added V8 documentation files:
+  - `docs/versions/v8_evaluation_layer.md`
+  - `docs/versions/v8_technical_walkthrough.md`
+  - `docs/versions/v8_commit_log.md`
+
+### Why We Built It
+- To make project behavior measurable instead of only manually checked.
+- To prepare repeatable evaluation runs across chat, tools, CSV, and RAG.
+- To create a dataset format that can grow with new cases.
+- To build a runner foundation before adding advanced scoring.
+
+### Tests Performed
+- Added unit tests for the eval runner foundation.
+- Full suite status after V8 evaluation foundation: `213 passed`.
+
+### What I Learned
+- Evaluation needs a stable dataset format before scoring gets sophisticated.
+- Setup steps are necessary for CSV and RAG cases because those flows depend on uploaded resources.
+- Even simple status/shape scoring is useful as a first regression signal.
+
+### Interview Explanation
+- In V8, I started the evaluation layer by adding a JSONL evaluation dataset and a reusable runner. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, and save a JSON result summary. This creates the foundation for later groundedness, citation accuracy, tool correctness, and regression scoring.

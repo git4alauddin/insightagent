@@ -3,7 +3,7 @@
 InsightAgent is a learning-first, production-style FastAPI backend for AI-powered data and document analysis.
 
 ## Current Version
-**V7 – RAG document Q&A**
+**V8 - Evaluation Layer**
 
 Cloud Run deployment is intentionally deferred until the local/containerized backend is fully closed out and ready for an external runtime.
 
@@ -15,6 +15,7 @@ Version notes:
 - [V5 – Data Analysis Assistant](docs/versions/v5_data_analysis_assistant.md)
 - [V6 – Backend Maturity](docs/versions/v6_backend_maturity.md)
 - [V7 – Document Q&A](docs/versions/v7_document_qa.md)
+- [V8 - Evaluation Layer](docs/versions/v8_evaluation_layer.md)
 
 ## Project Structure
 ```text
@@ -32,6 +33,8 @@ app/                  # Core FastAPI application
 tests/                # Unit and integration test suites
 
 docs/                 # Project report and version-wise build notes
+evals/                # Evaluation datasets and generated result files
+scripts/              # Utility scripts such as eval runner
 
 requirements.txt      # Python dependencies
 Dockerfile            # Container runtime definition
@@ -54,7 +57,7 @@ uvicorn app.main:app --reload
 Build the image:
 
 ```powershell
-docker build -t insightagent:v6 .
+docker build -t insightagent:v8 .
 ```
 
 Run the container:
@@ -63,14 +66,14 @@ Run the container:
 docker run --rm -p 8000:8000 `
   -e API_KEY=your-service-api-key-here `
   -e LLM_API_KEY=your-llm-api-key-here `
-  insightagent:v6
+  insightagent:v8
 ```
 
 Important production environment variables:
 
 ```text
 APP_ENV=production
-APP_VERSION=v7
+APP_VERSION=v8
 DOCS_ENABLED=false
 API_KEY=<service-api-key>
 LLM_API_KEY=<provider-api-key>
@@ -92,7 +95,7 @@ Expected response:
 {
   "status": "ok",
   "service": "InsightAgent",
-  "version": "v7"
+  "version": "v8"
 }
 ```
 
@@ -222,3 +225,14 @@ Invoke-RestMethod `
   -ContentType "application/json" `
   -Body '{"question":"What is the refund policy?"}'
 ```
+
+## Run Evaluations
+Start the API locally, then run:
+
+```powershell
+.\.venv\Scripts\python scripts\run_eval.py `
+  --base-url "http://127.0.0.1:8000" `
+  --api-key "your-service-api-key-here"
+```
+
+The initial V8 runner loads `evals/evaluation_dataset.jsonl`, calls the configured API cases, captures latency, checks response status/shape, and writes results under `evals/results/`.

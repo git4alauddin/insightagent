@@ -1,0 +1,226 @@
+import argparse
+import json
+import time
+from pathlib import Path
+from typing import Any
+
+import httpx
+
+
+DEFAULT_BASE_URL = "http://127.0.0.1:8000"
+DEFAULT_DATASET_PATH = Path("evals/evaluation_dataset.jsonl")
+DEFAULT_RESULTS_PATH = Path("evals/results/latest_eval_results.json")
+
+
+class EvalRunnerError(Exception):
+    pass
+
+
+def load_eval_cases(dataset_path: Path) -> list[dict[str, Any]]:
+    if not dataset_path.exists():
+        raise EvalRunnerError(f"Evaluation dataset not found: {dataset_path}")
+
+    cases: list[dict[str, Any]] = []
+    lines = dataset_path.read_text(encoding="utf-8").splitlines()
+    for line_number, line in enumerate(lines, start=1):
+        if not line.strip():
+            continue
+
+        try:
+            case = json.loads(line)
+        except json.JSONDecodeError as exc:
+            raise EvalRunnerError(f"Invalid JSONL at line {line_number}.") from exc
+
+        validate_eval_case(case, line_number)
+        cases.append(case)
+
+    return cases
+
+
+def validate_eval_case(case: dict[str, Any], line_number: int) -> None:
+    required_fields = {
+        "id",
+        "flow",
+        "method",
+        "endpoint",
+        "payload",
+        "expected_status",
+    }
+    missing_fields = sorted(required_fields - set(case))
+    if missing_fields:
+        raise EvalRunnerError(
+            f"Evaluation case line {line_number} missing fields: "
+            f"{', '.join(missing_fields)}"
+        )
+
+
+def run_eval_cases(
+    cases: list[dict[str, Any]],
+    *,
+    base_url: str,
+    api_key: str,
+    timeout_seconds: float = 30.0,
+) -> list[dict[str, Any]]:
+    results: list[dict[str, Any]] = []
+    with httpx.Client(base_url=base_url, timeout=timeout_seconds) as client:
+        for case in cases:
+            results.append(run_eval_case(client, case, api_key=api_key))
+
+    return results
+
+
+def run_eval_case(
+    client: httpx.Client,
+    case: dict[str, Any],
+    *,
+    api_key: str,
+) -> dict[str, Any]:
+    prepared_case = prepare_case(client, case, api_key=api_key)
+    started_at = time.perf_counter()
+    response = client.request(
+        prepared_case["method"],
+        prepared_case["endpoint"],
+        headers=build_headers(api_key),
+        json=prepared_case["payload"],
+    )
+    latency_ms = round((time.perf_counter() - started_at) * 1000, 2)
+
+    try:
+        response_body: Any = response.json()
+    except ValueError:
+        response_body = response.text
+
+    return score_eval_response(case, response.status_code, response_body, latency_ms)
+
+
+def prepare_case(
+    client: httpx.Client,
+    case: dict[str, Any],
+    *,
+    api_key: str,
+) -> dict[str, Any]:
+    endpoint = str(case["endpoint"])
+    setup = case.get("setup", {})
+
+    if "upload_dataset" in setup:
+        dataset_id = upload_setup_file(
+            client,
+            "/datasets/upload",
+            setup["upload_dataset"],
+            api_key=api_key,
+            id_key="dataset_id",
+        )
+        endpoint = endpoint.replace("{dataset_id}", dataset_id)
+
+    if "upload_document" in setup:
+        document_id = upload_setup_file(
+            client,
+            "/documents/upload",
+            setup["upload_document"],
+            api_key=api_key,
+            id_key="document_id",
+        )
+        endpoint = endpoint.replace("{document_id}", document_id)
+
+    return {
+        "method": case["method"],
+        "endpoint": endpoint,
+        "payload": case["payload"],
+    }
+
+
+def upload_setup_file(
+    client: httpx.Client,
+    endpoint: str,
+    upload_spec: dict[str, str],
+    *,
+    api_key: str,
+    id_key: str,
+) -> str:
+    files = {
+        "file": (
+            upload_spec["filename"],
+            upload_spec["content"].encode("utf-8"),
+            upload_spec["content_type"],
+        )
+    }
+    response = client.post(endpoint, headers=build_headers(api_key), files=files)
+    response.raise_for_status()
+    response_body = response.json()
+    return str(response_body[id_key])
+
+
+def score_eval_response(
+    case: dict[str, Any],
+    status_code: int,
+    response_body: Any,
+    latency_ms: float,
+) -> dict[str, Any]:
+    expected_status = int(case["expected_status"])
+    expected_keys = case.get("expected_keys", [])
+    missing_keys = [
+        key
+        for key in expected_keys
+        if not isinstance(response_body, dict) or key not in response_body
+    ]
+    passed = status_code == expected_status and not missing_keys
+
+    return {
+        "id": case["id"],
+        "flow": case["flow"],
+        "status_code": status_code,
+        "expected_status": expected_status,
+        "latency_ms": latency_ms,
+        "passed": passed,
+        "missing_keys": missing_keys,
+        "response": response_body,
+    }
+
+
+def build_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    total = len(results)
+    passed = sum(1 for result in results if result["passed"])
+    return {
+        "total": total,
+        "passed": passed,
+        "failed": total - passed,
+        "pass_rate": round(passed / total, 4) if total else 0.0,
+    }
+
+
+def save_results(results: list[dict[str, Any]], results_path: Path) -> None:
+    results_path.parent.mkdir(parents=True, exist_ok=True)
+    output = {
+        "summary": build_summary(results),
+        "results": results,
+    }
+    results_path.write_text(json.dumps(output, indent=2), encoding="utf-8")
+
+
+def build_headers(api_key: str) -> dict[str, str]:
+    return {"x-api-key": api_key}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run InsightAgent evaluation cases.")
+    parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
+    parser.add_argument("--api-key", required=True)
+    parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET_PATH)
+    parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS_PATH)
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+    cases = load_eval_cases(args.dataset)
+    results = run_eval_cases(cases, base_url=args.base_url, api_key=args.api_key)
+    save_results(results, args.results)
+    summary = build_summary(results)
+    print(
+        f"Evaluated {summary['total']} cases: "
+        f"{summary['passed']} passed, {summary['failed']} failed."
+    )
+
+
+if __name__ == "__main__":
+    main()

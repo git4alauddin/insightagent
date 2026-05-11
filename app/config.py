@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "InsightAgent"
-    app_version: str = "v7"
+    app_version: str = "v8"
     app_env: str = "development"
     log_level: str = "INFO"
     docs_enabled: bool = True
