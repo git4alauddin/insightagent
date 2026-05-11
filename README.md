@@ -250,7 +250,8 @@ The saved result file includes:
 - `summary.failed`
 - `summary.pass_rate`
 - `summary.failure_categories`
-- per-case HTTP status, latency, pass/fail result, score breakdown, failure categories, and response body
+- `summary.usage` with available/unavailable usage counts and token/cost totals when present
+- per-case HTTP status, latency, pass/fail result, score breakdown, failure categories, optional usage metadata, and response body
 
 `evals/results/` is ignored by Git so local evaluation runs do not create commit noise.
 
@@ -268,5 +269,5 @@ Comparison output reports pass-rate delta, newly failing cases, newly passing ca
 Current automated verification:
 
 ```text
-230 passed
+232 passed
 ```

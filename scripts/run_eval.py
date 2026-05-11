@@ -178,6 +178,7 @@ def score_eval_response(
         "passed": passed,
         "scores": scores,
         "failure_categories": failure_categories,
+        "usage": extract_usage_metadata(response_body),
         "response": response_body,
     }
 
@@ -475,6 +476,99 @@ def normalize_text(value: str) -> str:
     return " ".join(value.lower().split())
 
 
+def extract_usage_metadata(response_body: Any) -> dict[str, Any]:
+    usage = {
+        "available": False,
+        "input_tokens": None,
+        "output_tokens": None,
+        "total_tokens": None,
+        "estimated_cost_usd": None,
+    }
+    if not isinstance(response_body, dict):
+        return usage
+
+    usage_source = first_dict_value(response_body, ["usage", "token_usage"])
+    if usage_source is None:
+        usage_source = response_body
+
+    input_tokens = coerce_int(
+        first_present_value(
+            usage_source,
+            ["input_tokens", "prompt_tokens", "prompt_token_count"],
+        )
+    )
+    output_tokens = coerce_int(
+        first_present_value(
+            usage_source,
+            ["output_tokens", "completion_tokens", "completion_token_count"],
+        )
+    )
+    total_tokens = coerce_int(first_present_value(usage_source, ["total_tokens"]))
+    if total_tokens is None and input_tokens is not None and output_tokens is not None:
+        total_tokens = input_tokens + output_tokens
+
+    estimated_cost = coerce_float(
+        first_present_value(
+            usage_source,
+            ["estimated_cost_usd", "cost_usd", "total_cost_usd"],
+        )
+    )
+
+    usage.update(
+        {
+            "available": any(
+                value is not None
+                for value in (input_tokens, output_tokens, total_tokens, estimated_cost)
+            ),
+            "input_tokens": input_tokens,
+            "output_tokens": output_tokens,
+            "total_tokens": total_tokens,
+            "estimated_cost_usd": estimated_cost,
+        }
+    )
+    return usage
+
+
+def first_dict_value(
+    source: dict[str, Any],
+    keys: list[str],
+) -> dict[str, Any] | None:
+    for key in keys:
+        value = source.get(key)
+        if isinstance(value, dict):
+            return value
+
+    return None
+
+
+def first_present_value(source: dict[str, Any], keys: list[str]) -> Any:
+    for key in keys:
+        if key in source:
+            return source[key]
+
+    return None
+
+
+def coerce_int(value: Any) -> int | None:
+    if value is None or isinstance(value, bool):
+        return None
+
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def coerce_float(value: Any) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def build_failure_categories(scores: dict[str, dict[str, Any]]) -> list[str]:
     return [
         score_name
@@ -497,7 +591,52 @@ def build_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
         "failed": total - passed,
         "pass_rate": round(passed / total, 4) if total else 0.0,
         "failure_categories": failure_categories,
+        "usage": build_usage_summary(results),
     }
+
+
+def build_usage_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    usage_items = [
+        result.get("usage", {})
+        for result in results
+        if result.get("usage", {}).get("available") is True
+    ]
+
+    return {
+        "available_cases": len(usage_items),
+        "unavailable_cases": len(results) - len(usage_items),
+        "input_tokens": sum_optional_usage_field(usage_items, "input_tokens"),
+        "output_tokens": sum_optional_usage_field(usage_items, "output_tokens"),
+        "total_tokens": sum_optional_usage_field(usage_items, "total_tokens"),
+        "estimated_cost_usd": sum_optional_cost(usage_items),
+    }
+
+
+def sum_optional_usage_field(
+    usage_items: list[dict[str, Any]],
+    field_name: str,
+) -> int | None:
+    values = [
+        usage[field_name]
+        for usage in usage_items
+        if usage.get(field_name) is not None
+    ]
+    if not values:
+        return None
+
+    return int(sum(values))
+
+
+def sum_optional_cost(usage_items: list[dict[str, Any]]) -> float | None:
+    values = [
+        usage["estimated_cost_usd"]
+        for usage in usage_items
+        if usage.get("estimated_cost_usd") is not None
+    ]
+    if not values:
+        return None
+
+    return round(float(sum(values)), 6)
 
 
 def load_previous_results(previous_results_path: Path) -> dict[str, Any]:

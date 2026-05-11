@@ -95,7 +95,7 @@ This file maps each V8 commit heading to:
 - Covered V8 checklist items for missing citations and unsafe unsupported answers.
 - Added a stricter citation accuracy signal before adding semantic citation judging.
 
-### `<pending>` - `v8: document evaluation workflow and results`
+### `5a8586a` - `v8: document evaluation workflow and results`
 **What we did**
 - Expanded README evaluation instructions.
 - Documented local eval execution and regression comparison commands.
@@ -108,6 +108,21 @@ This file maps each V8 commit heading to:
 - Covered the V8 checklist item for documenting the evaluation process.
 - Made eval results easier to interpret without reading the runner code.
 - Clarified what the current eval layer measures and what is still pending.
+
+### `<pending>` - `v8: add token and cost metadata to eval results`
+**What we did**
+- Added per-case optional usage metadata to eval results.
+- Added token/cost extraction from common response shapes.
+- Added summary usage totals for available cases.
+- Preserved unavailable usage cleanly when endpoints do not return token/cost data.
+- Added tests for nested provider-style usage metadata.
+- Added tests for top-level usage metadata.
+- Updated docs to describe usage metadata in saved eval results.
+
+**What it solved / took care of**
+- Covered the V8 checklist item for tracking token/cost if available.
+- Made eval results future-ready for endpoints that expose provider usage.
+- Kept current deterministic endpoints honest by marking usage unavailable instead of inventing estimates.
 
 ## Reusable Entry Template
 

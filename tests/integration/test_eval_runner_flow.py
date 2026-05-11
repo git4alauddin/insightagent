@@ -89,6 +89,14 @@ def test_eval_runner_executes_csv_and_rag_cases_in_process(tmp_path: Path) -> No
         "failed": 0,
         "pass_rate": 1.0,
         "failure_categories": {},
+        "usage": {
+            "available_cases": 0,
+            "unavailable_cases": 2,
+            "input_tokens": None,
+            "output_tokens": None,
+            "total_tokens": None,
+            "estimated_cost_usd": None,
+        },
     }
     assert [result["id"] for result in results] == [
         "csv_missing_values_in_process",

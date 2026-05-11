@@ -15,7 +15,7 @@ The target flow is:
 
 Status: documented evaluation layer.
 
-V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, and deterministic scoring for format, tool correctness, CSV intent, citation presence, citation accuracy, relevance, basic groundedness, and insufficient-context safety. It does not yet implement token/cost tracking or model-assisted semantic judging.
+V8 now has the evaluation dataset, runner foundation, regression comparison, in-process API proof, optional token/cost metadata, and deterministic scoring for format, tool correctness, CSV intent, citation presence, citation accuracy, relevance, basic groundedness, and insufficient-context safety. It does not yet implement model-assisted semantic judging.
 
 ## Evaluation Dataset
 
@@ -77,6 +77,7 @@ Current behavior:
 - calls target endpoints
 - can run against an existing in-process test client
 - captures latency
+- captures token/cost metadata when response usage is available
 - checks expected status code
 - checks expected top-level response keys
 - runs rule-based scoring checks from case metadata
@@ -140,10 +141,12 @@ evals/results/latest_eval_results.json
 Saved eval output includes:
 - summary total, passed, failed, and pass rate
 - summary failure category counts
+- summary usage availability, token totals, and cost totals when present
 - per-case id, flow, status code, expected status, and latency
 - per-case pass/fail result
 - per-case score breakdown
 - per-case failure categories
+- per-case usage metadata
 - raw response body for debugging
 - optional comparison output
 
@@ -158,6 +161,30 @@ The V8 dataset covers:
 - CSV analysis
 - RAG document Q&A
 - negative insufficient-context RAG behavior
+
+## Token And Cost Metadata
+
+Each eval result includes:
+```json
+{
+  "usage": {
+    "available": false,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "estimated_cost_usd": null
+  }
+}
+```
+
+When an endpoint response includes usage metadata, the runner extracts common shapes such as:
+- `usage.prompt_tokens`
+- `usage.completion_tokens`
+- `usage.total_tokens`
+- `usage.estimated_cost_usd`
+- top-level `input_tokens`, `output_tokens`, `total_tokens`, or `cost_usd`
+
+If usage is unavailable, the runner records `available: false` instead of estimating or inventing values.
 
 The current automated test suite verifies:
 - eval case loading
@@ -216,10 +243,12 @@ Added unit tests for:
 - added/removed case detection
 - in-process CSV and RAG eval execution
 - eval result saving through an integration test
+- token/cost metadata extraction when available
+- unavailable usage tracking when token/cost data is absent
 
 Latest suite:
 ```text
-230 passed
+232 passed
 ```
 
 Current documented eval status:
@@ -228,7 +257,8 @@ Current documented eval status:
 - results are saved as JSON
 - pass/fail is generated per case
 - pass-rate and failure-category summaries are generated
+- token/cost metadata is tracked when available
 - evaluation covers chat, tool, CSV, and RAG flows
 
 ## Interview Explanation
-In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify RAG citation presence, check citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later model-assisted judging and token/cost tracking.
+In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, regression comparison, optional token/cost metadata, and an in-process integration proof. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, extract token/cost usage when endpoints provide it, check response shape, score tool selection, check CSV analysis intent, verify answer relevance through expected terms, verify RAG citation presence, check citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, detect insufficient-context safety, save a pass-rate summary with failure categories, compare current results against a previous run, and execute deterministic CSV/RAG eval cases through FastAPI `TestClient` in automated tests. This creates the foundation for later model-assisted judging.

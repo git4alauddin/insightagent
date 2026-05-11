@@ -75,6 +75,70 @@ def test_score_eval_response_passes_when_status_and_keys_match() -> None:
     assert result["passed"] is True
     assert result["failure_categories"] == []
     assert result["scores"]["format_validity"]["missing_keys"] == []
+    assert result["usage"] == {
+        "available": False,
+        "input_tokens": None,
+        "output_tokens": None,
+        "total_tokens": None,
+        "estimated_cost_usd": None,
+    }
+
+
+def test_score_eval_response_extracts_nested_usage_metadata() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "chat",
+            "expected_status": 200,
+            "expected_keys": ["answer"],
+        },
+        200,
+        {
+            "answer": "Hello",
+            "usage": {
+                "prompt_tokens": 12,
+                "completion_tokens": 8,
+                "estimated_cost_usd": 0.0004,
+            },
+        },
+        12.5,
+    )
+
+    assert result["usage"] == {
+        "available": True,
+        "input_tokens": 12,
+        "output_tokens": 8,
+        "total_tokens": 20,
+        "estimated_cost_usd": 0.0004,
+    }
+
+
+def test_score_eval_response_extracts_top_level_usage_metadata() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "chat",
+            "expected_status": 200,
+            "expected_keys": ["answer"],
+        },
+        200,
+        {
+            "answer": "Hello",
+            "input_tokens": "10",
+            "output_tokens": "5",
+            "total_tokens": "15",
+            "cost_usd": "0.001",
+        },
+        12.5,
+    )
+
+    assert result["usage"] == {
+        "available": True,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "total_tokens": 15,
+        "estimated_cost_usd": 0.001,
+    }
 
 
 def test_score_eval_response_fails_when_expected_key_is_missing() -> None:
@@ -421,9 +485,39 @@ def test_build_score_breakdown_checks_analysis_intent() -> None:
 
 def test_build_summary_counts_pass_fail_and_rate() -> None:
     summary = build_summary([
-        {"passed": True, "failure_categories": []},
-        {"passed": False, "failure_categories": ["tool_correctness"]},
-        {"passed": True, "failure_categories": []},
+        {
+            "passed": True,
+            "failure_categories": [],
+            "usage": {
+                "available": True,
+                "input_tokens": 10,
+                "output_tokens": 5,
+                "total_tokens": 15,
+                "estimated_cost_usd": 0.001,
+            },
+        },
+        {
+            "passed": False,
+            "failure_categories": ["tool_correctness"],
+            "usage": {
+                "available": True,
+                "input_tokens": 20,
+                "output_tokens": 10,
+                "total_tokens": 30,
+                "estimated_cost_usd": 0.0025,
+            },
+        },
+        {
+            "passed": True,
+            "failure_categories": [],
+            "usage": {
+                "available": False,
+                "input_tokens": None,
+                "output_tokens": None,
+                "total_tokens": None,
+                "estimated_cost_usd": None,
+            },
+        },
     ])
 
     assert summary == {
@@ -432,6 +526,14 @@ def test_build_summary_counts_pass_fail_and_rate() -> None:
         "failed": 1,
         "pass_rate": 0.6667,
         "failure_categories": {"tool_correctness": 1},
+        "usage": {
+            "available_cases": 2,
+            "unavailable_cases": 1,
+            "input_tokens": 30,
+            "output_tokens": 15,
+            "total_tokens": 45,
+            "estimated_cost_usd": 0.0035,
+        },
     }
 
 

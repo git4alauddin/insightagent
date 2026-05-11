@@ -65,6 +65,7 @@ Core functions:
 - `prepare_case(client, case, api_key)`
 - `upload_setup_file(...)`
 - `score_eval_response(case, status_code, response_body, latency_ms)`
+- `extract_usage_metadata(response_body)`
 - `build_summary(results)`
 - `save_results(results, results_path)`
 
@@ -93,6 +94,7 @@ Builds the final per-case result:
 - pass/fail result
 - score breakdown
 - failure categories
+- usage metadata
 - raw response body
 
 ### `build_score_breakdown(...)`
@@ -134,6 +136,30 @@ Checks configured citation expectations:
 - expected citation terms in the uploaded reference text
 
 This stays deterministic while making citation failures more specific than presence-only checks.
+
+### `extract_usage_metadata(...)`
+Extracts token/cost metadata when an endpoint returns it.
+
+Supported shapes include:
+- nested `usage.prompt_tokens`
+- nested `usage.completion_tokens`
+- nested `usage.total_tokens`
+- nested `usage.estimated_cost_usd`
+- top-level `input_tokens`
+- top-level `output_tokens`
+- top-level `total_tokens`
+- top-level `cost_usd`
+
+If no usage data exists, the eval result records:
+```json
+{
+  "available": false,
+  "input_tokens": null,
+  "output_tokens": null,
+  "total_tokens": null,
+  "estimated_cost_usd": null
+}
+```
 
 ### `build_failure_categories(...)`
 Returns the failed score names for each case.
@@ -218,8 +244,10 @@ The output includes:
 - failed count
 - pass rate
 - failure category counts
+- usage availability and totals
 - per-case status
 - latency
+- per-case usage metadata
 - response body
 - missing response keys
 - score breakdown
@@ -236,13 +264,21 @@ The output includes:
     "passed": 6,
     "failed": 0,
     "pass_rate": 1.0,
-    "failure_categories": {}
+    "failure_categories": {},
+    "usage": {
+      "available_cases": 0,
+      "unavailable_cases": 6,
+      "input_tokens": null,
+      "output_tokens": null,
+      "total_tokens": null,
+      "estimated_cost_usd": null
+    }
   },
   "results": []
 }
 ```
 
-The exact pass count depends on the live API, API keys, and model behavior for LLM-backed cases. The automated local suite currently verifies the deterministic runner/scoring behavior with `230 passed`.
+The exact pass count depends on the live API, API keys, and model behavior for LLM-backed cases. The automated local suite currently verifies the deterministic runner/scoring behavior with `232 passed`.
 
 ## 9. Tests Added
 
@@ -267,6 +303,8 @@ Verifies:
 - missing previous result file is handled safely
 - regression and improvement comparison works
 - saved result files can include comparison output
+- usage metadata is extracted from nested and top-level response fields
+- usage summary totals are generated for available cases
 
 ### `tests/integration/test_eval_runner_flow.py`
 Verifies:
@@ -287,6 +325,7 @@ Verifies:
 - call local/deployed API from eval runner: local API supported, in-process API proven
 - capture response: done
 - track latency: done
+- track token/cost if available: done
 - save evaluation result file: done
 - pass-rate summary: basic done
 - failure-category summary: basic done
@@ -306,7 +345,7 @@ Verifies:
 - RAG answers without citations fail: done
 - unsupported confident answers fail: done
 - citation semantic accuracy scoring: deterministic basic done, model-assisted pending
-- token/cost tracking: pending
+- token/cost tracking: done when response metadata is available
 
 ## 11. Interview Summary
-I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, regression comparison, and in-process integration proof. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify answer relevance through expected terms, verify tool selection, check CSV analysis intent, check citation presence and deterministic citation accuracy, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, fail RAG answers without citations, fail unsupported confident/cited answers, save a result summary with failure categories, compare the current run against previous results, and run deterministic CSV/RAG cases against FastAPI `TestClient` during automated tests. This creates the measurement layer that can later grow into model-assisted judging and token/cost tracking.
+I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, regression comparison, optional token/cost metadata, and in-process integration proof. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, extract token/cost usage when endpoint responses expose it, check status/shape expectations, verify answer relevance through expected terms, verify tool selection, check CSV analysis intent, check citation presence and deterministic citation accuracy, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, fail RAG answers without citations, fail unsupported confident/cited answers, save a result summary with failure categories and usage totals, compare the current run against previous results, and run deterministic CSV/RAG cases against FastAPI `TestClient` during automated tests. This creates the measurement layer that can later grow into model-assisted judging.
