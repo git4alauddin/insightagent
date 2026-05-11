@@ -28,11 +28,9 @@ def test_protected_endpoint_rejects_missing_api_key() -> None:
 
     assert response.status_code == 401
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "UNAUTHORIZED",
-                "message": "A valid x-api-key header is required.",
-            }
+        "error": {
+            "code": "UNAUTHORIZED",
+            "message": "A valid x-api-key header is required.",
         }
     }
 
@@ -48,11 +46,9 @@ def test_protected_endpoint_rejects_invalid_api_key() -> None:
 
     assert response.status_code == 401
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "UNAUTHORIZED",
-                "message": "A valid x-api-key header is required.",
-            }
+        "error": {
+            "code": "UNAUTHORIZED",
+            "message": "A valid x-api-key header is required.",
         }
     }
 
@@ -69,10 +65,8 @@ def test_protected_endpoint_fails_closed_when_api_key_is_not_configured(monkeypa
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "API_KEY_NOT_CONFIGURED",
-                "message": "API key authentication is not configured.",
-            }
+        "error": {
+            "code": "API_KEY_NOT_CONFIGURED",
+            "message": "API key authentication is not configured.",
         }
     }

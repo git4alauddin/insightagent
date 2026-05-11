@@ -37,10 +37,8 @@ def test_agent_query_returns_controlled_error_when_controller_fails() -> None:
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "AGENT_CONTROLLER_ERROR",
-                "message": "Tool decision output was not valid JSON.",
-            }
+        "error": {
+            "code": "AGENT_CONTROLLER_ERROR",
+            "message": "Tool decision output was not valid JSON.",
         }
     }

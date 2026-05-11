@@ -38,11 +38,9 @@ def test_chat_returns_controlled_error_when_llm_fails() -> None:
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "LLM_SERVICE_ERROR",
-                "message": "LLM API key is not configured.",
-            }
+        "error": {
+            "code": "LLM_SERVICE_ERROR",
+            "message": "LLM API key is not configured.",
         }
     }
 
@@ -82,11 +80,9 @@ def test_structured_chat_returns_controlled_error_when_service_fails() -> None:
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "STRUCTURED_LLM_SERVICE_ERROR",
-                "message": "LLM request timed out.",
-            }
+        "error": {
+            "code": "STRUCTURED_LLM_SERVICE_ERROR",
+            "message": "LLM request timed out.",
         }
     }
 
@@ -138,11 +134,9 @@ def test_memory_chat_returns_controlled_error_when_service_fails() -> None:
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "MEMORY_CHAT_SERVICE_ERROR",
-                "message": "Session not found: missing-session",
-            }
+        "error": {
+            "code": "MEMORY_CHAT_SERVICE_ERROR",
+            "message": "Session not found: missing-session",
         }
     }
 
@@ -153,10 +147,8 @@ def test_memory_chat_returns_controlled_error_when_message_too_long() -> None:
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "MEMORY_CHAT_SERVICE_ERROR",
-                "message": "Message too long.",
-            }
+        "error": {
+            "code": "MEMORY_CHAT_SERVICE_ERROR",
+            "message": "Message too long.",
         }
     }

@@ -48,11 +48,9 @@ def test_dataset_summary_returns_not_found_for_unknown_dataset() -> None:
 
     assert response.status_code == 404
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "DATASET_NOT_FOUND",
-                "message": "Dataset not found: ds_missing",
-            }
+        "error": {
+            "code": "DATASET_NOT_FOUND",
+            "message": "Dataset not found: ds_missing",
         }
     }
 
@@ -72,10 +70,8 @@ def test_dataset_summary_returns_storage_error_when_file_is_missing() -> None:
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "DATASET_STORAGE_ERROR",
-                "message": f"Dataset file is missing: {stored_path}",
-            }
+        "error": {
+            "code": "DATASET_STORAGE_ERROR",
+            "message": f"Dataset file is missing: {stored_path}",
         }
     }

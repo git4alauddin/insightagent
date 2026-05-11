@@ -75,11 +75,9 @@ def test_dataset_ask_dataset_not_found() -> None:
 
     assert response.status_code == 404
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "DATASET_NOT_FOUND",
-                "message": "Dataset not found: ds_missing",
-            }
+        "error": {
+            "code": "DATASET_NOT_FOUND",
+            "message": "Dataset not found: ds_missing",
         }
     }
 

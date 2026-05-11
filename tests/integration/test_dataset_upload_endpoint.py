@@ -51,11 +51,9 @@ def test_upload_rejects_non_csv_files() -> None:
 
     assert response.status_code == 400
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "DATASET_VALIDATION_ERROR",
-                "message": "Only CSV files are supported.",
-            }
+        "error": {
+            "code": "DATASET_VALIDATION_ERROR",
+            "message": "Only CSV files are supported.",
         }
     }
 
@@ -68,11 +66,9 @@ def test_upload_rejects_empty_csv() -> None:
 
     assert response.status_code == 400
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "DATASET_VALIDATION_ERROR",
-                "message": "CSV file is empty.",
-            }
+        "error": {
+            "code": "DATASET_VALIDATION_ERROR",
+            "message": "CSV file is empty.",
         }
     }
 
@@ -86,11 +82,9 @@ def test_upload_rejects_duplicate_columns() -> None:
 
     assert response.status_code == 400
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "DATASET_VALIDATION_ERROR",
-                "message": "CSV contains duplicate column names.",
-            }
+        "error": {
+            "code": "DATASET_VALIDATION_ERROR",
+            "message": "CSV contains duplicate column names.",
         }
     }
 
@@ -107,10 +101,8 @@ def test_upload_returns_controlled_db_error_when_registry_fails() -> None:
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "DATASET_DB_ERROR",
-                "message": "Database operation failed.",
-            }
+        "error": {
+            "code": "DATASET_DB_ERROR",
+            "message": "Database operation failed.",
         }
     }

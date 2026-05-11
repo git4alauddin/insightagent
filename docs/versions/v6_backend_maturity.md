@@ -46,16 +46,38 @@ Auth behavior:
 - missing or invalid `x-api-key` -> `401 UNAUTHORIZED`
 - missing server-side `API_KEY` config -> `503 API_KEY_NOT_CONFIGURED`
 
+### Global Exception Handling
+Added a central error handler registration path in `app/api/error_handlers.py`.
+
+All API errors now use this response shape:
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable message."
+  }
+}
+```
+
+Handled cases:
+- controlled route errors keep their existing codes, such as `DATASET_NOT_FOUND` or `UNAUTHORIZED`
+- request validation errors return `INVALID_INPUT`
+- unexpected backend errors return `INTERNAL_ERROR`
+
+Unexpected errors are logged but returned safely without exposing internal exception details.
+
 ## Why This Matters
 V6 protects costly and state-changing endpoints while keeping health/readiness checks available for uptime checks and deployment platforms.
 
 The backend now fails closed when API key auth is not configured, which is safer than accidentally exposing private endpoints.
 
+Global exception handling gives clients one consistent error format and prevents raw internal errors from leaking through API responses.
+
 ## Testing Status
-Latest suite after API key auth:
+Latest suite after global exception handling:
 
 ```text
-133 passed
+135 passed
 ```
 
 ## Current V6 Checklist Status
@@ -66,7 +88,8 @@ Latest suite after API key auth:
 - API key authentication: done.
 - Protected private endpoints: done.
 - Public `/health` and `/ready`: done.
-- Global exception handler: pending.
+- Global exception handler: done.
+- Structured error response: done.
 - Request ID middleware: pending.
 - Structured logging upgrade: pending.
 - Rate limiting: pending.
@@ -74,4 +97,4 @@ Latest suite after API key auth:
 - Cloud Run deployment: pending.
 
 ## Interview Explanation
-In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, and added API key authentication for private endpoints. Public health checks remain open, while LLM, agent, session, and dataset routes require a valid `x-api-key` header.
+In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, and centralized API error handling. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response.

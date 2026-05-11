@@ -16,6 +16,8 @@ V4 commit tracking: [docs/versions/v4_commit_log.md](docs/versions/v4_commit_log
 Detailed V5 notes: [docs/versions/v5_data_analysis_assistant.md](docs/versions/v5_data_analysis_assistant.md)
 V5 commit tracking: [docs/versions/v5_commit_log.md](docs/versions/v5_commit_log.md)
 Detailed V6 notes: [docs/versions/v6_backend_maturity.md](docs/versions/v6_backend_maturity.md)
+V6 technical walkthrough: [docs/versions/v6_technical_walkthrough.md](docs/versions/v6_technical_walkthrough.md)
+V6 commit tracking: [docs/versions/v6_commit_log.md](docs/versions/v6_commit_log.md)
 
 ## Project Structure
 ```text

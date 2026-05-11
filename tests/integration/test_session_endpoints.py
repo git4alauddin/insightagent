@@ -38,11 +38,9 @@ def test_create_session_returns_controlled_db_error_when_service_fails() -> None
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "SESSION_DB_ERROR",
-                "message": "Database operation failed.",
-            }
+        "error": {
+            "code": "SESSION_DB_ERROR",
+            "message": "Database operation failed.",
         }
     }
 
@@ -70,11 +68,9 @@ def test_get_session_messages_returns_controlled_error_for_missing_session() -> 
 
     assert response.status_code == 404
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "SESSION_NOT_FOUND",
-                "message": "Session not found: missing-session",
-            }
+        "error": {
+            "code": "SESSION_NOT_FOUND",
+            "message": "Session not found: missing-session",
         }
     }
 
@@ -88,10 +84,8 @@ def test_get_session_messages_returns_controlled_db_error_for_service_error() ->
 
     assert response.status_code == 503
     assert response.json() == {
-        "detail": {
-            "error": {
-                "code": "SESSION_DB_ERROR",
-                "message": "Database operation failed.",
-            }
+        "error": {
+            "code": "SESSION_DB_ERROR",
+            "message": "Database operation failed.",
         }
     }
