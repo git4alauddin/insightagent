@@ -371,8 +371,11 @@ Learning-first, version-by-version implementation.
 - Added grounded document answer prompt builder.
 - Added citation builder and weak-context fallback.
 - Added service-level grounded document answer response generation.
+- Added `POST /documents/{document_id}/ask`.
+- Added controlled document ask errors for missing documents and answer-service failures.
 - Added unit tests for document schemas.
 - Added integration tests for document upload.
+- Added integration tests for document ask.
 - Added unit tests for document text extraction and chunking.
 - Added unit tests for embedding generation and vector store behavior.
 - Added unit tests for semantic retrieval behavior.
@@ -392,6 +395,7 @@ Learning-first, version-by-version implementation.
 - To persist chunk vectors locally before adding semantic retrieval and answer generation.
 - To retrieve evidence chunks before allowing the backend to generate grounded answers.
 - To convert retrieval evidence into citations and safe answer responses before exposing a public ask endpoint.
+- To expose the document Q&A flow through a protected API endpoint.
 
 ### Tests Performed
 - Added unit tests for document schemas.
@@ -401,7 +405,8 @@ Learning-first, version-by-version implementation.
 - Added unit tests for local embedding and vector store behavior.
 - Added unit tests for semantic retrieval ranking, thresholding, and validation.
 - Added unit tests for grounded prompts, citations, answer responses, and weak-context fallback.
-- Full suite status after grounded document answer service: `199 passed`.
+- Added integration tests for successful document ask, weak context, missing documents, and answer errors.
+- Full suite status after document ask endpoint: `203 passed`.
 
 ### What I Learned
 - RAG systems need source/citation contracts early, not as an afterthought.
@@ -415,6 +420,7 @@ Learning-first, version-by-version implementation.
 - Similarity thresholds are the basis for weak-context fallback.
 - Citations should be built from backend retrieval metadata, not invented by the answer layer.
 - Weak-context fallback should happen before any confident answer is returned.
+- Endpoint wiring should preserve weak-context fallback as a valid response, not an exception.
 
 ### Interview Explanation
-- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, deterministic chunking, local embeddings, vector persistence, semantic retrieval, and grounded answer generation. I added schemas for document uploads, document questions, source citations, grounded answer responses, document chunks, and retrieval results, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, split cleaned text into overlapping metadata-rich chunks, generated deterministic local embeddings, stored vectors in SQLite, retrieved ranked evidence chunks with similarity scores, built citations from retrieved chunks, and added weak-context fallback so unsupported questions do not produce confident answers.
+- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, deterministic chunking, local embeddings, vector persistence, semantic retrieval, grounded answer generation, and the public document ask endpoint. I added schemas for document uploads, document questions, source citations, grounded answer responses, document chunks, and retrieval results, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, split cleaned text into overlapping metadata-rich chunks, generated deterministic local embeddings, stored vectors in SQLite, retrieved ranked evidence chunks with similarity scores, built citations from retrieved chunks, added weak-context fallback so unsupported questions do not produce confident answers, and exposed the flow through `POST /documents/{document_id}/ask`.

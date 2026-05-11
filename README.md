@@ -211,3 +211,14 @@ Invoke-RestMethod `
   -Headers $headers `
   -Form @{ file = Get-Item ".\policy.txt" }
 ```
+
+Ask a document question:
+
+```powershell
+Invoke-RestMethod `
+  -Uri "http://127.0.0.1:8000/documents/<document_id>/ask" `
+  -Method Post `
+  -Headers $headers `
+  -ContentType "application/json" `
+  -Body '{"question":"What is the refund policy?"}'
+```

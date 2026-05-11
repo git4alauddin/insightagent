@@ -6,9 +6,15 @@ from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from app.api.dependencies import require_api_key
 from app.api.rate_limit import enforce_rate_limit
 from app.config import settings
-from app.schemas.document import DocumentUploadResponse
+from app.schemas.document import (
+    DocumentAskRequest,
+    DocumentAskResponse,
+    DocumentUploadResponse,
+)
+from app.services.document_answer_service import DocumentAnswerError, answer_document_question
 from app.services.document_registry_service import (
     DocumentRegistryError,
+    get_document_metadata,
     register_document_metadata,
 )
 from app.services.document_service import (
@@ -22,6 +28,32 @@ router = APIRouter(
     tags=["documents"],
     dependencies=[Depends(require_api_key), Depends(enforce_rate_limit)],
 )
+
+
+def _ensure_document_exists(document_id: str) -> None:
+    try:
+        get_document_metadata(document_id)
+    except DocumentRegistryError as exc:
+        if "Document not found" in str(exc):
+            raise HTTPException(
+                status_code=404,
+                detail={
+                    "error": {
+                        "code": "DOCUMENT_NOT_FOUND",
+                        "message": str(exc),
+                    }
+                },
+            ) from exc
+
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": {
+                    "code": "DOCUMENT_DB_ERROR",
+                    "message": str(exc),
+                }
+            },
+        ) from exc
 
 
 @router.post("/documents/upload", response_model=DocumentUploadResponse)
@@ -91,6 +123,27 @@ def upload_document(
                 "error": {
                     "code": "DOCUMENT_STORAGE_ERROR",
                     "message": f"Document could not be stored: {exc}",
+                }
+            },
+        ) from exc
+
+
+@router.post("/documents/{document_id}/ask", response_model=DocumentAskResponse)
+def ask_document_question(
+    document_id: str,
+    request: DocumentAskRequest,
+) -> DocumentAskResponse:
+    _ensure_document_exists(document_id)
+
+    try:
+        return answer_document_question(document_id, request.question)
+    except DocumentAnswerError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "error": {
+                    "code": "DOCUMENT_ANSWER_ERROR",
+                    "message": str(exc),
                 }
             },
         ) from exc

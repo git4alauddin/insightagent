@@ -90,8 +90,9 @@ Key behaviors:
 ### `app/api/routes_documents.py`
 Adds:
 - `POST /documents/upload`
+- `POST /documents/{document_id}/ask`
 
-Flow:
+Upload flow:
 1. Read uploaded file bytes.
 2. Validate file name, extension, size, and empty content.
 3. Generate a `doc_<uuid>` document ID.
@@ -99,10 +100,18 @@ Flow:
 5. Register document metadata in SQLite.
 6. Return `DocumentUploadResponse`.
 
+Ask flow:
+1. Validate the request body through `DocumentAskRequest`.
+2. Confirm the document exists in SQLite metadata.
+3. Call `answer_document_question(...)`.
+4. Return `DocumentAskResponse`.
+
 Controlled errors:
 - `DOCUMENT_VALIDATION_ERROR` (`400`)
+- `DOCUMENT_NOT_FOUND` (`404`)
 - `DOCUMENT_DB_ERROR` (`503`)
 - `DOCUMENT_STORAGE_ERROR` (`503`)
+- `DOCUMENT_ANSWER_ERROR` (`503`)
 
 ### `app/main.py`
 Includes document router.
@@ -253,7 +262,32 @@ Behavior:
 - maps top similarity score to low/medium/high confidence
 - converts retrieval failures into `DocumentAnswerError`
 
-## 12. Tests Added
+## 12. Public Document Ask Endpoint
+
+### `app/api/routes_documents.py`
+The endpoint:
+```http
+POST /documents/{document_id}/ask
+```
+
+Responsibilities:
+- keep the endpoint protected by API key and rate limiting through router dependencies
+- validate `question` with `DocumentAskRequest`
+- verify the document exists before answer generation
+- return `DOCUMENT_NOT_FOUND` for unknown document IDs
+- return grounded answer responses from `DocumentAskResponse`
+- return controlled `DOCUMENT_ANSWER_ERROR` for answer-service failures
+
+Weak retrieval is not treated as an exception. It returns a normal `DocumentAskResponse` with:
+```json
+{
+  "status": "insufficient_context",
+  "confidence": "low",
+  "sources": []
+}
+```
+
+## 13. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -328,7 +362,14 @@ Verifies:
 - retrieval service orchestration
 - retrieval error conversion
 
-## 13. Checklist Mapping
+### `tests/integration/test_document_ask_endpoint.py`
+Verifies:
+- successful document answer response with citations
+- insufficient-context response when no chunks are indexed
+- missing document returns `DOCUMENT_NOT_FOUND`
+- answer-service failure returns `DOCUMENT_ANSWER_ERROR`
+
+## 14. Checklist Mapping
 - document upload endpoint: done
 - supported document extensions config: done
 - unsupported document-type handling: done
@@ -353,9 +394,10 @@ Verifies:
 - answer generated only from retrieved context: done
 - citation builder: done
 - weak-context fallback: done
-- `/documents/{document_id}/ask` endpoint: pending
+- `/documents/{document_id}/ask` endpoint: done
 - insufficient-context test questions: service-level done
 - citation examples in docs: done
+- RAG flow manually tested end-to-end: pending
 
-## 14. Interview Summary
-I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, semantic retrieval, and a grounded answer service. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, retrieves the most relevant chunks for a question using top-k and similarity threshold controls, builds citations from retrieved chunks, and returns insufficient-context fallback when evidence is missing. This creates the complete service-level RAG flow before the public ask endpoint is wired.
+## 15. Interview Summary
+I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, semantic retrieval, a grounded answer service, and the public document ask endpoint. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, retrieves the most relevant chunks for a question using top-k and similarity threshold controls, builds citations from retrieved chunks, returns insufficient-context fallback when evidence is missing, and exposes the answer flow through `POST /documents/{document_id}/ask`.

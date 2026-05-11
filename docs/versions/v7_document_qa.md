@@ -131,6 +131,21 @@ Behavior:
 
 This is intentionally service-level. The public `/documents/{document_id}/ask` endpoint will be wired after the answer behavior is stable and tested.
 
+### Document Ask Endpoint
+Added:
+```http
+POST /documents/{document_id}/ask
+```
+
+Behavior:
+- validates the request with `DocumentAskRequest`
+- confirms the document exists before answering
+- calls the grounded document answer service
+- returns `DocumentAskResponse`
+- returns `DOCUMENT_NOT_FOUND` for unknown documents
+- returns `DOCUMENT_ANSWER_ERROR` for controlled answer-service failures
+- preserves weak-context fallback as a normal `200` response with `status="insufficient_context"`
+
 ## Why This Matters
 The early V7 chunks define the API contract, indexing foundation, and retrieval layer before answer generation.
 
@@ -160,6 +175,24 @@ Ask document:
 POST /documents/{document_id}/ask
 ```
 
+Current ask response shape:
+```json
+{
+  "answer": "Based on the retrieved document context: Refunds are available.",
+  "confidence": "high",
+  "document_id": "doc_123",
+  "sources": [
+    {
+      "filename": "policy.txt",
+      "chunk_id": "doc_123_chunk_0000",
+      "similarity_score": 0.91,
+      "page": 1
+    }
+  ],
+  "status": "success"
+}
+```
+
 ## Example Future Response Shape
 ```json
 {
@@ -180,7 +213,6 @@ POST /documents/{document_id}/ask
 
 ## Deferred On Purpose
 Not built yet:
-- `/documents/{document_id}/ask` endpoint
 - end-to-end manual RAG API test
 
 ## Testing Status
@@ -236,10 +268,16 @@ Added grounded answer unit tests for:
 - grounded prompt content
 - retrieval error conversion
 
+Added document ask endpoint integration tests for:
+- successful answer response with citations
+- insufficient-context response when no chunks are indexed
+- missing document handling
+- controlled answer-service error handling
+
 Latest suite:
 ```text
-199 passed
+203 passed
 ```
 
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, creating a local vector indexing foundation, adding semantic retrieval, and building the grounded answer service. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, persist chunk vectors in SQLite, retrieve the most relevant chunks for a question, build citations, and return weak-context fallback when evidence is missing. The public document ask endpoint is intentionally deferred to the next V7 chunk.
+In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, creating a local vector indexing foundation, adding semantic retrieval, building the grounded answer service, and exposing the document ask endpoint. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, persist chunk vectors in SQLite, retrieve the most relevant chunks for a question, build citations, return weak-context fallback when evidence is missing, and expose that flow through `POST /documents/{document_id}/ask`.

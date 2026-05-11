@@ -85,7 +85,7 @@ This file maps each V7 commit heading to:
 - Added the retrieval evidence layer needed before grounded answer generation.
 - Prepared citation building by returning source chunk metadata with similarity scores.
 
-### `<pending>` - `v7: add grounded document answer service`
+### `f95b394` - `v7: add grounded document answer service`
 **What we did**
 - Added grounded document Q&A prompt builder.
 - Added citation builder from retrieved chunks.
@@ -98,6 +98,20 @@ This file maps each V7 commit heading to:
 - Converted retrieval results into the final document answer response shape.
 - Ensured unsupported questions do not produce confident answers.
 - Prepared the answer logic for the future `/documents/{document_id}/ask` endpoint.
+
+### `<pending>` - `v7: add document ask endpoint`
+**What we did**
+- Added `POST /documents/{document_id}/ask`.
+- Added document existence validation before answer generation.
+- Returned `DocumentAskResponse` from the grounded answer service.
+- Added controlled `DOCUMENT_NOT_FOUND` and `DOCUMENT_ANSWER_ERROR` responses.
+- Added document ask integration tests for success, weak context, missing documents, and answer errors.
+- Added README usage example for document questions.
+
+**What it solved / took care of**
+- Exposed the service-level RAG answer flow through the public API.
+- Connected validated questions to retrieval, citation, and weak-context behavior.
+- Completed the main V7 document Q&A endpoint surface.
 
 ## Reusable Entry Template
 
