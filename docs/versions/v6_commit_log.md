@@ -120,7 +120,7 @@ This file maps each V6 commit heading to:
 - Aligned runtime version reporting with the current project version.
 - Made the remaining Cloud Run deployment gap explicit instead of ambiguous.
 
-### `<pending>` - `v6: configure docs exposure by environment`
+### `04ec6b5` - `v6: configure docs exposure by environment`
 **What we did**
 - Added `DOCS_ENABLED` config.
 - Added an app factory to control FastAPI docs routes.
