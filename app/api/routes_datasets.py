@@ -4,6 +4,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 from app.api.dependencies import require_api_key
+from app.api.rate_limit import enforce_rate_limit
 from app.config import settings
 from app.schemas.dataset import DatasetAskRequest, DatasetAskResponse, DatasetSummaryResponse, DatasetUploadResponse
 from app.services.dataset_analysis_router import build_route_decision
@@ -23,7 +24,10 @@ from app.services.dataset_service import (
 )
 
 
-router = APIRouter(tags=["datasets"], dependencies=[Depends(require_api_key)])
+router = APIRouter(
+    tags=["datasets"],
+    dependencies=[Depends(require_api_key), Depends(enforce_rate_limit)],
+)
 
 
 def _resolve_dataset_storage_path(dataset_id: str) -> Path:

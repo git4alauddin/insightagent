@@ -28,6 +28,7 @@ app/
     cors.py
     dependencies.py
     middleware.py
+    rate_limit.py
     routes_health.py
     routes_chat.py
     routes_agent.py

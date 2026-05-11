@@ -108,6 +108,23 @@ Behavior:
 
 This keeps local frontend development possible without leaving production CORS overly permissive.
 
+### Basic Rate Limiting
+Added in-memory rate limiting in `app/api/rate_limit.py`.
+
+Config values:
+- `RATE_LIMIT_ENABLED`
+- `RATE_LIMIT_REQUESTS_PER_MINUTE`
+- `RATE_LIMIT_UPLOADS_PER_MINUTE`
+- `RATE_LIMIT_WINDOW_SECONDS`
+
+Behavior:
+- private endpoints are rate limited by API key
+- `/datasets/upload` uses the stricter upload limit
+- `/health` and `/ready` are not rate limited
+- exceeded limits return `429 RATE_LIMIT_EXCEEDED`
+
+This is intentionally simple for V6. A distributed store such as Redis would be a future production upgrade.
+
 ## Why This Matters
 V6 protects costly and state-changing endpoints while keeping health/readiness checks available for uptime checks and deployment platforms.
 
@@ -121,11 +138,13 @@ Structured request logs make latency, status codes, and request paths visible wi
 
 CORS config keeps browser access controlled and environment-aware.
 
+Rate limiting reduces accidental loops and basic abuse risk on costly or state-changing endpoints.
+
 ## Testing Status
-Latest suite after CORS configuration:
+Latest suite after rate limiting:
 
 ```text
-142 passed
+145 passed
 ```
 
 ## Current V6 Checklist Status
@@ -141,8 +160,8 @@ Latest suite after CORS configuration:
 - Request ID middleware: done.
 - Structured logging upgrade: done.
 - CORS config: done.
-- Rate limiting: pending.
+- Rate limiting: done.
 - Cloud Run deployment: pending.
 
 ## Interview Explanation
-In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, and configured environment-aware CORS. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.
+In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, configured environment-aware CORS, and added basic in-memory rate limiting. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.

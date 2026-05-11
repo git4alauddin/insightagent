@@ -13,6 +13,7 @@ The current V6 work focuses on:
 5. Request IDs for traceability.
 6. Structured request logging.
 7. Environment-aware CORS.
+8. Basic rate limiting.
 
 ## 2. CORS Configuration
 
@@ -90,7 +91,41 @@ Router-level dependency protection was added to:
 Public routes remain in:
 - `app/api/routes_health.py`
 
-## 5. Global Error Handling
+## 5. Rate Limiting
+
+### `app/config.py`
+Adds:
+- `rate_limit_enabled`
+- `rate_limit_requests_per_minute`
+- `rate_limit_uploads_per_minute`
+- `rate_limit_window_seconds`
+
+### `app/api/rate_limit.py`
+Core function:
+- `enforce_rate_limit(...)`
+
+Behavior:
+- tracks requests in memory
+- uses the API key as the main rate-limit identity
+- applies a general request limit to private endpoints
+- applies a stricter upload limit to `/datasets/upload`
+- returns `429 RATE_LIMIT_EXCEEDED` when the limit is crossed
+
+Supporting function:
+- `reset_rate_limit_store()`
+
+This exists so tests can clear the in-memory limiter state.
+
+### Protected Routers
+Rate limiting is attached alongside API key auth to:
+- `app/api/routes_chat.py`
+- `app/api/routes_agent.py`
+- `app/api/routes_session.py`
+- `app/api/routes_datasets.py`
+
+Public health routes are not rate limited.
+
+## 6. Global Error Handling
 
 ### `app/api/error_handlers.py`
 Core functions:
@@ -124,7 +159,7 @@ register_exception_handlers(app)
 
 This attaches the handlers once during app startup.
 
-## 6. Request ID Middleware
+## 7. Request ID Middleware
 
 ### `app/api/middleware.py`
 Core function:
@@ -172,7 +207,7 @@ Calls:
 register_request_id_middleware(app)
 ```
 
-## 7. Tests Added/Extended
+## 8. Tests Added/Extended
 
 ### CORS Tests
 `tests/integration/test_cors_config.py` verifies:
@@ -187,6 +222,12 @@ register_request_id_middleware(app)
 - protected endpoints reject missing API keys
 - protected endpoints reject invalid API keys
 - missing configured `API_KEY` fails closed
+
+### Rate Limit Tests
+`tests/integration/test_rate_limit.py` verifies:
+- too many private requests return `RATE_LIMIT_EXCEEDED`
+- upload endpoints use a stricter limit
+- `/health` is not rate limited
 
 ### Error Handler Tests
 `tests/integration/test_error_handlers.py` verifies:
@@ -212,7 +253,7 @@ Existing tests were updated to expect the new V6 error shape:
 }
 ```
 
-## 8. Checklist Mapping
+## 9. Checklist Mapping
 - `/ready` endpoint: done
 - dependency readiness checks: done
 - Dockerfile: done
@@ -224,7 +265,7 @@ Existing tests were updated to expect the new V6 error shape:
 - structured error response: done
 - request ID middleware: done
 - structured request logging: done
-- rate limiting: pending
+- rate limiting: done
 
-## 9. Interview Summary
-In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, environment-aware CORS, API key protection for private endpoints, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
+## 10. Interview Summary
+In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, environment-aware CORS, API key protection for private endpoints, basic rate limiting, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.

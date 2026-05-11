@@ -72,7 +72,7 @@ This file maps each V6 commit heading to:
 - Made request behavior easier to debug.
 - Started the V6 structured logging upgrade without introducing a new logging library.
 
-### `<pending>` - `v6: add environment-aware CORS configuration`
+### `52a9fdf` - `v6: add environment-aware CORS configuration`
 **What we did**
 - Added CORS settings for app environment and allowed origins.
 - Added CORS middleware registration.
@@ -83,6 +83,18 @@ This file maps each V6 commit heading to:
 **What it solved / took care of**
 - Prepared the backend for browser-based frontend access.
 - Avoided permissive production CORS defaults.
+
+### `<pending>` - `v6: add basic in-memory rate limiting`
+**What we did**
+- Added rate limit settings.
+- Added in-memory rate limit enforcement.
+- Applied rate limiting to private routers.
+- Added a stricter limit path for dataset uploads.
+- Added rate-limit integration tests.
+
+**What it solved / took care of**
+- Protected costly/private endpoints from accidental loops and basic abuse.
+- Kept `/health` and `/ready` outside rate limiting.
 
 ## Reusable Entry Template
 

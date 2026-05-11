@@ -7,6 +7,10 @@ class Settings(BaseSettings):
     app_env: str = "development"
     log_level: str = "INFO"
     cors_allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
+    rate_limit_enabled: bool = True
+    rate_limit_requests_per_minute: int = 60
+    rate_limit_uploads_per_minute: int = 5
+    rate_limit_window_seconds: int = 60
 
     llm_provider: str = "groq"
     llm_model: str = "llama-3.1-8b-instant"
