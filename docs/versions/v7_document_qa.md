@@ -30,6 +30,8 @@ Added document upload guardrail settings:
 - `DOCUMENT_CHUNK_SIZE`
 - `DOCUMENT_CHUNK_OVERLAP`
 - `DOCUMENT_EMBEDDING_DIMENSIONS`
+- `DOCUMENT_RETRIEVAL_TOP_K`
+- `DOCUMENT_SIMILARITY_THRESHOLD`
 
 Default supported extensions:
 - `.pdf`
@@ -104,13 +106,25 @@ Behavior:
 - loads chunks in chunk order
 - converts SQLite errors into controlled service errors
 
+### Semantic Retrieval Service
+Added semantic retrieval over indexed document chunks.
+
+Behavior:
+- embeds the user question
+- loads stored chunks and embeddings for a document
+- computes cosine similarity
+- maps similarity scores into the `0.0` to `1.0` citation range
+- filters chunks below `DOCUMENT_SIMILARITY_THRESHOLD`
+- returns the top `DOCUMENT_RETRIEVAL_TOP_K` matches
+- returns retrieval trace metadata: top-k, threshold, candidate count, chunks, and scores
+
 ## Why This Matters
-The early V7 chunks define the API contract and indexing foundation before retrieval and answer generation.
+The early V7 chunks define the API contract, indexing foundation, and retrieval layer before answer generation.
 
 This keeps the RAG build controlled:
 - no parsing before upload contracts are clear
 - no embeddings before chunk/source metadata is clear
-- no answers without citation structure
+- no answers without citation and retrieval evidence
 
 ## Planned API Surface
 
@@ -153,7 +167,6 @@ POST /documents/{document_id}/ask
 
 ## Deferred On Purpose
 Not built yet:
-- retrieval
 - grounded answer generation
 
 ## Testing Status
@@ -192,10 +205,19 @@ Added local indexing unit tests for:
 - document index replacement
 - controlled vector store errors
 
+Added semantic retrieval unit tests for:
+- cosine similarity scoring
+- `0.0` to `1.0` similarity score mapping
+- ranked top-k retrieval
+- similarity threshold filtering
+- blank question handling
+- invalid retrieval settings
+- vector dimension validation
+
 Latest suite:
 ```text
-183 passed
+191 passed
 ```
 
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, and creating a local vector indexing foundation. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, and persist chunk vectors in SQLite. Retrieval and grounded answers are intentionally deferred to later V7 chunks.
+In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, creating a local vector indexing foundation, and adding semantic retrieval. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, persist chunk vectors in SQLite, and retrieve the most relevant chunks for a question. Grounded answer generation is intentionally deferred to later V7 chunks.

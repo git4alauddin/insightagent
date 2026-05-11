@@ -366,10 +366,13 @@ Learning-first, version-by-version implementation.
 - Added document chunk metadata with document ID, filename, chunk index, chunk ID, and optional page.
 - Added deterministic local embedding generation.
 - Added SQLite-backed chunk/vector storage.
+- Added semantic retrieval over indexed document chunks.
+- Added retrieval trace metadata with top-k, similarity threshold, candidate count, and scored chunks.
 - Added unit tests for document schemas.
 - Added integration tests for document upload.
 - Added unit tests for document text extraction and chunking.
 - Added unit tests for embedding generation and vector store behavior.
+- Added unit tests for semantic retrieval behavior.
 - Added V7 documentation files:
   - `docs/versions/v7_document_qa.md`
   - `docs/versions/v7_technical_walkthrough.md`
@@ -383,6 +386,7 @@ Learning-first, version-by-version implementation.
 - To convert stored documents into text before chunking and retrieval.
 - To convert extracted text into citation-ready chunks before embeddings and retrieval.
 - To persist chunk vectors locally before adding semantic retrieval and answer generation.
+- To retrieve evidence chunks before allowing the backend to generate grounded answers.
 
 ### Tests Performed
 - Added unit tests for document schemas.
@@ -390,7 +394,8 @@ Learning-first, version-by-version implementation.
 - Added unit tests for document text extraction.
 - Added unit tests for document chunking behavior and invalid settings.
 - Added unit tests for local embedding and vector store behavior.
-- Full suite status after local vector indexing: `183 passed`.
+- Added unit tests for semantic retrieval ranking, thresholding, and validation.
+- Full suite status after semantic retrieval: `191 passed`.
 
 ### What I Learned
 - RAG systems need source/citation contracts early, not as an afterthought.
@@ -400,6 +405,8 @@ Learning-first, version-by-version implementation.
 - Chunking needs deterministic output and metadata because retrieval and citations depend on stable source units.
 - A local deterministic embedding layer is useful for building and testing retrieval plumbing without depending on external embedding APIs.
 - Vector storage needs replacement behavior so a document can be safely re-indexed.
+- Retrieval should expose trace metadata so answer quality can be debugged before the LLM generation step.
+- Similarity thresholds are the basis for weak-context fallback.
 
 ### Interview Explanation
-- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, deterministic chunking, local embeddings, and vector persistence. I added schemas for document uploads, document questions, source citations, grounded answer responses, and document chunks, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, split cleaned text into overlapping metadata-rich chunks, generated deterministic local embeddings, and stored vectors in SQLite. This sets up the future RAG pipeline to retrieve and answer with citations.
+- In V7, I started the document Q&A layer by defining contracts, adding the upload lifecycle, implementing text extraction, deterministic chunking, local embeddings, vector persistence, and semantic retrieval. I added schemas for document uploads, document questions, source citations, grounded answer responses, document chunks, and retrieval results, implemented safe raw document upload persistence with SQLite metadata, added extraction paths for TXT, Markdown, and PDF files, split cleaned text into overlapping metadata-rich chunks, generated deterministic local embeddings, stored vectors in SQLite, and retrieved ranked evidence chunks with similarity scores. This sets up the future RAG pipeline to answer with citations.

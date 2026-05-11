@@ -57,7 +57,7 @@ This file maps each V7 commit heading to:
 - Preserved document/source metadata needed for later citations.
 - Added guardrails so invalid chunk settings fail before indexing.
 
-### `<pending>` - `v7: add local vector indexing foundation`
+### `0a681d3` - `v7: add local vector indexing foundation`
 **What we did**
 - Added local embedding dimension configuration.
 - Added deterministic local embedding generation.
@@ -70,6 +70,20 @@ This file maps each V7 commit heading to:
 - Turned document chunks into vector-ready records.
 - Created a local vector index foundation without external embedding API dependency.
 - Prepared the backend for semantic retrieval and citation-backed answers.
+
+### `<pending>` - `v7: add semantic retrieval over document chunks`
+**What we did**
+- Added retrieval top-k and similarity threshold configuration.
+- Added retrieved chunk and retrieval result schemas.
+- Added cosine similarity scoring.
+- Added semantic retrieval over stored document chunks.
+- Added retrieval trace metadata: top-k, threshold, candidate count, and scored chunks.
+- Added retrieval unit tests for ranking, threshold filtering, and invalid settings.
+
+**What it solved / took care of**
+- Made stored document vectors searchable by question.
+- Added the retrieval evidence layer needed before grounded answer generation.
+- Prepared citation building by returning source chunk metadata with similarity scores.
 
 ## Reusable Entry Template
 

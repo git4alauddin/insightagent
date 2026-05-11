@@ -19,8 +19,10 @@ Added:
 - `document_chunk_size`
 - `document_chunk_overlap`
 - `document_embedding_dimensions`
+- `document_retrieval_top_k`
+- `document_similarity_threshold`
 
-These settings prepare upload validation, deterministic chunking, and local vector indexing for PDF, TXT, and Markdown files.
+These settings prepare upload validation, deterministic chunking, local vector indexing, and semantic retrieval for PDF, TXT, and Markdown files.
 
 ## 3. Database Metadata
 
@@ -68,6 +70,8 @@ Main models:
 - `DocumentChunk`
 - `DocumentAskRequest`
 - `SourceCitation`
+- `RetrievedDocumentChunk`
+- `DocumentRetrievalResult`
 - `DocumentAskResponse`
 
 Key behaviors:
@@ -77,6 +81,8 @@ Key behaviors:
 - `DocumentAskRequest.question` trims and rejects blank input.
 - `SourceCitation.similarity_score` must be between `0.0` and `1.0`.
 - `SourceCitation.page` is optional but must be positive when present.
+- `RetrievedDocumentChunk` carries source chunk text and similarity score.
+- `DocumentRetrievalResult` carries top-k, threshold, candidate count, and matching chunks.
 - `DocumentAskResponse.answer` must not be blank.
 
 ## 6. API Layer
@@ -190,7 +196,34 @@ Responsibilities:
 - load indexed chunks in chunk order
 - convert SQLite failures into `DocumentVectorStoreError`
 
-## 10. Tests Added
+## 10. Semantic Retrieval
+
+### `app/services/document_retrieval_service.py`
+Core functions:
+- `retrieve_relevant_chunks(document_id, question, top_k=None, similarity_threshold=None)`
+- `cosine_similarity(left, right)`
+- `similarity_score(left, right)`
+
+Behavior:
+- embeds the question with the local embedding service
+- loads indexed chunks through the vector store service
+- computes cosine similarity between question and chunk vectors
+- maps cosine similarity from `-1.0..1.0` into `0.0..1.0`
+- filters chunks below the configured similarity threshold
+- sorts matches by descending similarity score
+- returns only the configured top-k matches
+
+Retrieval result includes:
+- `document_id`
+- `question`
+- `retrieved_chunks`
+- `top_k`
+- `similarity_threshold`
+- `candidate_count`
+
+This gives the later answer endpoint a concrete evidence set and retrieval trace before any LLM answer is generated.
+
+## 11. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -244,7 +277,18 @@ Verifies:
 - wrong document ID rejection
 - controlled DB error handling
 
-## 11. Checklist Mapping
+### `tests/unit/test_document_retrieval_service.py`
+Verifies:
+- cosine similarity calculation
+- similarity score mapping into `0.0..1.0`
+- ranked top-k retrieval
+- threshold filtering
+- blank question rejection
+- invalid top-k rejection
+- invalid threshold rejection
+- vector dimension validation
+
+## 12. Checklist Mapping
 - document upload endpoint: done
 - supported document extensions config: done
 - unsupported document-type handling: done
@@ -261,11 +305,14 @@ Verifies:
 - chunk metadata: done
 - embedding generation: done
 - vector store integration: done
-- retrieval: pending
-- top-k retrieval: pending
-- similarity threshold: pending
-- retrieval log with chunks/scores: pending
+- semantic retrieval: done
+- top-k retrieval: done
+- similarity threshold: done
+- retrieval log with chunks/scores: done
 - grounded answer generation: pending
+- citation builder: pending
+- weak-context fallback: pending
+- `/documents/{document_id}/ask` endpoint: pending
 
-## 12. Interview Summary
-I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, and SQLite-backed vector persistence. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, and stores chunk vectors for retrieval. This creates the foundation for semantic retrieval and grounded answer generation.
+## 13. Interview Summary
+I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, and semantic retrieval. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, and retrieves the most relevant chunks for a question using top-k and similarity threshold controls. This creates the evidence layer needed for grounded answer generation.

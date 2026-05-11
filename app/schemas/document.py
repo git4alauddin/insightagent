@@ -45,6 +45,41 @@ class SourceCitation(BaseModel):
     page: int | None = Field(default=None, ge=1)
 
 
+class RetrievedDocumentChunk(BaseModel):
+    chunk_id: str
+    document_id: str
+    filename: str
+    chunk_index: int = Field(ge=0)
+    text: str
+    similarity_score: float = Field(ge=0.0, le=1.0)
+    page: int | None = Field(default=None, ge=1)
+
+    @field_validator("text")
+    @classmethod
+    def text_must_not_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+        if not cleaned_value:
+            raise ValueError("Retrieved chunk text must not be empty.")
+        return cleaned_value
+
+
+class DocumentRetrievalResult(BaseModel):
+    document_id: str
+    question: str
+    retrieved_chunks: list[RetrievedDocumentChunk]
+    top_k: int = Field(gt=0)
+    similarity_threshold: float = Field(ge=0.0, le=1.0)
+    candidate_count: int = Field(ge=0)
+
+    @field_validator("question")
+    @classmethod
+    def question_must_not_be_blank(cls, value: str) -> str:
+        cleaned_value = value.strip()
+        if not cleaned_value:
+            raise ValueError("Question must not be empty.")
+        return cleaned_value
+
+
 class DocumentAskResponse(BaseModel):
     answer: str
     confidence: Literal["low", "medium", "high"]

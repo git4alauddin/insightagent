@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     document_chunk_size: int = 800
     document_chunk_overlap: int = 120
     document_embedding_dimensions: int = 64
+    document_retrieval_top_k: int = 3
+    document_similarity_threshold: float = 0.2
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 
