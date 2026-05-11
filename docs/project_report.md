@@ -351,3 +351,30 @@ Learning-first, version-by-version implementation.
 
 ### Interview Explanation
 - In V6, I hardened the backend for deployment-style use. I aligned app version reporting to V6, added readiness checks, verified Docker runtime support, environment-aware CORS, configurable API docs exposure, API key authentication, rate limiting, centralized exception handling, request IDs, and structured request logging. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.
+
+## V7 Progress
+
+### What We Built
+- Added document Q&A schema contracts.
+- Added source citation schema.
+- Added document upload guardrail config.
+- Added unit tests for document schemas.
+- Added V7 documentation files:
+  - `docs/versions/v7_document_qa.md`
+  - `docs/versions/v7_technical_walkthrough.md`
+  - `docs/versions/v7_commit_log.md`
+
+### Why We Built It
+- To start RAG with stable API contracts before parsing, chunking, embeddings, and retrieval.
+- To make citations part of the response design from the beginning.
+- To keep weak-context and grounded-answer behavior explicit before answer generation is implemented.
+
+### Tests Performed
+- Added unit tests for document schemas.
+
+### What I Learned
+- RAG systems need source/citation contracts early, not as an afterthought.
+- Response schemas help define what “grounded answer” means before model logic is added.
+
+### Interview Explanation
+- In V7, I started the document Q&A layer by defining contracts first. I added schemas for document uploads, document questions, source citations, and grounded answer responses. This sets up the future RAG pipeline to return answers with citations and controlled confidence/status values.

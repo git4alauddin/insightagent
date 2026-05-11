@@ -26,6 +26,8 @@ class Settings(BaseSettings):
     csv_max_columns: int = 200
     upload_dir: str = "uploads"
     allowed_dataset_extensions: tuple[str, ...] = (".csv",)
+    document_max_file_size_mb: int = 20
+    allowed_document_extensions: tuple[str, ...] = (".pdf", ".txt", ".md")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

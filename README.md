@@ -3,7 +3,7 @@
 InsightAgent is a learning-first, production-style FastAPI backend for AI-powered data and document analysis.
 
 ## Current Version
-V6 - Backend maturity and deployment hardening.
+V7 - RAG document Q&A.
 
 Cloud Run deployment is intentionally deferred until the local/containerized backend is fully closed out and ready for an external runtime.
 
@@ -20,6 +20,9 @@ V5 commit tracking: [docs/versions/v5_commit_log.md](docs/versions/v5_commit_log
 Detailed V6 notes: [docs/versions/v6_backend_maturity.md](docs/versions/v6_backend_maturity.md)
 V6 technical walkthrough: [docs/versions/v6_technical_walkthrough.md](docs/versions/v6_technical_walkthrough.md)
 V6 commit tracking: [docs/versions/v6_commit_log.md](docs/versions/v6_commit_log.md)
+Detailed V7 notes: [docs/versions/v7_document_qa.md](docs/versions/v7_document_qa.md)
+V7 technical walkthrough: [docs/versions/v7_technical_walkthrough.md](docs/versions/v7_technical_walkthrough.md)
+V7 commit tracking: [docs/versions/v7_commit_log.md](docs/versions/v7_commit_log.md)
 
 ## Project Structure
 ```text
@@ -49,6 +52,7 @@ app/
     agent.py
     tools.py
     dataset.py
+    document.py
   services/
     llm_service.py
     structured_llm_service.py
@@ -85,6 +89,9 @@ docs/
     v6_backend_maturity.md
     v6_technical_walkthrough.md
     v6_commit_log.md
+    v7_document_qa.md
+    v7_technical_walkthrough.md
+    v7_commit_log.md
 ```
 
 ## Run Locally
