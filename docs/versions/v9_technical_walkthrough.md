@@ -117,7 +117,41 @@ Current event:
 
 This is intentionally route-level for now because the route has access to the request id and the validated response object.
 
-## 6. Checklist Mapping
+## 6. Metrics Summary Script
+
+### `scripts/metrics_summary.py`
+V9 adds a small log summarizer for structured JSON logs.
+
+Core functions:
+- `extract_json_payload(line)` reads plain JSON log lines and prefixed runtime log lines.
+- `load_log_events(log_path)` loads valid JSON event payloads and skips non-JSON noise.
+- `build_metrics_summary(events)` splits request logs and agent tool logs into separate summaries.
+- `save_summary(summary, output_path)` writes a reusable JSON report.
+
+Request metrics currently include:
+- total requests
+- successful requests
+- failed requests
+- success rate
+- average latency
+- endpoint counts
+- error category counts
+
+Agent tool metrics currently include:
+- total tool events
+- successful tool events
+- failed tool events
+- success rate
+- tool usage counts
+- tool status counts
+
+CLI example:
+
+```powershell
+.\.venv\Scripts\python scripts\metrics_summary.py --logs logs\app.log --output logs\metrics_summary.json
+```
+
+## 7. Checklist Mapping
 
 Started:
 - V9 version boundary
@@ -132,17 +166,19 @@ Started:
 - API -> agent -> tool tracing
 - tool used tracking
 - tool status tracking
+- metrics summary script
+- tool usage summary
+- tool success/failure summary
+- error categories visible in summaries
 
 Pending:
 - deeper service-level tool execution tracing
 - token/cost tracking in runtime logs
-- tool usage summary
-- metrics summary script
 - log format documentation
 - request lifecycle trace example
 - observability section in README
 
-## 7. Tests Added
+## 8. Tests Added
 
 ### `tests/integration/test_request_id_middleware.py`
 Verifies:
@@ -158,5 +194,14 @@ Verifies:
 - controlled agent errors
 - agent tool trace log includes request id, tool used, tool status, agent status, and output summary
 
-## 8. Interview Summary
-I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs and agent tool trace logs. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. This creates the runtime trace foundation needed for later tool metrics, log summaries, and request lifecycle examples.
+### `tests/unit/test_metrics_summary.py`
+Verifies:
+- JSON payload extraction from plain and prefixed log lines
+- invalid log lines are skipped
+- missing log files return controlled errors
+- request metrics are summarized
+- agent tool metrics are summarized
+- summary JSON can be written to disk
+
+## 9. Interview Summary
+I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, and a metrics summary script. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, and tool success/failure counts.

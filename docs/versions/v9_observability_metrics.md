@@ -15,7 +15,7 @@ The target flow is:
 
 Status: started.
 
-V9 now has the version boundary, documentation scaffold, enriched request completion logs, and agent tool trace logs. Runtime tracing will continue in small follow-up chunks.
+V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, and a metrics summary script foundation. Runtime tracing will continue in small follow-up chunks.
 
 ## Planned Scope
 
@@ -95,12 +95,75 @@ Current agent tool log shape:
 
 This creates the first API -> agent -> tool trace signal and gives the later metrics summary script a stable event for tool usage frequency and tool success/failure reporting.
 
+## Metrics Summary Script
+
+`scripts/metrics_summary.py` turns structured log lines into a small JSON metrics report.
+
+It accepts:
+- plain JSON log lines
+- prefixed runtime log lines where the JSON payload appears after timestamp/logger text
+
+Example command:
+
+```powershell
+.\.venv\Scripts\python scripts\metrics_summary.py --logs logs\app.log
+```
+
+Optional output file:
+
+```powershell
+.\.venv\Scripts\python scripts\metrics_summary.py --logs logs\app.log --output logs\metrics_summary.json
+```
+
+Current summary shape:
+
+```json
+{
+  "requests": {
+    "total": 3,
+    "successful": 2,
+    "failed": 1,
+    "success_rate": 0.6667,
+    "average_latency_ms": 20.0,
+    "endpoint_counts": {
+      "/agent/query": 2,
+      "/health": 1
+    },
+    "error_categories": {
+      "AUTH_ERROR": 1
+    }
+  },
+  "agent_tools": {
+    "total": 3,
+    "successful": 2,
+    "failed": 1,
+    "success_rate": 0.6667,
+    "tool_usage": {
+      "calculator": 2,
+      "date_time": 1
+    },
+    "tool_status_counts": {
+      "failed": 1,
+      "success": 2
+    }
+  }
+}
+```
+
+This gives V9 a first reusable way to prove:
+- request success/failure rate
+- endpoint activity
+- average latency
+- visible error categories
+- tool usage frequency
+- tool success/failure counts
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented in this scaffold chunk:
-- metrics summary script
 - observability README proof
 - request lifecycle trace examples
+- token/cost runtime logging
 
 ## Testing Status
 
@@ -109,6 +172,7 @@ The scaffold will be verified through:
 - full test suite
 - focused request ID middleware tests
 - focused agent endpoint trace tests
+- focused metrics summary tests
 
 ## Interview Explanation
-In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, and agent tool trace logs. This prepares the project to add deeper request-level tracing, structured runtime logs, tool and error metrics, token/cost visibility, and a metrics summary workflow without mixing observability work into the completed V8 evaluation layer.
+In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, and a metrics summary script. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, and tool usage metrics without mixing observability work into the completed V8 evaluation layer.

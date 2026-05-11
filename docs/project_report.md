@@ -524,6 +524,7 @@ Status: started.
 - Fixed exception handler type diagnostics without changing runtime error behavior.
 - Enriched request completion logs with request status, endpoint, optional session id, error category, and latency.
 - Added agent tool trace logs with request id, tool used, tool status, agent status, and output summary.
+- Added a metrics summary script for structured request and agent tool logs.
 - Added V9 documentation files:
   - `docs/versions/v9_observability_metrics.md`
   - `docs/versions/v9_technical_walkthrough.md`
@@ -535,12 +536,14 @@ Status: started.
 - To avoid mixing observability implementation into the completed evaluation layer.
 - To make every request log easier to summarize by success/failure and error category.
 - To start tracing the API -> agent -> tool path before building metrics summaries.
+- To turn structured logs into reusable request and tool usage metrics.
 
 ### Tests Performed
 - Health endpoint test verified V9 version reporting.
 - Request ID middleware tests verify enriched request completion logs.
 - Error handler tests verified the typing diagnostic fix did not change error behavior.
 - Agent endpoint tests verify tool trace log fields.
+- Metrics summary tests verify JSON log parsing, request summaries, tool summaries, and output writing.
 - Full suite verified the scaffold did not regress existing behavior.
 
 ### What I Learned
@@ -548,6 +551,7 @@ Status: started.
 - Observability should be introduced with a clear trace model before adding metrics scripts or log analysis.
 - Request logs become much more useful once status and error category are explicit fields.
 - Tool metrics need a stable tool trace event before frequency and success-rate summaries can be reliable.
+- Metrics scripts are simpler and more reliable when runtime logs use stable event names and fields.
 
 ### Interview Explanation
-- In V9, I started the observability and metrics layer by creating the version boundary, documentation scaffold, enriched request completion logs, and agent tool trace logs. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with request id, tool used, tool status, agent status, and output summary. This prepares InsightAgent for deeper API-to-agent-to-tool tracing, structured runtime logs, tool usage analytics, token/cost visibility, and metrics summaries while keeping V8 evaluation complete and separate.
+- In V9, I started the observability and metrics layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, and a metrics summary script. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script parses structured log lines and reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, and tool success/failure counts. This prepares InsightAgent for deeper API-to-agent-to-tool tracing, token/cost visibility, and observability proof while keeping V8 evaluation complete and separate.

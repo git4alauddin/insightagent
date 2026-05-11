@@ -46,7 +46,7 @@ This file maps each V9 commit heading to:
 - Made every request log easier to summarize by status and error category.
 - Added a foundation for later metrics summary and request lifecycle examples.
 
-### `<pending>` - `v9: add tool trace fields to agent logs`
+### `2272215` - `v9: add tool trace fields to agent logs`
 **What we did**
 - Added structured `agent_tool_completed` logs for agent queries.
 - Logged request id, tool used, tool status, agent status, and tool output summary.
@@ -57,6 +57,20 @@ This file maps each V9 commit heading to:
 - Started API -> agent -> tool tracing.
 - Covered the first tool-used and tool-status observability fields.
 - Prepared agent logs for later tool usage frequency and success/failure metrics.
+
+### `<pending>` - `v9: add metrics summary script foundation`
+**What we did**
+- Added `scripts/metrics_summary.py`.
+- Parsed both plain JSON log lines and prefixed log lines containing JSON payloads.
+- Summarized request totals, success/failure counts, success rate, average latency, endpoint counts, and error categories.
+- Summarized agent tool event totals, tool usage counts, tool status counts, and tool success rate.
+- Added optional JSON output writing through `--output`.
+- Added focused unit coverage for parsing, summary generation, missing log files, and output writing.
+
+**What it solved / took care of**
+- Started the V9 metrics summary workflow.
+- Turned structured request and agent tool logs into reusable operational metrics.
+- Made tool usage frequency and tool success/failure counts measurable from logs.
 
 ## Reusable Entry Template
 
