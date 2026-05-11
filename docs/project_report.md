@@ -448,6 +448,8 @@ Status: foundation started.
 - Added `scripts/run_eval.py`.
 - Added setup upload support for dataset and document evaluation cases.
 - Added basic status/shape scoring.
+- Added rule-based scoring for tool correctness, CSV intent, citations, and insufficient-context safety.
+- Added failure category summaries.
 - Added latency capture.
 - Added JSON result output under `evals/results/`.
 - Added unit tests for eval case loading, validation, scoring, and summary generation.
@@ -461,15 +463,18 @@ Status: foundation started.
 - To prepare repeatable evaluation runs across chat, tools, CSV, and RAG.
 - To create a dataset format that can grow with new cases.
 - To build a runner foundation before adding advanced scoring.
+- To make failures easier to debug by categorizing scoring failures.
 
 ### Tests Performed
 - Added unit tests for the eval runner foundation.
-- Full suite status after V8 evaluation foundation: `213 passed`.
+- Added unit tests for scoring rules and failure categories.
+- Full suite status after V8 scoring rules: `217 passed`.
 
 ### What I Learned
 - Evaluation needs a stable dataset format before scoring gets sophisticated.
 - Setup steps are necessary for CSV and RAG cases because those flows depend on uploaded resources.
 - Even simple status/shape scoring is useful as a first regression signal.
+- Rule-based scoring can catch important regressions before introducing model-assisted evaluation.
 
 ### Interview Explanation
-- In V8, I started the evaluation layer by adding a JSONL evaluation dataset and a reusable runner. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, and save a JSON result summary. This creates the foundation for later groundedness, citation accuracy, tool correctness, and regression scoring.
+- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, and deterministic scoring rules. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, score tool correctness, check CSV analysis intent, verify basic RAG citation presence, validate insufficient-context safety, and save a JSON result summary with failure categories. This creates the foundation for later groundedness, semantic citation accuracy, token/cost tracking, and regression scoring.

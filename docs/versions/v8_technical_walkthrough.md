@@ -67,10 +67,44 @@ Core functions:
 Current scoring is intentionally simple:
 - expected HTTP status must match
 - expected top-level keys must exist
+- optional response `status` must match
+- optional `tool_used` must match
+- optional CSV `analysis_trace.intent` must match
+- optional RAG citations must be present
+- optional RAG source filename must match
+- optional insufficient-context cases must return no citations
 
-This gives us a stable runner before adding subjective or model-assisted scoring.
+This gives us deterministic rule-based scoring before adding subjective or model-assisted scoring.
 
-## 5. Result Output
+## 5. Scoring Rules
+
+### `score_eval_response(...)`
+Builds the final per-case result:
+- HTTP status
+- latency
+- pass/fail result
+- score breakdown
+- failure categories
+- raw response body
+
+### `build_score_breakdown(...)`
+Runs only the scoring checks requested by each case.
+
+Supported checks:
+- `http_status`
+- `format_validity`
+- `response_status`
+- `tool_correctness`
+- `analysis_intent`
+- `citation_presence`
+- `insufficient_context_safety`
+
+### `build_failure_categories(...)`
+Returns the failed score names for each case.
+
+This makes eval output easier to debug because failures say what kind of problem happened instead of only returning `passed=false`.
+
+## 6. Result Output
 
 Default output:
 ```text
@@ -86,10 +120,12 @@ The output includes:
 - latency
 - response body
 - missing response keys
+- score breakdown
+- failure categories
 
 `evals/results/` is ignored by Git so local eval runs do not create commit noise.
 
-## 6. Tests Added
+## 7. Tests Added
 
 ### `tests/unit/test_eval_runner.py`
 Verifies:
@@ -97,9 +133,14 @@ Verifies:
 - missing required fields are rejected
 - response shape scoring passes when expected keys exist
 - response shape scoring fails when expected keys are missing
+- tool correctness is checked
+- citation presence is checked
+- insufficient-context safety is checked
+- CSV analysis intent is checked
 - summary pass/fail counts and pass rate are correct
+- failure category counts are summarized
 
-## 7. Checklist Mapping
+## 8. Checklist Mapping
 - evaluation dataset JSONL: started
 - chat/structured-output test cases: started
 - tool-calling test cases: started
@@ -112,14 +153,16 @@ Verifies:
 - track latency: done
 - save evaluation result file: done
 - pass-rate summary: basic done
+- failure-category summary: basic done
+- tool correctness scoring: basic done
+- format validity scoring: basic done
+- citation presence scoring: basic done
+- insufficient-context safety scoring: basic done
 - relevance scoring: pending
 - groundedness scoring: pending
-- tool correctness scoring: pending
-- format validity scoring: basic shape scoring started
-- citation accuracy scoring: pending
+- citation semantic accuracy scoring: pending
 - token/cost tracking: pending
-- failure-category summary: pending
 - regression comparison: pending
 
-## 8. Interview Summary
-I started V8 by creating the evaluation dataset and runner foundation. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check basic status/shape expectations, and save a result summary. This creates the measurement layer that can later grow into groundedness, citation accuracy, tool correctness, and regression scoring.
+## 9. Interview Summary
+I started V8 by creating the evaluation dataset, runner foundation, and deterministic scoring rules. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify tool selection, check CSV analysis intent, check basic citation presence, validate insufficient-context safety, and save a result summary with failure categories. This creates the measurement layer that can later grow into groundedness, semantic citation accuracy, token/cost tracking, and regression scoring.

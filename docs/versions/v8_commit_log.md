@@ -6,7 +6,7 @@ This file maps each V8 commit heading to:
 
 ## Commit-by-Commit (V8)
 
-### `<pending>` - `v8: add evaluation dataset and runner foundation`
+### `52de6ae` - `v8: add evaluation dataset and runner foundation`
 **What we did**
 - Updated app version defaults to V8.
 - Added JSONL evaluation dataset.
@@ -22,6 +22,22 @@ This file maps each V8 commit heading to:
 - Created the foundation for repeatable evaluation runs.
 - Gave V8 a measurable dataset format before adding advanced scoring.
 - Prepared the project for pass-rate summaries, failure analysis, and regression tracking.
+
+### `<pending>` - `v8: add evaluation scoring rules`
+**What we did**
+- Added per-case `scoring` metadata to the evaluation dataset.
+- Added status and format-validity scoring.
+- Added tool correctness scoring.
+- Added CSV analysis intent scoring.
+- Added RAG citation presence scoring.
+- Added insufficient-context safety scoring.
+- Added failure category summaries.
+- Added unit tests for scoring rules and failure categories.
+
+**What it solved / took care of**
+- Made eval results more useful than status/key checks alone.
+- Started detecting wrong tool selection and missing citations.
+- Added failure categories that can support later debugging and regression tracking.
 
 ## Reusable Entry Template
 

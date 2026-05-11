@@ -157,13 +157,9 @@ def score_eval_response(
     latency_ms: float,
 ) -> dict[str, Any]:
     expected_status = int(case["expected_status"])
-    expected_keys = case.get("expected_keys", [])
-    missing_keys = [
-        key
-        for key in expected_keys
-        if not isinstance(response_body, dict) or key not in response_body
-    ]
-    passed = status_code == expected_status and not missing_keys
+    scores = build_score_breakdown(case, status_code, response_body)
+    failure_categories = build_failure_categories(scores)
+    passed = not failure_categories
 
     return {
         "id": case["id"],
@@ -172,19 +168,166 @@ def score_eval_response(
         "expected_status": expected_status,
         "latency_ms": latency_ms,
         "passed": passed,
-        "missing_keys": missing_keys,
+        "scores": scores,
+        "failure_categories": failure_categories,
         "response": response_body,
     }
+
+
+def build_score_breakdown(
+    case: dict[str, Any],
+    status_code: int,
+    response_body: Any,
+) -> dict[str, dict[str, Any]]:
+    expected_status = int(case["expected_status"])
+    scoring = case.get("scoring", {})
+
+    scores = {
+        "http_status": {
+            "passed": status_code == expected_status,
+            "expected": expected_status,
+            "actual": status_code,
+        },
+        "format_validity": score_format_validity(case, response_body),
+    }
+
+    if "expected_response_status" in scoring:
+        scores["response_status"] = score_response_status(scoring, response_body)
+
+    if "expected_tool_used" in scoring:
+        scores["tool_correctness"] = score_tool_correctness(scoring, response_body)
+
+    if "expected_analysis_intent" in scoring:
+        scores["analysis_intent"] = score_analysis_intent(scoring, response_body)
+
+    if scoring.get("require_citations"):
+        scores["citation_presence"] = score_citation_presence(scoring, response_body)
+
+    if scoring.get("require_no_citations"):
+        scores["insufficient_context_safety"] = score_no_citations(response_body)
+
+    return scores
+
+
+def score_format_validity(
+    case: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    expected_keys = case.get("expected_keys", [])
+    missing_keys = [
+        key
+        for key in expected_keys
+        if not isinstance(response_body, dict) or key not in response_body
+    ]
+
+    return {
+        "passed": not missing_keys,
+        "missing_keys": missing_keys,
+    }
+
+
+def score_response_status(
+    scoring: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    expected_status = scoring["expected_response_status"]
+    actual_status = (
+        response_body.get("status")
+        if isinstance(response_body, dict)
+        else None
+    )
+    return {
+        "passed": actual_status == expected_status,
+        "expected": expected_status,
+        "actual": actual_status,
+    }
+
+
+def score_tool_correctness(
+    scoring: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    expected_tool = scoring["expected_tool_used"]
+    actual_tool = response_body.get("tool_used") if isinstance(response_body, dict) else None
+    return {
+        "passed": actual_tool == expected_tool,
+        "expected": expected_tool,
+        "actual": actual_tool,
+    }
+
+
+def score_analysis_intent(
+    scoring: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    expected_intent = scoring["expected_analysis_intent"]
+    trace = (
+        response_body.get("analysis_trace", {})
+        if isinstance(response_body, dict)
+        else {}
+    )
+    actual_intent = trace.get("intent") if isinstance(trace, dict) else None
+    return {
+        "passed": actual_intent == expected_intent,
+        "expected": expected_intent,
+        "actual": actual_intent,
+    }
+
+
+def score_citation_presence(
+    scoring: dict[str, Any],
+    response_body: Any,
+) -> dict[str, Any]:
+    sources = response_body.get("sources", []) if isinstance(response_body, dict) else []
+    expected_filename = scoring.get("expected_source_filename")
+    valid_sources = sources if isinstance(sources, list) else []
+    has_citations = bool(valid_sources)
+    filename_matches = (
+        expected_filename is None
+        or any(
+            isinstance(source, dict) and source.get("filename") == expected_filename
+            for source in valid_sources
+        )
+    )
+
+    return {
+        "passed": has_citations and filename_matches,
+        "citation_count": len(valid_sources),
+        "expected_source_filename": expected_filename,
+    }
+
+
+def score_no_citations(response_body: Any) -> dict[str, Any]:
+    sources = response_body.get("sources", []) if isinstance(response_body, dict) else []
+    valid_sources = sources if isinstance(sources, list) else []
+    return {
+        "passed": valid_sources == [],
+        "citation_count": len(valid_sources),
+    }
+
+
+def build_failure_categories(scores: dict[str, dict[str, Any]]) -> list[str]:
+    return [
+        score_name
+        for score_name, score_result in scores.items()
+        if not score_result["passed"]
+    ]
 
 
 def build_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
     total = len(results)
     passed = sum(1 for result in results if result["passed"])
+    failure_categories: dict[str, int] = {}
+    for result in results:
+        for category in result.get("failure_categories", []):
+            failure_categories[category] = failure_categories.get(category, 0) + 1
+
     return {
         "total": total,
         "passed": passed,
         "failed": total - passed,
         "pass_rate": round(passed / total, 4) if total else 0.0,
+        "failure_categories": failure_categories,
     }
 
 
