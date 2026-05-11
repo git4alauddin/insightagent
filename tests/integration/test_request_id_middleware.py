@@ -1,3 +1,6 @@
+import json
+import logging
+
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -33,3 +36,27 @@ def test_error_response_includes_request_id() -> None:
     assert response.status_code == 401
     assert response.headers["x-request-id"] == "error-request-123"
     assert response.json()["error"]["request_id"] == "error-request-123"
+
+
+def test_request_log_includes_trace_fields(caplog) -> None:
+    client = TestClient(app)
+
+    with caplog.at_level(logging.INFO, logger="app.api.middleware"):
+        response = client.get("/health", headers={"x-request-id": "log-request-123"})
+
+    log_payloads = [
+        json.loads(record.message)
+        for record in caplog.records
+        if record.name == "app.api.middleware"
+    ]
+
+    request_log = next(
+        payload for payload in log_payloads if payload["event"] == "request_completed"
+    )
+
+    assert response.status_code == 200
+    assert request_log["request_id"] == "log-request-123"
+    assert request_log["method"] == "GET"
+    assert request_log["path"] == "/health"
+    assert request_log["status_code"] == 200
+    assert isinstance(request_log["latency_ms"], float)

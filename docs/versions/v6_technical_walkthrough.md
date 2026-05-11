@@ -11,6 +11,7 @@ The current V6 work focuses on:
 3. API key protection for private endpoints.
 4. Consistent structured API errors.
 5. Request IDs for traceability.
+6. Structured request logging.
 
 ## 2. Readiness Layer
 
@@ -106,6 +107,7 @@ Behavior:
 - generates `req_<uuid>` when no request ID is provided
 - stores the value on `request.state.request_id`
 - writes the same value back to the `x-request-id` response header
+- logs one structured JSON request record after the response is created
 
 ### `app/api/error_handlers.py`
 The error handlers read `request.state.request_id` and include it in the response body:
@@ -120,6 +122,21 @@ The error handlers read `request.state.request_id` and include it in the respons
 ```
 
 This gives clients a stable ID they can share when debugging a failed request.
+
+### Structured Request Log
+The middleware emits a JSON log message like:
+```json
+{
+  "event": "request_completed",
+  "request_id": "req_...",
+  "method": "GET",
+  "path": "/health",
+  "status_code": 200,
+  "latency_ms": 1.23
+}
+```
+
+This is intentionally simple for V6. V9 can expand this into tool usage, token usage, cost, and richer metrics.
 
 ### `app/main.py`
 Calls:
@@ -147,6 +164,7 @@ register_request_id_middleware(app)
 - request IDs are generated when missing
 - incoming request IDs are reused
 - error responses include the same request ID in headers and body
+- request logs include trace fields
 
 ### Existing Integration Tests
 Existing tests were updated to expect the new V6 error shape:
@@ -170,8 +188,9 @@ Existing tests were updated to expect the new V6 error shape:
 - global exception handling: done
 - structured error response: done
 - request ID middleware: done
+- structured request logging: done
 - rate limiting: pending
 - CORS config: pending
 
 ## 8. Interview Summary
-In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, API key protection for private endpoints, global exception handlers that return one consistent error format, and request IDs for traceability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
+In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, API key protection for private endpoints, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.

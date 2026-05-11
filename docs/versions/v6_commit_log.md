@@ -49,7 +49,7 @@ This file maps each V6 commit heading to:
 - Gave the API one consistent error contract.
 - Prevented internal exception details from leaking to clients.
 
-### `<pending>` - `v6: add request ID middleware`
+### `7dbb1df` - `v6: add request ID middleware`
 **What we did**
 - Added request ID middleware.
 - Reused incoming `x-request-id` values when provided.
@@ -61,6 +61,16 @@ This file maps each V6 commit heading to:
 **What it solved / took care of**
 - Made each request traceable.
 - Prepared the backend for structured logging and observability.
+
+### `<pending>` - `v6: add structured request logging`
+**What we did**
+- Added structured JSON request logs in the request middleware.
+- Logged request ID, method, path, status code, and latency.
+- Added a log-capture test for request log fields.
+
+**What it solved / took care of**
+- Made request behavior easier to debug.
+- Started the V6 structured logging upgrade without introducing a new logging library.
 
 ## Reusable Entry Template
 

@@ -77,6 +77,23 @@ Behavior:
 
 This prepares the backend for traceable logs and easier debugging.
 
+### Structured Request Logging
+The request middleware now logs one structured JSON record after each request.
+
+Example fields:
+```json
+{
+  "event": "request_completed",
+  "request_id": "req_123",
+  "method": "POST",
+  "path": "/chat",
+  "status_code": 200,
+  "latency_ms": 42.5
+}
+```
+
+This creates a simple request audit trail and prepares the project for V9 observability metrics.
+
 ## Why This Matters
 V6 protects costly and state-changing endpoints while keeping health/readiness checks available for uptime checks and deployment platforms.
 
@@ -86,11 +103,13 @@ Global exception handling gives clients one consistent error format and prevents
 
 Request IDs make each API call traceable across responses, logs, and later observability work.
 
+Structured request logs make latency, status codes, and request paths visible without adding a full observability stack yet.
+
 ## Testing Status
-Latest suite after request ID middleware:
+Latest suite after structured request logging:
 
 ```text
-138 passed
+139 passed
 ```
 
 ## Current V6 Checklist Status
@@ -104,10 +123,10 @@ Latest suite after request ID middleware:
 - Global exception handler: done.
 - Structured error response: done.
 - Request ID middleware: done.
-- Structured logging upgrade: pending.
+- Structured logging upgrade: done.
 - Rate limiting: pending.
 - CORS config: pending.
 - Cloud Run deployment: pending.
 
 ## Interview Explanation
-In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, and added request IDs for traceability. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.
+In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, and introduced structured request logs with method, path, status, and latency. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.
