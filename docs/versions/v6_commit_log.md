@@ -96,7 +96,7 @@ This file maps each V6 commit heading to:
 - Protected costly/private endpoints from accidental loops and basic abuse.
 - Kept `/health` and `/ready` outside rate limiting.
 
-### `<pending>` - `v6: verify Docker build and runtime`
+### `f934779` - `v6: verify Docker build and runtime`
 **What we did**
 - Built the Docker image locally.
 - Started a temporary container with test environment variables.
@@ -107,6 +107,18 @@ This file maps each V6 commit heading to:
 **What it solved / took care of**
 - Confirmed the Dockerfile works beyond static inspection.
 - Proved the containerized app can serve health/readiness endpoints.
+
+### `<pending>` - `v6: finalize production config and checklist docs`
+**What we did**
+- Updated the default app version to `v6`.
+- Updated `.env.example` and local version expectations.
+- Updated `/health` test expectation.
+- Added production environment documentation.
+- Added final V6 checklist/deferred notes.
+
+**What it solved / took care of**
+- Aligned runtime version reporting with the current project version.
+- Made the remaining Cloud Run deployment gap explicit instead of ambiguous.
 
 ## Reusable Entry Template
 

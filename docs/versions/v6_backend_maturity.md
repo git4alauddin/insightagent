@@ -10,6 +10,9 @@ The version focuses on:
 - production-style error handling and request controls
 - deployment preparation
 
+## Final Outcome
+V6 now provides a locally verified, container-ready backend with protected private endpoints, readiness checks, structured errors, request IDs, structured request logs, environment-aware CORS, and basic in-memory rate limiting.
+
 ## Progress So Far
 
 ### Readiness Endpoint
@@ -138,6 +141,17 @@ Behavior:
 
 This is intentionally simple for V6. A distributed store such as Redis would be a future production upgrade.
 
+### Production Configuration Cleanup
+The app version now defaults to `v6`.
+
+Important environment variables for production-style runs:
+- `APP_ENV=production`
+- `APP_VERSION=v6`
+- `API_KEY`
+- `LLM_API_KEY`
+- `CORS_ALLOWED_ORIGINS`
+- `RATE_LIMIT_ENABLED=true`
+
 ## Why This Matters
 V6 protects costly and state-changing endpoints while keeping health/readiness checks available for uptime checks and deployment platforms.
 
@@ -168,6 +182,11 @@ container runtime: passed
 /ready: ready
 ```
 
+Version alignment:
+```text
+/health version: v6
+```
+
 ## Current V6 Checklist Status
 - Dockerfile: done.
 - `.dockerignore`: done.
@@ -184,7 +203,17 @@ container runtime: passed
 - Structured logging upgrade: done.
 - CORS config: done.
 - Rate limiting: done.
-- Cloud Run deployment: pending.
+- `APP_VERSION=v6`: done.
+- Production env documentation: done.
+- Cloud Run deployment: deferred on purpose.
+
+## Deferred On Purpose
+Cloud Run deployment is not completed in this local V6 closeout.
+
+Reason:
+- the backend is now container-ready and verified locally
+- actual Cloud Run deployment requires cloud project configuration, Artifact Registry setup, service account/environment setup, and external endpoint verification
+- this can be done as a separate deployment chunk without changing the local backend architecture
 
 ## Interview Explanation
-In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized and verified the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, configured environment-aware CORS, and added basic in-memory rate limiting. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.
+In V6, I hardened InsightAgent for deployment-style use. I added readiness checks, aligned the app version to V6, containerized and verified the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, configured environment-aware CORS, and added basic in-memory rate limiting. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.

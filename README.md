@@ -5,6 +5,8 @@ InsightAgent is a learning-first, production-style FastAPI backend for AI-powere
 ## Current Version
 V6 - Backend maturity and deployment hardening.
 
+Cloud Run deployment is intentionally deferred until the local/containerized backend is fully closed out and ready for an external runtime.
+
 Detailed V1 notes: [docs/versions/v1_fastapi_basic_chat.md](docs/versions/v1_fastapi_basic_chat.md)
 V1 commit tracking: [docs/versions/v1_commit_log.md](docs/versions/v1_commit_log.md)
 Detailed V2 notes: [docs/versions/v2_structured_output.md](docs/versions/v2_structured_output.md)
@@ -80,6 +82,9 @@ docs/
     v3_tool_calling_agentic.md
     v4_memory_context.md
     v5_data_analysis_assistant.md
+    v6_backend_maturity.md
+    v6_technical_walkthrough.md
+    v6_commit_log.md
 ```
 
 ## Run Locally
@@ -111,6 +116,17 @@ docker run --rm -p 8000:8000 `
   insightagent:v6
 ```
 
+Important production environment variables:
+
+```text
+APP_ENV=production
+APP_VERSION=v6
+API_KEY=<service-api-key>
+LLM_API_KEY=<provider-api-key>
+CORS_ALLOWED_ORIGINS=<deployed-frontend-origin>
+RATE_LIMIT_ENABLED=true
+```
+
 Check health:
 
 ```bash
@@ -123,7 +139,7 @@ Expected response:
 {
   "status": "ok",
   "service": "InsightAgent",
-  "version": "v1"
+  "version": "v6"
 }
 ```
 

@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "InsightAgent"
-    app_version: str = "v1"
+    app_version: str = "v6"
     app_env: str = "development"
     log_level: str = "INFO"
     cors_allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"

@@ -14,8 +14,32 @@ The current V6 work focuses on:
 6. Structured request logging.
 7. Environment-aware CORS.
 8. Basic rate limiting.
+9. Production configuration cleanup.
 
-## 2. CORS Configuration
+## 2. Configuration Cleanup
+
+### `app/config.py`
+V6 defaults:
+- `app_version = "v6"`
+- `app_env = "development"`
+- CORS and rate limit settings are environment-driven.
+
+### `.env.example`
+Documents the deployable environment shape:
+- app identity
+- CORS origins
+- API key auth
+- LLM configuration
+- rate limit settings
+- upload settings
+
+### Local `.env`
+The local ignored `.env` should set:
+```text
+APP_VERSION=v6
+```
+
+## 3. CORS Configuration
 
 ### `app/config.py`
 Adds:
@@ -42,7 +66,7 @@ register_cors_middleware(app)
 
 This keeps browser-origin rules centralized during app startup.
 
-## 3. Readiness Layer
+## 4. Readiness Layer
 
 ### `app/api/routes_health.py`
 Adds:
@@ -61,7 +85,7 @@ Core checks:
 
 This keeps deployment dependency checks outside the route layer.
 
-## 4. Docker Runtime Verification
+## 5. Docker Runtime Verification
 
 ### `Dockerfile`
 The Docker image:
@@ -96,7 +120,7 @@ Verified:
 - `/health` returned `status: ok`
 - `/ready` returned `status: ready`
 
-## 5. API Key Authentication
+## 6. API Key Authentication
 
 ### `app/config.py`
 Adds:
@@ -126,7 +150,7 @@ Router-level dependency protection was added to:
 Public routes remain in:
 - `app/api/routes_health.py`
 
-## 6. Rate Limiting
+## 7. Rate Limiting
 
 ### `app/config.py`
 Adds:
@@ -160,7 +184,7 @@ Rate limiting is attached alongside API key auth to:
 
 Public health routes are not rate limited.
 
-## 7. Global Error Handling
+## 8. Global Error Handling
 
 ### `app/api/error_handlers.py`
 Core functions:
@@ -194,7 +218,7 @@ register_exception_handlers(app)
 
 This attaches the handlers once during app startup.
 
-## 8. Request ID Middleware
+## 9. Request ID Middleware
 
 ### `app/api/middleware.py`
 Core function:
@@ -242,7 +266,7 @@ Calls:
 register_request_id_middleware(app)
 ```
 
-## 9. Tests Added/Extended
+## 10. Tests Added/Extended
 
 ### CORS Tests
 `tests/integration/test_cors_config.py` verifies:
@@ -288,8 +312,9 @@ Existing tests were updated to expect the new V6 error shape:
 }
 ```
 
-## 10. Checklist Mapping
+## 11. Checklist Mapping
 - `/ready` endpoint: done
+- `/health` reports V6 version: done
 - dependency readiness checks: done
 - Dockerfile: done
 - `.dockerignore`: done
@@ -303,6 +328,8 @@ Existing tests were updated to expect the new V6 error shape:
 - request ID middleware: done
 - structured request logging: done
 - rate limiting: done
+- production env documentation: done
+- Cloud Run deployment: deferred
 
-## 11. Interview Summary
-In V6, I added production-style backend hardening. The service now has readiness checks, verified Docker runtime support, environment-aware CORS, API key protection for private endpoints, basic rate limiting, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
+## 12. Interview Summary
+In V6, I added production-style backend hardening. The service now has V6 versioned health checks, readiness checks, verified Docker runtime support, environment-aware CORS, API key protection for private endpoints, basic rate limiting, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
