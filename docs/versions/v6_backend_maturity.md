@@ -147,10 +147,19 @@ The app version now defaults to `v6`.
 Important environment variables for production-style runs:
 - `APP_ENV=production`
 - `APP_VERSION=v6`
+- `DOCS_ENABLED=false`
 - `API_KEY`
 - `LLM_API_KEY`
 - `CORS_ALLOWED_ORIGINS`
 - `RATE_LIMIT_ENABLED=true`
+
+### Docs Exposure Decision
+FastAPI docs are controlled by `DOCS_ENABLED`.
+
+Behavior:
+- development default: `/docs`, `/redoc`, and `/openapi.json` are enabled
+- production recommendation: set `DOCS_ENABLED=false`
+- when disabled, docs/schema routes return the standard structured 404 response
 
 ## Why This Matters
 V6 protects costly and state-changing endpoints while keeping health/readiness checks available for uptime checks and deployment platforms.
@@ -168,10 +177,10 @@ CORS config keeps browser access controlled and environment-aware.
 Rate limiting reduces accidental loops and basic abuse risk on costly or state-changing endpoints.
 
 ## Testing Status
-Latest automated test suite after rate limiting:
+Latest automated test suite after docs exposure configuration:
 
 ```text
-145 passed
+149 passed
 ```
 
 Docker verification:
@@ -204,6 +213,8 @@ Version alignment:
 - CORS config: done.
 - Rate limiting: done.
 - `APP_VERSION=v6`: done.
+- `/docs` exposure decision: done.
+- Environment-controlled docs exposure: done.
 - Production env documentation: done.
 - Cloud Run deployment: deferred on purpose.
 
@@ -216,4 +227,4 @@ Reason:
 - this can be done as a separate deployment chunk without changing the local backend architecture
 
 ## Interview Explanation
-In V6, I hardened InsightAgent for deployment-style use. I added readiness checks, aligned the app version to V6, containerized and verified the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, configured environment-aware CORS, and added basic in-memory rate limiting. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.
+In V6, I hardened InsightAgent for deployment-style use. I added readiness checks, aligned the app version to V6, containerized and verified the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, added request IDs for traceability, introduced structured request logs, configured environment-aware CORS, added basic in-memory rate limiting, and made API docs exposure environment-controlled. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.

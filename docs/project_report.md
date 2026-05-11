@@ -287,6 +287,7 @@ Learning-first, version-by-version implementation.
 - Added Docker runtime files.
 - Verified Docker image build and runtime.
 - Aligned app version reporting to V6.
+- Added environment-controlled docs exposure.
 - Added API key configuration through `API_KEY`.
 - Added shared `x-api-key` auth dependency.
 - Protected chat, agent, session, and dataset endpoints.
@@ -309,6 +310,7 @@ Learning-first, version-by-version implementation.
 - To keep deployment health checks publicly reachable.
 - To prove the containerized backend can actually start and serve health/readiness endpoints.
 - To keep `/health` and documentation aligned with the active project version.
+- To keep interactive API docs available in development but optionally disabled in production.
 - To fail closed when authentication is not configured.
 - To give API clients one predictable error contract.
 - To prevent internal exception details from leaking in responses.
@@ -324,12 +326,13 @@ Learning-first, version-by-version implementation.
 - Ran the full test suite after structured request logging.
 - Ran the full test suite after CORS configuration.
 - Ran the full test suite after rate limiting.
-- Current suite status: `145 passed`.
 - Built Docker image `insightagent:v6-verify`.
 - Ran a temporary container on host port `18000`.
 - Verified `/health` returned `ok`.
 - Verified `/ready` returned `ready`.
 - Ran the full suite after version/config cleanup.
+- Ran the full suite after docs exposure configuration.
+- Current suite status: `149 passed`.
 
 ### What I Learned
 - Authentication can be centralized as a FastAPI dependency.
@@ -344,6 +347,7 @@ Learning-first, version-by-version implementation.
 - In-memory rate limiting is enough for local V6 learning, while Redis or a gateway would be better for multi-instance production.
 - Docker verification should test the running container, not only whether the Dockerfile exists.
 - Deployment work can be split from backend hardening when cloud setup would distract from local correctness.
+- `/docs` exposure should be a deliberate environment decision, not an accidental default.
 
 ### Interview Explanation
-- In V6, I hardened the backend for deployment-style use. I aligned app version reporting to V6, added readiness checks, verified Docker runtime support, environment-aware CORS, API key authentication, rate limiting, centralized exception handling, request IDs, and structured request logging. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.
+- In V6, I hardened the backend for deployment-style use. I aligned app version reporting to V6, added readiness checks, verified Docker runtime support, environment-aware CORS, configurable API docs exposure, API key authentication, rate limiting, centralized exception handling, request IDs, and structured request logging. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.

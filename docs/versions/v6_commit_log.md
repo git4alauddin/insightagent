@@ -108,7 +108,7 @@ This file maps each V6 commit heading to:
 - Confirmed the Dockerfile works beyond static inspection.
 - Proved the containerized app can serve health/readiness endpoints.
 
-### `<pending>` - `v6: finalize production config and checklist docs`
+### `70bb535` - `v6: finalize production config and checklist docs`
 **What we did**
 - Updated the default app version to `v6`.
 - Updated `.env.example` and local version expectations.
@@ -119,6 +119,18 @@ This file maps each V6 commit heading to:
 **What it solved / took care of**
 - Aligned runtime version reporting with the current project version.
 - Made the remaining Cloud Run deployment gap explicit instead of ambiguous.
+
+### `<pending>` - `v6: configure docs exposure by environment`
+**What we did**
+- Added `DOCS_ENABLED` config.
+- Added an app factory to control FastAPI docs routes.
+- Kept docs enabled by default for development.
+- Allowed docs/OpenAPI to be disabled for production-style runs.
+- Added docs exposure tests.
+
+**What it solved / took care of**
+- Completed the V6 `/docs` exposure decision.
+- Avoided exposing interactive API docs by default in production.
 
 ## Reusable Entry Template
 

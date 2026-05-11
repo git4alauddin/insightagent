@@ -121,11 +121,14 @@ Important production environment variables:
 ```text
 APP_ENV=production
 APP_VERSION=v6
+DOCS_ENABLED=false
 API_KEY=<service-api-key>
 LLM_API_KEY=<provider-api-key>
 CORS_ALLOWED_ORIGINS=<deployed-frontend-origin>
 RATE_LIMIT_ENABLED=true
 ```
+
+For production deployments, keep `DOCS_ENABLED=false` unless API docs are intentionally exposed.
 
 Check health:
 

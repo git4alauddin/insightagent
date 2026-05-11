@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     app_version: str = "v6"
     app_env: str = "development"
     log_level: str = "INFO"
+    docs_enabled: bool = True
     cors_allowed_origins: str = "http://localhost:3000,http://127.0.0.1:3000"
     rate_limit_enabled: bool = True
     rate_limit_requests_per_minute: int = 60
