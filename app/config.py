@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     allowed_document_extensions: tuple[str, ...] = (".pdf", ".txt", ".md")
     document_chunk_size: int = 800
     document_chunk_overlap: int = 120
+    document_embedding_dimensions: int = 64
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

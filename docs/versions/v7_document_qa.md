@@ -29,6 +29,7 @@ Added document upload guardrail settings:
 - `ALLOWED_DOCUMENT_EXTENSIONS`
 - `DOCUMENT_CHUNK_SIZE`
 - `DOCUMENT_CHUNK_OVERLAP`
+- `DOCUMENT_EMBEDDING_DIMENSIONS`
 
 Default supported extensions:
 - `.pdf`
@@ -71,6 +72,37 @@ Behavior:
 - uses configurable chunk size and overlap values
 - attaches chunk metadata: `chunk_id`, `document_id`, `filename`, `chunk_index`, and optional `page`
 - rejects empty cleaned text and invalid chunk settings
+
+### Local Embedding Service
+Added deterministic local embedding generation.
+
+Behavior:
+- tokenizes chunk text
+- hashes tokens into a fixed-size vector
+- normalizes the vector for future similarity comparison
+- rejects text without tokens
+- rejects invalid embedding dimensions
+
+This is intentionally local and deterministic for the portfolio build. It gives us a testable embedding pipeline before adding retrieval behavior.
+
+### Local Vector Store
+Added SQLite-backed chunk/vector persistence.
+
+Stored fields:
+- `chunk_id`
+- `document_id`
+- `filename`
+- `chunk_index`
+- `text`
+- `page`
+- `embedding_json`
+- `created_at`
+
+Behavior:
+- saves indexed chunks for a document
+- replaces an existing document index during re-indexing
+- loads chunks in chunk order
+- converts SQLite errors into controlled service errors
 
 ## Why This Matters
 The early V7 chunks define the API contract and indexing foundation before retrieval and answer generation.
@@ -121,8 +153,6 @@ POST /documents/{document_id}/ask
 
 ## Deferred On Purpose
 Not built yet:
-- embeddings
-- vector store
 - retrieval
 - grounded answer generation
 
@@ -154,10 +184,18 @@ Added chunking unit tests for:
 - empty cleaned text handling
 - invalid chunk size/overlap handling
 
+Added local indexing unit tests for:
+- deterministic embedding generation
+- normalized embedding vectors
+- chunk embedding generation
+- vector store save/load
+- document index replacement
+- controlled vector store errors
+
 Latest suite:
 ```text
-173 passed
+183 passed
 ```
 
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, and adding deterministic text chunking. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, then split extracted text into overlapping chunks with citation-ready metadata. Embeddings, retrieval, and grounded answers are intentionally deferred to later V7 chunks.
+In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, and creating a local vector indexing foundation. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, and persist chunk vectors in SQLite. Retrieval and grounded answers are intentionally deferred to later V7 chunks.

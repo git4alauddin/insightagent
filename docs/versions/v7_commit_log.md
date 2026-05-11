@@ -44,7 +44,7 @@ This file maps each V7 commit heading to:
 - Converted stored document files into text for the future chunking pipeline.
 - Added safe extraction failure behavior before retrieval/answer generation.
 
-### `<pending>` - `v7: add document chunking service`
+### `875e646` - `v7: add document chunking service`
 **What we did**
 - Added chunk size and chunk overlap configuration.
 - Added `DocumentChunk` schema with source metadata.
@@ -56,6 +56,20 @@ This file maps each V7 commit heading to:
 - Converted extracted text into retrievable chunk units.
 - Preserved document/source metadata needed for later citations.
 - Added guardrails so invalid chunk settings fail before indexing.
+
+### `<pending>` - `v7: add local vector indexing foundation`
+**What we did**
+- Added local embedding dimension configuration.
+- Added deterministic local embedding generation.
+- Added chunk embedding generation.
+- Added SQLite-backed `document_chunks` vector index table.
+- Added vector store save/load service.
+- Added tests for embeddings, vector persistence, replacement, and controlled DB errors.
+
+**What it solved / took care of**
+- Turned document chunks into vector-ready records.
+- Created a local vector index foundation without external embedding API dependency.
+- Prepared the backend for semantic retrieval and citation-backed answers.
 
 ## Reusable Entry Template
 

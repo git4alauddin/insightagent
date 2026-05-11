@@ -61,6 +61,44 @@ def _ensure_documents_columns(cursor) -> None:
         cursor.execute("ALTER TABLE documents ADD COLUMN uploaded_at TEXT NOT NULL DEFAULT ''")
 
 
+def _ensure_document_chunks_columns(cursor) -> None:
+    cursor.execute("PRAGMA table_info(document_chunks)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    if "document_id" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE document_chunks ADD COLUMN document_id TEXT NOT NULL DEFAULT ''"
+        )
+
+    if "filename" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE document_chunks ADD COLUMN filename TEXT NOT NULL DEFAULT ''"
+        )
+
+    if "chunk_index" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE document_chunks ADD COLUMN chunk_index INTEGER NOT NULL DEFAULT 0"
+        )
+
+    if "text" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE document_chunks ADD COLUMN text TEXT NOT NULL DEFAULT ''"
+        )
+
+    if "page" not in existing_columns:
+        cursor.execute("ALTER TABLE document_chunks ADD COLUMN page INTEGER")
+
+    if "embedding_json" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE document_chunks ADD COLUMN embedding_json TEXT NOT NULL DEFAULT '[]'"
+        )
+
+    if "created_at" not in existing_columns:
+        cursor.execute(
+            "ALTER TABLE document_chunks ADD COLUMN created_at TEXT NOT NULL DEFAULT ''"
+        )
+
+
 def create_tables() -> None:
     with db_cursor() as cursor:
         cursor.execute(
@@ -123,3 +161,21 @@ def create_tables() -> None:
         )
 
         _ensure_documents_columns(cursor)
+
+        cursor.execute(
+            """
+            CREATE TABLE IF NOT EXISTS document_chunks (
+                chunk_id TEXT PRIMARY KEY,
+                document_id TEXT NOT NULL,
+                filename TEXT NOT NULL,
+                chunk_index INTEGER NOT NULL,
+                text TEXT NOT NULL,
+                page INTEGER,
+                embedding_json TEXT NOT NULL,
+                created_at TEXT NOT NULL,
+                FOREIGN KEY (document_id) REFERENCES documents(document_id)
+            )
+            """
+        )
+
+        _ensure_document_chunks_columns(cursor)

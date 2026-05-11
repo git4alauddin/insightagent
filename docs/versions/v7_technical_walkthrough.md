@@ -18,8 +18,9 @@ Added:
 - `allowed_document_extensions`
 - `document_chunk_size`
 - `document_chunk_overlap`
+- `document_embedding_dimensions`
 
-These settings prepare upload validation and deterministic chunking for PDF, TXT, and Markdown files.
+These settings prepare upload validation, deterministic chunking, and local vector indexing for PDF, TXT, and Markdown files.
 
 ## 3. Database Metadata
 
@@ -149,7 +150,47 @@ Example:
 }
 ```
 
-## 9. Tests Added
+## 9. Local Embeddings and Vector Store
+
+### `app/services/document_embedding_service.py`
+Core functions:
+- `generate_embedding(text, dimensions=None)`
+- `generate_chunk_embeddings(chunks, dimensions=None)`
+
+Behavior:
+- tokenizes text into alphanumeric tokens
+- hashes tokens into a fixed-size vector
+- normalizes vectors to unit length
+- rejects invalid dimensions
+- rejects text without tokens
+
+This is a local deterministic embedding foundation. It avoids external API dependency while the retrieval pipeline is still being built.
+
+### `app/db/schema.py`
+Adds `document_chunks` table:
+- `chunk_id`
+- `document_id`
+- `filename`
+- `chunk_index`
+- `text`
+- `page`
+- `embedding_json`
+- `created_at`
+
+### `app/services/document_vector_store_service.py`
+Core functions:
+- `save_document_chunks(document_id, chunks, embeddings_by_chunk_id)`
+- `get_document_chunks(document_id)`
+
+Responsibilities:
+- create tables before vector operations
+- validate chunks and embeddings before saving
+- replace an existing document index during re-indexing
+- store embeddings as JSON in SQLite
+- load indexed chunks in chunk order
+- convert SQLite failures into `DocumentVectorStoreError`
+
+## 10. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -185,7 +226,25 @@ Verifies:
 - invalid chunk size handling
 - invalid chunk overlap handling
 
-## 10. Checklist Mapping
+### `tests/unit/test_document_embedding_service.py`
+Verifies:
+- deterministic embedding output
+- normalized vectors
+- invalid dimension handling
+- text-without-token handling
+- embedding generation per chunk
+
+### `tests/unit/test_document_vector_store_service.py`
+Verifies:
+- chunk/vector save and load
+- chunk ordering
+- index replacement for re-indexing
+- empty chunk list rejection
+- missing embedding rejection
+- wrong document ID rejection
+- controlled DB error handling
+
+## 11. Checklist Mapping
 - document upload endpoint: done
 - supported document extensions config: done
 - unsupported document-type handling: done
@@ -200,10 +259,13 @@ Verifies:
 - chunk size configuration: done
 - chunk overlap configuration: done
 - chunk metadata: done
-- embeddings: pending
-- vector store: pending
+- embedding generation: done
+- vector store integration: done
 - retrieval: pending
+- top-k retrieval: pending
+- similarity threshold: pending
+- retrieval log with chunks/scores: pending
 - grounded answer generation: pending
 
-## 11. Interview Summary
-I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, and adding deterministic document chunking. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, and splits it into overlapping chunks with source metadata. This creates the foundation for the later RAG pipeline: embeddings, retrieval, and grounded answer generation.
+## 12. Interview Summary
+I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, and SQLite-backed vector persistence. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, and stores chunk vectors for retrieval. This creates the foundation for semantic retrieval and grounded answer generation.
