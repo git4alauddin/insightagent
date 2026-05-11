@@ -236,3 +236,12 @@ Start the API locally, then run:
 ```
 
 The initial V8 runner loads `evals/evaluation_dataset.jsonl`, calls the configured API cases, captures latency, checks response status/shape, and writes results under `evals/results/`.
+
+Compare against a previous run:
+
+```powershell
+.\.venv\Scripts\python scripts\run_eval.py `
+  --base-url "http://127.0.0.1:8000" `
+  --api-key "your-service-api-key-here" `
+  --compare-to "evals/results/previous_eval_results.json"
+```

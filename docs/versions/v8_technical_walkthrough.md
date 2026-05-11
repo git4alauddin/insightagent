@@ -104,7 +104,38 @@ Returns the failed score names for each case.
 
 This makes eval output easier to debug because failures say what kind of problem happened instead of only returning `passed=false`.
 
-## 6. Result Output
+## 6. Regression Comparison
+
+### `load_previous_results(previous_results_path)`
+Loads a previously saved JSON result file.
+
+Controlled errors:
+- missing previous result file
+- invalid JSON
+
+### `compare_eval_results(current_results, previous_output)`
+Compares the current run to a previous run.
+
+Comparison output:
+- `previous_pass_rate`
+- `current_pass_rate`
+- `pass_rate_delta`
+- `new_failures`
+- `new_passes`
+- `added_cases`
+- `removed_cases`
+
+### CLI
+Use:
+```powershell
+.\.venv\Scripts\python scripts\run_eval.py `
+  --api-key "your-service-api-key-here" `
+  --compare-to "evals/results/previous_eval_results.json"
+```
+
+When comparison is enabled, the saved result file includes a top-level `comparison` object.
+
+## 7. Result Output
 
 Default output:
 ```text
@@ -122,10 +153,11 @@ The output includes:
 - missing response keys
 - score breakdown
 - failure categories
+- optional regression comparison
 
 `evals/results/` is ignored by Git so local eval runs do not create commit noise.
 
-## 7. Tests Added
+## 8. Tests Added
 
 ### `tests/unit/test_eval_runner.py`
 Verifies:
@@ -139,8 +171,12 @@ Verifies:
 - CSV analysis intent is checked
 - summary pass/fail counts and pass rate are correct
 - failure category counts are summarized
+- previous result files load correctly
+- missing previous result file is handled safely
+- regression and improvement comparison works
+- saved result files can include comparison output
 
-## 8. Checklist Mapping
+## 9. Checklist Mapping
 - evaluation dataset JSONL: started
 - chat/structured-output test cases: started
 - tool-calling test cases: started
@@ -154,6 +190,7 @@ Verifies:
 - save evaluation result file: done
 - pass-rate summary: basic done
 - failure-category summary: basic done
+- regression comparison note: basic done
 - tool correctness scoring: basic done
 - format validity scoring: basic done
 - citation presence scoring: basic done
@@ -162,7 +199,6 @@ Verifies:
 - groundedness scoring: pending
 - citation semantic accuracy scoring: pending
 - token/cost tracking: pending
-- regression comparison: pending
 
-## 9. Interview Summary
-I started V8 by creating the evaluation dataset, runner foundation, and deterministic scoring rules. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify tool selection, check CSV analysis intent, check basic citation presence, validate insufficient-context safety, and save a result summary with failure categories. This creates the measurement layer that can later grow into groundedness, semantic citation accuracy, token/cost tracking, and regression scoring.
+## 10. Interview Summary
+I started V8 by creating the evaluation dataset, runner foundation, deterministic scoring rules, and regression comparison. Evaluation cases are stored as JSONL, the runner can call the local API with setup uploads for CSV and RAG flows, capture latency and responses, check status/shape expectations, verify tool selection, check CSV analysis intent, check basic citation presence, validate insufficient-context safety, save a result summary with failure categories, and compare the current run against previous results to identify pass-rate delta, new failures, new passes, added cases, and removed cases. This creates the measurement layer that can later grow into groundedness, semantic citation accuracy, and token/cost tracking.

@@ -88,12 +88,28 @@ Example:
   --api-key "your-service-api-key-here"
 ```
 
+Regression comparison:
+```powershell
+.\.venv\Scripts\python scripts\run_eval.py `
+  --base-url "http://127.0.0.1:8000" `
+  --api-key "your-service-api-key-here" `
+  --compare-to "evals/results/previous_eval_results.json"
+```
+
+Comparison output includes:
+- previous pass rate
+- current pass rate
+- pass-rate delta
+- newly failing cases
+- newly passing cases
+- added cases
+- removed cases
+
 ## Deferred On Purpose
 Not built in this first V8 chunk:
 - relevance scoring
 - groundedness scoring
 - token/cost tracking
-- previous-run regression comparison
 - semantic citation accuracy beyond filename/source presence
 
 ## Testing Status
@@ -108,11 +124,15 @@ Added unit tests for:
 - missing-key failure detection
 - pass-rate summary generation
 - failure-category summary generation
+- previous-result loading
+- regression comparison
+- new failure/new pass detection
+- added/removed case detection
 
 Latest suite:
 ```text
-217 passed
+221 passed
 ```
 
 ## Interview Explanation
-In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, and rule-based scoring. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify basic citation presence, detect insufficient-context safety, and save a pass-rate summary with failure categories. This creates the foundation for later groundedness, semantic citation accuracy, token/cost tracking, and regression comparison.
+In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, rule-based scoring, and regression comparison. The runner can load cases, validate their structure, call local API endpoints with an API key, run setup uploads for dataset and document flows, capture latency, check response shape, score tool selection, check CSV analysis intent, verify basic citation presence, detect insufficient-context safety, save a pass-rate summary with failure categories, and compare current results against a previous run. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.

@@ -450,6 +450,7 @@ Status: foundation started.
 - Added basic status/shape scoring.
 - Added rule-based scoring for tool correctness, CSV intent, citations, and insufficient-context safety.
 - Added failure category summaries.
+- Added regression comparison against previous eval results.
 - Added latency capture.
 - Added JSON result output under `evals/results/`.
 - Added unit tests for eval case loading, validation, scoring, and summary generation.
@@ -464,17 +465,20 @@ Status: foundation started.
 - To create a dataset format that can grow with new cases.
 - To build a runner foundation before adding advanced scoring.
 - To make failures easier to debug by categorizing scoring failures.
+- To detect pass-rate changes and newly failing cases across eval runs.
 
 ### Tests Performed
 - Added unit tests for the eval runner foundation.
 - Added unit tests for scoring rules and failure categories.
-- Full suite status after V8 scoring rules: `217 passed`.
+- Added unit tests for regression comparison behavior.
+- Full suite status after V8 regression comparison: `221 passed`.
 
 ### What I Learned
 - Evaluation needs a stable dataset format before scoring gets sophisticated.
 - Setup steps are necessary for CSV and RAG cases because those flows depend on uploaded resources.
 - Even simple status/shape scoring is useful as a first regression signal.
 - Rule-based scoring can catch important regressions before introducing model-assisted evaluation.
+- Comparing current and previous result files helps separate new regressions from known failures.
 
 ### Interview Explanation
-- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, and deterministic scoring rules. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, score tool correctness, check CSV analysis intent, verify basic RAG citation presence, validate insufficient-context safety, and save a JSON result summary with failure categories. This creates the foundation for later groundedness, semantic citation accuracy, token/cost tracking, and regression scoring.
+- In V8, I started the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, and regression comparison. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, check expected response status and keys, score tool correctness, check CSV analysis intent, verify basic RAG citation presence, validate insufficient-context safety, save a JSON result summary with failure categories, and compare current results against a previous run to identify pass-rate delta, new failures, new passes, added cases, and removed cases. This creates the foundation for later groundedness, semantic citation accuracy, and token/cost tracking.

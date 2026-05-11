@@ -23,7 +23,7 @@ This file maps each V8 commit heading to:
 - Gave V8 a measurable dataset format before adding advanced scoring.
 - Prepared the project for pass-rate summaries, failure analysis, and regression tracking.
 
-### `<pending>` - `v8: add evaluation scoring rules`
+### `de114ec` - `v8: add evaluation scoring rules`
 **What we did**
 - Added per-case `scoring` metadata to the evaluation dataset.
 - Added status and format-validity scoring.
@@ -38,6 +38,22 @@ This file maps each V8 commit heading to:
 - Made eval results more useful than status/key checks alone.
 - Started detecting wrong tool selection and missing citations.
 - Added failure categories that can support later debugging and regression tracking.
+
+### `<pending>` - `v8: add eval regression comparison`
+**What we did**
+- Added previous result loading.
+- Added eval result comparison helper.
+- Added `--compare-to` CLI option.
+- Added pass-rate delta output.
+- Added newly failing and newly passing case detection.
+- Added added/removed case detection.
+- Added comparison output in saved result files.
+- Added unit tests for comparison behavior.
+
+**What it solved / took care of**
+- Made eval runs comparable over time.
+- Added the first regression signal for V8.
+- Helped identify which cases got worse, improved, were added, or disappeared.
 
 ## Reusable Entry Template
 

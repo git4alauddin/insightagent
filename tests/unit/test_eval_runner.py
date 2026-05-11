@@ -7,7 +7,10 @@ from scripts.run_eval import (
     EvalRunnerError,
     build_summary,
     build_score_breakdown,
+    compare_eval_results,
     load_eval_cases,
+    load_previous_results,
+    save_results,
     score_eval_response,
 )
 
@@ -191,3 +194,66 @@ def test_build_summary_counts_pass_fail_and_rate() -> None:
         "pass_rate": 0.6667,
         "failure_categories": {"tool_correctness": 1},
     }
+
+
+def test_load_previous_results_reads_saved_json(tmp_path: Path) -> None:
+    previous_path = tmp_path / "previous.json"
+    previous_path.write_text(
+        json.dumps({"summary": {"pass_rate": 1.0}, "results": []}),
+        encoding="utf-8",
+    )
+
+    previous = load_previous_results(previous_path)
+
+    assert previous["summary"]["pass_rate"] == 1.0
+
+
+def test_load_previous_results_rejects_missing_file(tmp_path: Path) -> None:
+    with pytest.raises(EvalRunnerError, match="Previous results not found"):
+        load_previous_results(tmp_path / "missing.json")
+
+
+def test_compare_eval_results_reports_regression_and_improvement() -> None:
+    previous_output = {
+        "summary": {"pass_rate": 0.5},
+        "results": [
+            {"id": "case_regressed", "passed": True},
+            {"id": "case_improved", "passed": False},
+            {"id": "case_removed", "passed": True},
+        ],
+    }
+    current_results = [
+        {
+            "id": "case_regressed",
+            "passed": False,
+            "failure_categories": ["format_validity"],
+        },
+        {"id": "case_improved", "passed": True, "failure_categories": []},
+        {"id": "case_added", "passed": True, "failure_categories": []},
+    ]
+
+    comparison = compare_eval_results(current_results, previous_output)
+
+    assert comparison == {
+        "previous_pass_rate": 0.5,
+        "current_pass_rate": 0.6667,
+        "pass_rate_delta": 0.1667,
+        "new_failures": ["case_regressed"],
+        "new_passes": ["case_improved"],
+        "added_cases": ["case_added"],
+        "removed_cases": ["case_removed"],
+    }
+
+
+def test_save_results_can_include_comparison(tmp_path: Path) -> None:
+    results_path = tmp_path / "latest.json"
+    save_results(
+        [{"id": "case_1", "passed": True, "failure_categories": []}],
+        results_path,
+        comparison={"pass_rate_delta": 0.25},
+    )
+
+    saved = json.loads(results_path.read_text(encoding="utf-8"))
+
+    assert saved["summary"]["passed"] == 1
+    assert saved["comparison"]["pass_rate_delta"] == 0.25

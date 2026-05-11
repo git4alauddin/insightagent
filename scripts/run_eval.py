@@ -331,12 +331,71 @@ def build_summary(results: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
-def save_results(results: list[dict[str, Any]], results_path: Path) -> None:
+def load_previous_results(previous_results_path: Path) -> dict[str, Any]:
+    if not previous_results_path.exists():
+        raise EvalRunnerError(f"Previous results not found: {previous_results_path}")
+
+    try:
+        return json.loads(previous_results_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise EvalRunnerError("Previous results file is not valid JSON.") from exc
+
+
+def compare_eval_results(
+    current_results: list[dict[str, Any]],
+    previous_output: dict[str, Any],
+) -> dict[str, Any]:
+    previous_results = previous_output.get("results", [])
+    previous_summary = previous_output.get("summary", {})
+    current_summary = build_summary(current_results)
+
+    previous_by_id = {
+        str(result["id"]): result
+        for result in previous_results
+        if isinstance(result, dict) and "id" in result
+    }
+    current_by_id = {str(result["id"]): result for result in current_results}
+
+    new_failures = [
+        case_id
+        for case_id, current_result in current_by_id.items()
+        if previous_by_id.get(case_id, {}).get("passed") is True
+        and current_result["passed"] is False
+    ]
+    new_passes = [
+        case_id
+        for case_id, current_result in current_by_id.items()
+        if previous_by_id.get(case_id, {}).get("passed") is False
+        and current_result["passed"] is True
+    ]
+
+    previous_pass_rate = float(previous_summary.get("pass_rate", 0.0))
+    current_pass_rate = float(current_summary["pass_rate"])
+
+    return {
+        "previous_pass_rate": previous_pass_rate,
+        "current_pass_rate": current_pass_rate,
+        "pass_rate_delta": round(current_pass_rate - previous_pass_rate, 4),
+        "new_failures": sorted(new_failures),
+        "new_passes": sorted(new_passes),
+        "added_cases": sorted(set(current_by_id) - set(previous_by_id)),
+        "removed_cases": sorted(set(previous_by_id) - set(current_by_id)),
+    }
+
+
+def save_results(
+    results: list[dict[str, Any]],
+    results_path: Path,
+    comparison: dict[str, Any] | None = None,
+) -> None:
     results_path.parent.mkdir(parents=True, exist_ok=True)
     output = {
         "summary": build_summary(results),
         "results": results,
     }
+    if comparison is not None:
+        output["comparison"] = comparison
+
     results_path.write_text(json.dumps(output, indent=2), encoding="utf-8")
 
 
@@ -350,6 +409,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--api-key", required=True)
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET_PATH)
     parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS_PATH)
+    parser.add_argument("--compare-to", type=Path, default=None)
     return parser.parse_args()
 
 
@@ -357,12 +417,22 @@ def main() -> None:
     args = parse_args()
     cases = load_eval_cases(args.dataset)
     results = run_eval_cases(cases, base_url=args.base_url, api_key=args.api_key)
-    save_results(results, args.results)
+    comparison = None
+    if args.compare_to is not None:
+        previous_output = load_previous_results(args.compare_to)
+        comparison = compare_eval_results(results, previous_output)
+
+    save_results(results, args.results, comparison=comparison)
     summary = build_summary(results)
     print(
         f"Evaluated {summary['total']} cases: "
         f"{summary['passed']} passed, {summary['failed']} failed."
     )
+    if comparison is not None:
+        print(
+            "Pass-rate delta vs previous: "
+            f"{comparison['pass_rate_delta']:+.4f}"
+        )
 
 
 if __name__ == "__main__":
