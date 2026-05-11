@@ -9,7 +9,7 @@ from app.services.session_service import SessionServiceError, append_message, cr
 
 
 client = TestClient(app)
-client.headers.update({"x-api-key": "test-api-key"})
+client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
 
 @pytest.fixture(autouse=True)
@@ -41,6 +41,7 @@ def test_create_session_returns_controlled_db_error_when_service_fails() -> None
         "error": {
             "code": "SESSION_DB_ERROR",
             "message": "Database operation failed.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -71,6 +72,7 @@ def test_get_session_messages_returns_controlled_error_for_missing_session() -> 
         "error": {
             "code": "SESSION_NOT_FOUND",
             "message": "Session not found: missing-session",
+            "request_id": "test-request-id",
         }
     }
 
@@ -87,5 +89,6 @@ def test_get_session_messages_returns_controlled_db_error_for_service_error() ->
         "error": {
             "code": "SESSION_DB_ERROR",
             "message": "Database operation failed.",
+            "request_id": "test-request-id",
         }
     }

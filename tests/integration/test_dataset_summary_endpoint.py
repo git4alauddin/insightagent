@@ -10,7 +10,7 @@ from app.services.dataset_registry_service import get_dataset_metadata
 
 
 client = TestClient(app)
-client.headers.update({"x-api-key": "test-api-key"})
+client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
 
 @pytest.fixture(autouse=True)
@@ -51,6 +51,7 @@ def test_dataset_summary_returns_not_found_for_unknown_dataset() -> None:
         "error": {
             "code": "DATASET_NOT_FOUND",
             "message": "Dataset not found: ds_missing",
+            "request_id": "test-request-id",
         }
     }
 
@@ -73,5 +74,6 @@ def test_dataset_summary_returns_storage_error_when_file_is_missing() -> None:
         "error": {
             "code": "DATASET_STORAGE_ERROR",
             "message": f"Dataset file is missing: {stored_path}",
+            "request_id": "test-request-id",
         }
     }

@@ -10,7 +10,7 @@ from app.services.dataset_registry_service import DatasetRegistryError, get_data
 
 
 client = TestClient(app)
-client.headers.update({"x-api-key": "test-api-key"})
+client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
 
 @pytest.fixture(autouse=True)
@@ -54,6 +54,7 @@ def test_upload_rejects_non_csv_files() -> None:
         "error": {
             "code": "DATASET_VALIDATION_ERROR",
             "message": "Only CSV files are supported.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -69,6 +70,7 @@ def test_upload_rejects_empty_csv() -> None:
         "error": {
             "code": "DATASET_VALIDATION_ERROR",
             "message": "CSV file is empty.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -85,6 +87,7 @@ def test_upload_rejects_duplicate_columns() -> None:
         "error": {
             "code": "DATASET_VALIDATION_ERROR",
             "message": "CSV contains duplicate column names.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -104,5 +107,6 @@ def test_upload_returns_controlled_db_error_when_registry_fails() -> None:
         "error": {
             "code": "DATASET_DB_ERROR",
             "message": "Database operation failed.",
+            "request_id": "test-request-id",
         }
     }

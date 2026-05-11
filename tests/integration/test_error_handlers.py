@@ -7,7 +7,7 @@ from app.main import app
 
 def test_validation_error_returns_structured_invalid_input() -> None:
     client = TestClient(app)
-    client.headers.update({"x-api-key": "test-api-key"})
+    client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
     response = client.post("/chat", json={})
 
@@ -16,13 +16,14 @@ def test_validation_error_returns_structured_invalid_input() -> None:
         "error": {
             "code": "INVALID_INPUT",
             "message": "Request validation failed.",
+            "request_id": "test-request-id",
         }
     }
 
 
 def test_unexpected_error_returns_safe_internal_error() -> None:
     client = TestClient(app, raise_server_exceptions=False)
-    client.headers.update({"x-api-key": "test-api-key"})
+    client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
     with patch(
         "app.api.routes_chat.generate_answer",
@@ -35,5 +36,6 @@ def test_unexpected_error_returns_safe_internal_error() -> None:
         "error": {
             "code": "INTERNAL_ERROR",
             "message": "An unexpected error occurred.",
+            "request_id": "test-request-id",
         }
     }

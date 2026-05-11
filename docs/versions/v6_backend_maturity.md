@@ -66,6 +66,17 @@ Handled cases:
 
 Unexpected errors are logged but returned safely without exposing internal exception details.
 
+### Request ID Middleware
+Added request ID middleware in `app/api/middleware.py`.
+
+Behavior:
+- reuses an incoming `x-request-id` header when provided
+- generates a new `req_<uuid>` value when missing
+- adds `x-request-id` to every response header
+- includes `request_id` in structured error responses
+
+This prepares the backend for traceable logs and easier debugging.
+
 ## Why This Matters
 V6 protects costly and state-changing endpoints while keeping health/readiness checks available for uptime checks and deployment platforms.
 
@@ -73,11 +84,13 @@ The backend now fails closed when API key auth is not configured, which is safer
 
 Global exception handling gives clients one consistent error format and prevents raw internal errors from leaking through API responses.
 
+Request IDs make each API call traceable across responses, logs, and later observability work.
+
 ## Testing Status
-Latest suite after global exception handling:
+Latest suite after request ID middleware:
 
 ```text
-135 passed
+138 passed
 ```
 
 ## Current V6 Checklist Status
@@ -90,11 +103,11 @@ Latest suite after global exception handling:
 - Public `/health` and `/ready`: done.
 - Global exception handler: done.
 - Structured error response: done.
-- Request ID middleware: pending.
+- Request ID middleware: done.
 - Structured logging upgrade: pending.
 - Rate limiting: pending.
 - CORS config: pending.
 - Cloud Run deployment: pending.
 
 ## Interview Explanation
-In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, and centralized API error handling. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response.
+In V6, I started hardening InsightAgent for deployment. I added a readiness endpoint for dependency checks, containerized the backend with Docker, protected private endpoints with API key authentication, centralized API error handling, and added request IDs for traceability. Public health checks remain open, while private routes require a valid `x-api-key` header and errors return a consistent structured response with a request ID.

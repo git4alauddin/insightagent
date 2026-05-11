@@ -294,6 +294,9 @@ Learning-first, version-by-version implementation.
 - Standardized API error responses to `{"error": {"code": "...", "message": "..."}}`.
 - Added `INVALID_INPUT` handling for request validation errors.
 - Added safe `INTERNAL_ERROR` handling for unexpected backend errors.
+- Added request ID middleware.
+- Added `x-request-id` response headers.
+- Added `request_id` to structured error responses.
 
 ### Why We Built It
 - To protect costly LLM and data endpoints.
@@ -302,11 +305,13 @@ Learning-first, version-by-version implementation.
 - To fail closed when authentication is not configured.
 - To give API clients one predictable error contract.
 - To prevent internal exception details from leaking in responses.
+- To make requests traceable across client responses and future logs.
 
 ### Tests Performed
 - Ran the full test suite after auth changes.
 - Ran the full test suite after global exception handling.
-- Current suite status: `135 passed`.
+- Ran the full test suite after request ID middleware.
+- Current suite status: `138 passed`.
 
 ### What I Learned
 - Authentication can be centralized as a FastAPI dependency.
@@ -315,6 +320,7 @@ Learning-first, version-by-version implementation.
 - Missing auth configuration should be treated as a deployment error, not as permission to expose the API.
 - FastAPI exception handlers can preserve custom route errors while standardizing the response shape.
 - Unexpected errors should be logged internally and returned as safe generic API errors.
+- Request IDs are a small feature that make debugging much easier once logs and metrics grow.
 
 ### Interview Explanation
-- In V6, I started hardening the backend for deployment. I added readiness checks, containerized the service, introduced API key authentication, and centralized exception handling. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response.
+- In V6, I started hardening the backend for deployment. I added readiness checks, containerized the service, introduced API key authentication, centralized exception handling, and added request IDs. Private routes are protected at the router level, `/health` and `/ready` stay public for deployment checks, and API errors now use one consistent structured response with a traceable request ID.

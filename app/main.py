@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
 from app.api.error_handlers import register_exception_handlers
+from app.api.middleware import register_request_id_middleware
 from app.api.routes_agent import router as agent_router
 from app.api.routes_chat import router as chat_router
 from app.api.routes_datasets import router as datasets_router
@@ -18,6 +19,7 @@ app = FastAPI(
 )
 
 register_exception_handlers(app)
+register_request_id_middleware(app)
 
 app.include_router(health_router)
 app.include_router(chat_router)

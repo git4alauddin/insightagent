@@ -13,7 +13,7 @@ from app.services.structured_llm_service import (
 
 
 client = TestClient(app)
-client.headers.update({"x-api-key": "test-api-key"})
+client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
 
 def test_chat_returns_llm_answer() -> None:
@@ -41,6 +41,7 @@ def test_chat_returns_controlled_error_when_llm_fails() -> None:
         "error": {
             "code": "LLM_SERVICE_ERROR",
             "message": "LLM API key is not configured.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -83,6 +84,7 @@ def test_structured_chat_returns_controlled_error_when_service_fails() -> None:
         "error": {
             "code": "STRUCTURED_LLM_SERVICE_ERROR",
             "message": "LLM request timed out.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -137,6 +139,7 @@ def test_memory_chat_returns_controlled_error_when_service_fails() -> None:
         "error": {
             "code": "MEMORY_CHAT_SERVICE_ERROR",
             "message": "Session not found: missing-session",
+            "request_id": "test-request-id",
         }
     }
 
@@ -150,5 +153,6 @@ def test_memory_chat_returns_controlled_error_when_message_too_long() -> None:
         "error": {
             "code": "MEMORY_CHAT_SERVICE_ERROR",
             "message": "Message too long.",
+            "request_id": "test-request-id",
         }
     }

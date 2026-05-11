@@ -26,6 +26,7 @@ app/
   config.py
   api/
     dependencies.py
+    middleware.py
     routes_health.py
     routes_chat.py
     routes_agent.py

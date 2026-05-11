@@ -24,13 +24,18 @@ def test_public_ready_does_not_require_api_key(monkeypatch) -> None:
 def test_protected_endpoint_rejects_missing_api_key() -> None:
     client = TestClient(app)
 
-    response = client.post("/chat", json={"message": "Hello"})
+    response = client.post(
+        "/chat",
+        json={"message": "Hello"},
+        headers={"x-request-id": "test-request-id"},
+    )
 
     assert response.status_code == 401
     assert response.json() == {
         "error": {
             "code": "UNAUTHORIZED",
             "message": "A valid x-api-key header is required.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -41,7 +46,7 @@ def test_protected_endpoint_rejects_invalid_api_key() -> None:
     response = client.post(
         "/chat",
         json={"message": "Hello"},
-        headers={"x-api-key": "wrong-key"},
+        headers={"x-api-key": "wrong-key", "x-request-id": "test-request-id"},
     )
 
     assert response.status_code == 401
@@ -49,6 +54,7 @@ def test_protected_endpoint_rejects_invalid_api_key() -> None:
         "error": {
             "code": "UNAUTHORIZED",
             "message": "A valid x-api-key header is required.",
+            "request_id": "test-request-id",
         }
     }
 
@@ -60,7 +66,7 @@ def test_protected_endpoint_fails_closed_when_api_key_is_not_configured(monkeypa
     response = client.post(
         "/chat",
         json={"message": "Hello"},
-        headers={"x-api-key": "test-api-key"},
+        headers={"x-api-key": "test-api-key", "x-request-id": "test-request-id"},
     )
 
     assert response.status_code == 503
@@ -68,5 +74,6 @@ def test_protected_endpoint_fails_closed_when_api_key_is_not_configured(monkeypa
         "error": {
             "code": "API_KEY_NOT_CONFIGURED",
             "message": "API key authentication is not configured.",
+            "request_id": "test-request-id",
         }
     }

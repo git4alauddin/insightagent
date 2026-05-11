@@ -10,6 +10,7 @@ The current V6 work focuses on:
 2. Docker runtime setup.
 3. API key protection for private endpoints.
 4. Consistent structured API errors.
+5. Request IDs for traceability.
 
 ## 2. Readiness Layer
 
@@ -83,6 +84,7 @@ Behavior:
 - controlled `HTTPException` responses keep their custom route error codes
 - request body/path validation failures return `INVALID_INPUT`
 - unexpected crashes return `INTERNAL_ERROR`
+- structured errors include `request_id`
 - unexpected errors are logged server-side
 
 ### `app/main.py`
@@ -93,7 +95,39 @@ register_exception_handlers(app)
 
 This attaches the handlers once during app startup.
 
-## 5. Tests Added/Extended
+## 5. Request ID Middleware
+
+### `app/api/middleware.py`
+Core function:
+- `register_request_id_middleware(app)`
+
+Behavior:
+- reads incoming `x-request-id`
+- generates `req_<uuid>` when no request ID is provided
+- stores the value on `request.state.request_id`
+- writes the same value back to the `x-request-id` response header
+
+### `app/api/error_handlers.py`
+The error handlers read `request.state.request_id` and include it in the response body:
+```json
+{
+  "error": {
+    "code": "ERROR_CODE",
+    "message": "Human readable message.",
+    "request_id": "req_..."
+  }
+}
+```
+
+This gives clients a stable ID they can share when debugging a failed request.
+
+### `app/main.py`
+Calls:
+```python
+register_request_id_middleware(app)
+```
+
+## 6. Tests Added/Extended
 
 ### Auth Tests
 `tests/integration/test_auth_dependency.py` verifies:
@@ -108,18 +142,25 @@ This attaches the handlers once during app startup.
 - validation errors return `INVALID_INPUT`
 - unexpected exceptions return safe `INTERNAL_ERROR`
 
+### Request ID Tests
+`tests/integration/test_request_id_middleware.py` verifies:
+- request IDs are generated when missing
+- incoming request IDs are reused
+- error responses include the same request ID in headers and body
+
 ### Existing Integration Tests
 Existing tests were updated to expect the new V6 error shape:
 ```json
 {
   "error": {
     "code": "...",
-    "message": "..."
+    "message": "...",
+    "request_id": "..."
   }
 }
 ```
 
-## 6. Checklist Mapping
+## 7. Checklist Mapping
 - `/ready` endpoint: done
 - dependency readiness checks: done
 - Dockerfile: done
@@ -128,9 +169,9 @@ Existing tests were updated to expect the new V6 error shape:
 - private endpoint protection: done
 - global exception handling: done
 - structured error response: done
-- request ID middleware: pending
+- request ID middleware: done
 - rate limiting: pending
 - CORS config: pending
 
-## 7. Interview Summary
-In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, API key protection for private endpoints, and global exception handlers that return one consistent error format. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.
+## 8. Interview Summary
+In V6, I added production-style backend hardening. The service now has readiness checks, Docker runtime support, API key protection for private endpoints, global exception handlers that return one consistent error format, and request IDs for traceability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.

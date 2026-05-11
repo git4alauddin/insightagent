@@ -25,7 +25,7 @@ This file maps each V6 commit heading to:
 - Made the backend container-ready.
 - Reduced image noise and avoided copying local-only files.
 
-### `<pending>` - `v6: add API key authentication for private endpoints`
+### `cbfb6c1` - `v6: add API key authentication for private endpoints`
 **What we did**
 - Added `API_KEY` config.
 - Added shared `x-api-key` authentication dependency.
@@ -37,7 +37,7 @@ This file maps each V6 commit heading to:
 - Protected costly and state-changing endpoints.
 - Made missing auth configuration fail closed.
 
-### `<pending>` - `v6: add global exception handling and structured errors`
+### `11aecf9` - `v6: add global exception handling and structured errors`
 **What we did**
 - Added global exception handlers.
 - Converted controlled `HTTPException` responses into a clean `{"error": ...}` shape.
@@ -48,6 +48,19 @@ This file maps each V6 commit heading to:
 **What it solved / took care of**
 - Gave the API one consistent error contract.
 - Prevented internal exception details from leaking to clients.
+
+### `<pending>` - `v6: add request ID middleware`
+**What we did**
+- Added request ID middleware.
+- Reused incoming `x-request-id` values when provided.
+- Generated request IDs when missing.
+- Added `x-request-id` to response headers.
+- Added `request_id` to structured error responses.
+- Added request ID integration tests.
+
+**What it solved / took care of**
+- Made each request traceable.
+- Prepared the backend for structured logging and observability.
 
 ## Reusable Entry Template
 

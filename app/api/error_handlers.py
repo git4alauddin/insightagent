@@ -10,15 +10,38 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 logger = logging.getLogger(__name__)
 
 
-def _build_error_response(status_code: int, code: str, message: str) -> JSONResponse:
+from app.api.middleware import REQUEST_ID_HEADER
+
+
+def _get_request_id(request: Request) -> str | None:
+    request_id = getattr(request.state, "request_id", None)
+    if request_id:
+        return str(request_id)
+    return None
+
+
+def _build_error_response(
+    status_code: int,
+    code: str,
+    message: str,
+    request_id: str | None,
+) -> JSONResponse:
+    content = {
+        "error": {
+            "code": code,
+            "message": message,
+            "request_id": request_id,
+        }
+    }
+
+    headers = {}
+    if request_id:
+        headers[REQUEST_ID_HEADER] = request_id
+
     return JSONResponse(
         status_code=status_code,
-        content={
-            "error": {
-                "code": code,
-                "message": message,
-            }
-        },
+        content=content,
+        headers=headers,
     )
 
 
@@ -41,20 +64,20 @@ async def http_exception_handler(
     request: Request,
     exc: StarletteHTTPException,
 ) -> JSONResponse:
-    del request
     code, message = _extract_error_detail(exc.detail)
-    return _build_error_response(exc.status_code, code, message)
+    return _build_error_response(exc.status_code, code, message, _get_request_id(request))
 
 
 async def validation_exception_handler(
     request: Request,
     exc: RequestValidationError,
 ) -> JSONResponse:
-    del request, exc
+    del exc
     return _build_error_response(
         status_code=422,
         code="INVALID_INPUT",
         message="Request validation failed.",
+        request_id=_get_request_id(request),
     )
 
 
@@ -67,6 +90,7 @@ async def unexpected_exception_handler(
         status_code=500,
         code="INTERNAL_ERROR",
         message="An unexpected error occurred.",
+        request_id=_get_request_id(request),
     )
 
 
