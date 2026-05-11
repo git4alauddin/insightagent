@@ -113,7 +113,7 @@ This file maps each V7 commit heading to:
 - Connected validated questions to retrieval, citation, and weak-context behavior.
 - Completed the main V7 document Q&A endpoint surface.
 
-### `<pending>` - `v7: wire document indexing after upload`
+### `bb06d08` - `v7: wire document indexing after upload`
 **What we did**
 - Added document indexing service.
 - Wired upload to extract text, chunk text, generate embeddings, and save vectors.
@@ -126,6 +126,19 @@ This file maps each V7 commit heading to:
 - Made the V7 document flow end-to-end from upload to ask.
 - Ensured uploaded documents are immediately searchable.
 - Proved grounded answers can be returned from uploaded document content.
+
+## V7 Closeout
+
+V7 is complete at the implementation and automated verification level.
+
+Final V7 proof:
+- document upload stores metadata and raw files safely
+- upload-time indexing extracts, chunks, embeds, and stores vectors
+- document ask retrieves indexed chunks
+- answers include citations from retrieved chunk metadata
+- weak retrieval returns `insufficient_context`
+- unsupported or failed indexing paths return controlled errors
+- full automated suite passed with `207 passed`
 
 ## Reusable Entry Template
 

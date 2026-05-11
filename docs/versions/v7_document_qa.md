@@ -14,6 +14,10 @@ The target flow is:
 
 ## Current Progress
 
+Status: complete.
+
+V7 is implemented and verified through automated end-to-end tests. The upload flow now indexes documents immediately, and the ask endpoint can answer against indexed chunks with citations or return `insufficient_context` when evidence is weak.
+
 ### Document Contracts
 Added document schema contracts in `app/schemas/document.py`.
 
@@ -134,7 +138,7 @@ Behavior:
 - returns an extractive answer using only retrieved chunk text
 - converts retrieval errors into controlled answer-service errors
 
-This is intentionally service-level. The public `/documents/{document_id}/ask` endpoint will be wired after the answer behavior is stable and tested.
+This answer behavior is now exposed through `POST /documents/{document_id}/ask`.
 
 ### Document Ask Endpoint
 Added:
@@ -182,7 +186,7 @@ This keeps the RAG build controlled:
 - no embeddings before chunk/source metadata is clear
 - no answers without citation and retrieval evidence
 
-## Planned API Surface
+## API Surface
 
 Upload document:
 ```http
@@ -221,7 +225,7 @@ Current ask response shape:
 }
 ```
 
-## Example Future Response Shape
+## Citation Response Example
 ```json
 {
   "answer": "The refund policy is described in the uploaded document.",
@@ -239,9 +243,11 @@ Current ask response shape:
 }
 ```
 
-## Deferred On Purpose
-Not built yet:
-- optional manual curl/Postman RAG proof outside automated tests
+## Completion Notes
+V7 is complete for the planned backend implementation. The full upload-to-ask RAG path is covered by automated integration tests.
+
+Optional future proof outside this implementation chunk:
+- run the same upload and ask flow manually through curl/Postman for demo recording
 
 ## Testing Status
 Added schema unit tests for:

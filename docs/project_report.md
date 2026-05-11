@@ -354,6 +354,10 @@ Learning-first, version-by-version implementation.
 
 ## V7 Progress
 
+Status: complete.
+
+V7 is implemented and verified through automated end-to-end upload-to-ask RAG tests.
+
 ### What We Built
 - Added document Q&A schema contracts.
 - Added source citation schema.
@@ -375,6 +379,7 @@ Learning-first, version-by-version implementation.
 - Added controlled document ask errors for missing documents and answer-service failures.
 - Added automatic upload-time document indexing.
 - Added controlled document indexing errors.
+- Added end-to-end upload-to-ask RAG behavior.
 - Added unit tests for document schemas.
 - Added integration tests for document upload.
 - Added integration tests for document ask.
@@ -382,6 +387,7 @@ Learning-first, version-by-version implementation.
 - Added unit tests for embedding generation and vector store behavior.
 - Added unit tests for semantic retrieval behavior.
 - Added unit tests for grounded answer behavior.
+- Added end-to-end integration tests for upload-to-ask RAG flow.
 - Added V7 documentation files:
   - `docs/versions/v7_document_qa.md`
   - `docs/versions/v7_technical_walkthrough.md`

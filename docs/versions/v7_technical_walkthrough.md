@@ -1,6 +1,8 @@
 # V7 Technical Walkthrough
 
-This document explains the V7 document Q&A layer file by file as it grows.
+This document explains the completed V7 document Q&A layer file by file.
+
+Status: complete.
 
 ## 1. Design Intent
 V7 will add RAG-based document question answering.
@@ -235,7 +237,7 @@ Retrieval result includes:
 - `similarity_threshold`
 - `candidate_count`
 
-This gives the later answer endpoint a concrete evidence set and retrieval trace before any LLM answer is generated.
+This gives the answer endpoint a concrete evidence set and retrieval trace before any response is generated.
 
 ## 11. Grounded Answer Service
 
@@ -446,7 +448,7 @@ Verifies:
 - citation examples in docs: done
 - automatic upload-time indexing: done
 - RAG flow tested end-to-end: automated test done
-- RAG flow manually tested end-to-end: pending
+- RAG flow manually tested end-to-end: optional demo proof
 
 ## 16. Interview Summary
 I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, semantic retrieval, a grounded answer service, the public document ask endpoint, and automatic upload-time indexing. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, marks documents as indexed, retrieves the most relevant chunks for a question using top-k and similarity threshold controls, builds citations from retrieved chunks, returns insufficient-context fallback when evidence is missing, and exposes the answer flow through `POST /documents/{document_id}/ask`.
