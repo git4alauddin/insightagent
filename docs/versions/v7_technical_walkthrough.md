@@ -43,10 +43,12 @@ The table includes migration-safe column checks through `_ensure_documents_colum
 Core functions:
 - `register_document_metadata(...)`
 - `get_document_metadata(document_id)`
+- `update_document_status(document_id, status)`
 
 Responsibilities:
 - create tables before metadata operations
 - store document metadata in SQLite
+- mark documents as `indexed` after upload-time indexing succeeds
 - convert SQLite failures into `DocumentRegistryError`
 - return explicit not-found errors for missing document IDs
 
@@ -98,7 +100,9 @@ Upload flow:
 3. Generate a `doc_<uuid>` document ID.
 4. Store the raw file under `uploads/documents/<session_or_standalone>/`.
 5. Register document metadata in SQLite.
-6. Return `DocumentUploadResponse`.
+6. Index the document.
+7. Mark the document as `indexed`.
+8. Return `DocumentUploadResponse`.
 
 Ask flow:
 1. Validate the request body through `DocumentAskRequest`.
@@ -111,6 +115,7 @@ Controlled errors:
 - `DOCUMENT_NOT_FOUND` (`404`)
 - `DOCUMENT_DB_ERROR` (`503`)
 - `DOCUMENT_STORAGE_ERROR` (`503`)
+- `DOCUMENT_INDEXING_ERROR` (`400`)
 - `DOCUMENT_ANSWER_ERROR` (`503`)
 
 ### `app/main.py`
@@ -287,7 +292,36 @@ Weak retrieval is not treated as an exception. It returns a normal `DocumentAskR
 }
 ```
 
-## 13. Tests Added
+## 13. Upload-Time Indexing
+
+### `app/services/document_indexing_service.py`
+Core function:
+- `index_document(document_id, filename, storage_path, file_extension)`
+
+Flow:
+1. Extract text from the stored document.
+2. Chunk the extracted text.
+3. Generate embeddings for each chunk.
+4. Save chunks and vectors in SQLite.
+5. Return the number of chunks indexed.
+
+Errors from extraction, chunking, embedding, and vector storage are converted into `DocumentIndexingError`.
+
+### `app/api/routes_documents.py`
+The upload endpoint now calls `index_document(...)` after metadata registration.
+
+Successful uploads now return:
+```json
+{
+  "document_id": "doc_123",
+  "filename": "policy.txt",
+  "status": "indexed"
+}
+```
+
+This makes the document immediately available for `/documents/{document_id}/ask`.
+
+## 14. Tests Added
 
 ### `tests/unit/test_document_schemas.py`
 Verifies:
@@ -369,7 +403,20 @@ Verifies:
 - missing document returns `DOCUMENT_NOT_FOUND`
 - answer-service failure returns `DOCUMENT_ANSWER_ERROR`
 
-## 14. Checklist Mapping
+### `tests/unit/test_document_indexing_service.py`
+Verifies:
+- indexing extracts, chunks, embeds, and stores vectors
+- extraction failures return `DocumentIndexingError`
+
+### `tests/integration/test_document_rag_flow.py`
+Verifies:
+- upload returns indexed status
+- uploaded document chunks are stored
+- ask works immediately after upload
+- answer includes citation source from indexed chunk
+- indexing failures return `DOCUMENT_INDEXING_ERROR`
+
+## 15. Checklist Mapping
 - document upload endpoint: done
 - supported document extensions config: done
 - unsupported document-type handling: done
@@ -397,7 +444,9 @@ Verifies:
 - `/documents/{document_id}/ask` endpoint: done
 - insufficient-context test questions: service-level done
 - citation examples in docs: done
+- automatic upload-time indexing: done
+- RAG flow tested end-to-end: automated test done
 - RAG flow manually tested end-to-end: pending
 
-## 15. Interview Summary
-I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, semantic retrieval, a grounded answer service, and the public document ask endpoint. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, retrieves the most relevant chunks for a question using top-k and similarity threshold controls, builds citations from retrieved chunks, returns insufficient-context fallback when evidence is missing, and exposes the answer flow through `POST /documents/{document_id}/ask`.
+## 16. Interview Summary
+I started V7 by defining the document Q&A contracts, implementing safe document upload persistence, adding text extraction, deterministic document chunking, local embedding generation, SQLite-backed vector persistence, semantic retrieval, a grounded answer service, the public document ask endpoint, and automatic upload-time indexing. The backend validates supported document files, stores them with generated IDs, records metadata in SQLite, extracts text from TXT, Markdown, and PDF files, normalizes extracted text, splits it into overlapping chunks with source metadata, generates deterministic local embeddings, stores chunk vectors, marks documents as indexed, retrieves the most relevant chunks for a question using top-k and similarity threshold controls, builds citations from retrieved chunks, returns insufficient-context fallback when evidence is missing, and exposes the answer flow through `POST /documents/{document_id}/ask`.

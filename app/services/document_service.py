@@ -28,9 +28,10 @@ def validate_document_file(file_name: str, file_size_bytes: int) -> str:
 def build_document_upload_response(
     document_id: str,
     filename: str,
+    status: str = "uploaded",
 ) -> DocumentUploadResponse:
     return DocumentUploadResponse(
         document_id=document_id,
         filename=filename,
-        status="uploaded",
+        status=status,
     )

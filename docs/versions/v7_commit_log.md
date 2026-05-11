@@ -99,7 +99,7 @@ This file maps each V7 commit heading to:
 - Ensured unsupported questions do not produce confident answers.
 - Prepared the answer logic for the future `/documents/{document_id}/ask` endpoint.
 
-### `<pending>` - `v7: add document ask endpoint`
+### `69c4096` - `v7: add document ask endpoint`
 **What we did**
 - Added `POST /documents/{document_id}/ask`.
 - Added document existence validation before answer generation.
@@ -112,6 +112,20 @@ This file maps each V7 commit heading to:
 - Exposed the service-level RAG answer flow through the public API.
 - Connected validated questions to retrieval, citation, and weak-context behavior.
 - Completed the main V7 document Q&A endpoint surface.
+
+### `<pending>` - `v7: wire document indexing after upload`
+**What we did**
+- Added document indexing service.
+- Wired upload to extract text, chunk text, generate embeddings, and save vectors.
+- Marked uploaded documents as `indexed` after successful indexing.
+- Added controlled `DOCUMENT_INDEXING_ERROR` response.
+- Added unit tests for indexing service success and extraction failure.
+- Added upload-to-ask integration tests for end-to-end RAG behavior.
+
+**What it solved / took care of**
+- Made the V7 document flow end-to-end from upload to ask.
+- Ensured uploaded documents are immediately searchable.
+- Proved grounded answers can be returned from uploaded document content.
 
 ## Reusable Entry Template
 

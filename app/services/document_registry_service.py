@@ -103,3 +103,25 @@ def get_document_metadata(document_id: str) -> dict[str, object]:
         "status": row["status"],
         "uploaded_at": row["uploaded_at"],
     }
+
+
+def update_document_status(document_id: str, status: str) -> None:
+    try:
+        create_tables()
+    except sqlite3.Error as exc:
+        _raise_db_error(exc)
+
+    try:
+        with db_cursor() as cursor:
+            cursor.execute(
+                """
+                UPDATE documents
+                SET status = ?
+                WHERE document_id = ?
+                """,
+                (status, document_id),
+            )
+            if cursor.rowcount == 0:
+                raise DocumentRegistryError(f"Document not found: {document_id}")
+    except sqlite3.Error as exc:
+        _raise_db_error(exc)

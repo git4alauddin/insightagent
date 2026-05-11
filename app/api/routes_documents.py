@@ -12,10 +12,12 @@ from app.schemas.document import (
     DocumentUploadResponse,
 )
 from app.services.document_answer_service import DocumentAnswerError, answer_document_question
+from app.services.document_indexing_service import DocumentIndexingError, index_document
 from app.services.document_registry_service import (
     DocumentRegistryError,
     get_document_metadata,
     register_document_metadata,
+    update_document_status,
 )
 from app.services.document_service import (
     DocumentServiceError,
@@ -103,7 +105,18 @@ def upload_document(
             file_extension=file_extension,
             file_size_bytes=len(file_bytes),
         )
-        return build_document_upload_response(document_id, file.filename)
+        index_document(
+            document_id=document_id,
+            filename=file.filename,
+            storage_path=str(target_path),
+            file_extension=file_extension,
+        )
+        update_document_status(document_id, "indexed")
+        return build_document_upload_response(
+            document_id,
+            file.filename,
+            status="indexed",
+        )
     except DocumentRegistryError as exc:
         target_path.unlink(missing_ok=True)
         raise HTTPException(
@@ -111,6 +124,16 @@ def upload_document(
             detail={
                 "error": {
                     "code": "DOCUMENT_DB_ERROR",
+                    "message": str(exc),
+                }
+            },
+        ) from exc
+    except DocumentIndexingError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "error": {
+                    "code": "DOCUMENT_INDEXING_ERROR",
                     "message": str(exc),
                 }
             },

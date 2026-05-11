@@ -51,6 +51,11 @@ Current behavior:
 - validates file size
 - stores the raw file under `uploads/documents/...`
 - stores metadata in SQLite
+- extracts text
+- chunks text
+- generates local embeddings
+- stores chunk vectors
+- marks the document as indexed
 - returns a stable `document_id`
 
 ### Text Extraction Service
@@ -146,6 +151,29 @@ Behavior:
 - returns `DOCUMENT_ANSWER_ERROR` for controlled answer-service failures
 - preserves weak-context fallback as a normal `200` response with `status="insufficient_context"`
 
+### Automatic Indexing After Upload
+Added automatic indexing inside the document upload flow.
+
+Indexing flow:
+1. Store raw uploaded file.
+2. Register document metadata with `uploaded` status.
+3. Extract text from the stored file.
+4. Chunk cleaned text.
+5. Generate chunk embeddings.
+6. Save chunks and vectors.
+7. Mark document status as `indexed`.
+8. Return upload response with `status="indexed"`.
+
+Controlled indexing failures return:
+```json
+{
+  "error": {
+    "code": "DOCUMENT_INDEXING_ERROR",
+    "message": "No text could be extracted from the document."
+  }
+}
+```
+
 ## Why This Matters
 The early V7 chunks define the API contract, indexing foundation, and retrieval layer before answer generation.
 
@@ -166,7 +194,7 @@ Current upload response:
 {
   "document_id": "doc_123",
   "filename": "policy.txt",
-  "status": "uploaded"
+  "status": "indexed"
 }
 ```
 
@@ -213,7 +241,7 @@ Current ask response shape:
 
 ## Deferred On Purpose
 Not built yet:
-- end-to-end manual RAG API test
+- optional manual curl/Postman RAG proof outside automated tests
 
 ## Testing Status
 Added schema unit tests for:
@@ -274,10 +302,16 @@ Added document ask endpoint integration tests for:
 - missing document handling
 - controlled answer-service error handling
 
+Added end-to-end RAG integration tests for:
+- upload indexes document automatically
+- uploaded document can be asked immediately
+- answer includes citation source from indexed chunk
+- indexing errors are controlled
+
 Latest suite:
 ```text
-203 passed
+207 passed
 ```
 
 ## Interview Explanation
-In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, creating a local vector indexing foundation, adding semantic retrieval, building the grounded answer service, and exposing the document ask endpoint. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, persist chunk vectors in SQLite, retrieve the most relevant chunks for a question, build citations, return weak-context fallback when evidence is missing, and expose that flow through `POST /documents/{document_id}/ask`.
+In V7, I started the RAG layer by defining document Q&A contracts, adding the document upload lifecycle, introducing text extraction, adding deterministic text chunking, creating a local vector indexing foundation, adding semantic retrieval, building the grounded answer service, exposing the document ask endpoint, and wiring upload-time indexing. The backend can now accept supported document files, validate them safely, persist raw files, store metadata, return a stable indexed `document_id`, extract text from TXT, Markdown, and PDF files, split extracted text into overlapping chunks with citation-ready metadata, generate deterministic local embeddings, persist chunk vectors in SQLite, retrieve the most relevant chunks for a question, build citations, return weak-context fallback when evidence is missing, and expose the end-to-end flow through `POST /documents/{document_id}/ask`.

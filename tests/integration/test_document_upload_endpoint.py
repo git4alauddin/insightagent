@@ -31,7 +31,7 @@ def test_upload_txt_document_success_returns_metadata() -> None:
 
     assert response.status_code == 200
     data = response.json()
-    assert data["status"] == "uploaded"
+    assert data["status"] == "indexed"
     assert data["filename"] == "policy.txt"
     assert data["document_id"].startswith("doc_")
 
@@ -39,6 +39,7 @@ def test_upload_txt_document_success_returns_metadata() -> None:
     assert metadata["filename"] == "policy.txt"
     assert metadata["file_extension"] == ".txt"
     assert metadata["file_size_bytes"] == 36
+    assert metadata["status"] == "indexed"
     assert Path(str(metadata["storage_path"])).exists()
 
 
