@@ -124,7 +124,7 @@ This file maps each V8 commit heading to:
 - Made eval results future-ready for endpoints that expose provider usage.
 - Kept current deterministic endpoints honest by marking usage unavailable instead of inventing estimates.
 
-### `<pending>` - `v8: close out evaluation layer documentation`
+### `00b46ae` - `v8: close out evaluation layer documentation`
 **What we did**
 - Marked V8 as complete in the version documentation.
 - Added a V8 closeout summary.

@@ -511,3 +511,33 @@ Status: complete.
 
 ### Interview Explanation
 - In V8, I built the evaluation layer by adding a JSONL evaluation dataset, a reusable runner, deterministic scoring rules, regression comparison, optional token/cost metadata, an in-process integration proof, and README-level evaluation workflow documentation. The runner can load and validate cases, call local API endpoints with an API key, upload setup files for CSV and RAG cases, capture latency, extract token/cost usage when endpoint responses expose it, check expected response status and keys, verify answer relevance through expected terms, score tool correctness, check CSV analysis intent, verify RAG citation presence, check deterministic citation accuracy through expected filenames/chunk prefixes/reference terms, check deterministic groundedness against uploaded reference text, validate insufficient-context safety, fail RAG answers without citations, fail unsupported confident/cited answers, save a JSON result summary with failure categories and usage totals, compare current results against previous runs, and run deterministic CSV/RAG eval cases against FastAPI `TestClient` in automated tests. The README explains how to run evals, compare results, and interpret the saved result JSON. V8 is complete with model-assisted judging and Cloud Run execution left as honest future improvements.
+
+## V9 Progress
+
+Status: started.
+
+### What We Built
+- Updated app version reporting to V9.
+- Updated `.env.example` to `APP_VERSION=v9`.
+- Updated health endpoint test expectation to V9.
+- Updated README current version, Docker image examples, health response example, and V9 docs link.
+- Added V9 documentation files:
+  - `docs/versions/v9_observability_metrics.md`
+  - `docs/versions/v9_technical_walkthrough.md`
+  - `docs/versions/v9_commit_log.md`
+
+### Why We Built It
+- To create a clean V9 boundary after closing V8.
+- To give request tracing, structured logs, metrics, and observability work dedicated docs.
+- To avoid mixing observability implementation into the completed evaluation layer.
+
+### Tests Performed
+- Health endpoint test will verify V9 version reporting.
+- Full suite will verify the scaffold did not regress existing behavior.
+
+### What I Learned
+- Version boundaries make it easier to explain which capabilities belong to which milestone.
+- Observability should be introduced with a clear trace model before adding metrics scripts or log analysis.
+
+### Interview Explanation
+- In V9, I started the observability and metrics layer by creating the version boundary and documentation scaffold. This prepares InsightAgent for request tracing, structured runtime logs, tool usage analytics, error categorization, token/cost visibility, and metrics summaries while keeping V8 evaluation complete and separate.
