@@ -3,7 +3,7 @@
 InsightAgent is a learning-first, production-style FastAPI backend for AI-powered data and document analysis.
 
 ## Current Version
-**V9 - Observability + Metrics**
+**V10 - Portfolio Packaging**
 
 Cloud Run deployment is intentionally deferred until the local/containerized backend is fully closed out and ready for an external runtime.
 
@@ -17,6 +17,7 @@ Version notes:
 - [V7 – Document Q&A](docs/versions/v7_document_qa.md)
 - [V8 - Evaluation Layer](docs/versions/v8_evaluation_layer.md)
 - [V9 - Observability + Metrics](docs/versions/v9_observability_metrics.md)
+- [V10 - Portfolio Packaging](docs/versions/v10_portfolio_packaging.md)
 
 ## Project Structure
 ```text
@@ -58,7 +59,7 @@ uvicorn app.main:app --reload
 Build the image:
 
 ```powershell
-docker build -t insightagent:v9 .
+docker build -t insightagent:v10 .
 ```
 
 Run the container:
@@ -67,14 +68,14 @@ Run the container:
 docker run --rm -p 8000:8000 `
   -e API_KEY=your-service-api-key-here `
   -e LLM_API_KEY=your-llm-api-key-here `
-  insightagent:v9
+  insightagent:v10
 ```
 
 Important production environment variables:
 
 ```text
 APP_ENV=production
-APP_VERSION=v9
+APP_VERSION=v10
 DOCS_ENABLED=false
 API_KEY=<service-api-key>
 LLM_API_KEY=<provider-api-key>
@@ -96,7 +97,7 @@ Expected response:
 {
   "status": "ok",
   "service": "InsightAgent",
-  "version": "v9"
+  "version": "v10"
 }
 ```
 

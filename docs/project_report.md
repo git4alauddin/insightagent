@@ -572,3 +572,32 @@ Status: complete.
 
 ### Interview Explanation
 - In V9, I built the observability and metrics layer by creating the version boundary, enriched request completion logs, agent tool trace logs, a metrics summary script, README-level observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. The API logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, latency, and nullable usage fields for each request. Agent queries emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, tool success/failure counts, and usage totals when available. Eval results store stable request ids so failed cases can be searched in runtime logs.
+
+## V10 Progress
+
+Status: started.
+
+### What We Built
+- Updated app version reporting to V10.
+- Updated `.env.example` to `APP_VERSION=v10`.
+- Updated health endpoint test expectation to V10.
+- Updated README current version, Docker image examples, health response example, and V10 docs link.
+- Added V10 documentation files:
+  - `docs/versions/v10_portfolio_packaging.md`
+  - `docs/versions/v10_technical_walkthrough.md`
+  - `docs/versions/v10_commit_log.md`
+
+### Why We Built It
+- To create a clean V10 boundary after closing V9.
+- To keep portfolio packaging separate from backend feature work.
+- To prepare dedicated docs for README polish, architecture, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, resume bullets, and interview pitch.
+
+### Tests Performed
+- Health endpoint test will verify V10 version reporting.
+- Full suite will verify the scaffold did not regress existing behavior.
+
+### What I Learned
+- Portfolio packaging is its own version because presenting the project clearly is different from adding backend features.
+
+### Interview Explanation
+- In V10, I started the portfolio packaging layer. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished README, recruiter-facing summary, engineer-facing architecture, API examples, demo script, evaluation proof, observability proof, trade-offs, limitations, future improvements, resume bullets, and interview pitch.
