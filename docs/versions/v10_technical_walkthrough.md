@@ -98,7 +98,6 @@ Pending:
 - professional README
 - recruiter-facing summary
 - visual architecture diagram if needed
-- API endpoint table and examples
 - demo script
 - evaluation results section
 - observability examples

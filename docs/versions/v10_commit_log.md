@@ -37,7 +37,7 @@ This file maps each V10 commit heading to:
 - Added an architecture artifact under `docs/`.
 - Created the technical backbone that the final README can link to.
 
-### `<pending>` - `v10: add portfolio API examples`
+### `29b2e6b` - `v10: add portfolio API examples`
 **What we did**
 - Added `docs/api_examples.md`.
 - Documented public and protected endpoints.
