@@ -79,7 +79,7 @@ Relevant app behavior already exists:
 
 ## 4. Next Verification Flow
 
-Next steps should prove:
+Local container verification proved:
 
 ```text
 docker build succeeds
@@ -90,7 +90,17 @@ protected endpoint without key fails
 protected endpoint with key succeeds
 ```
 
-After local container verification, the same behavior should be checked against the Cloud Run URL.
+Verification commands/results:
+
+- Docker image built as `insightagent:deploy-verify`.
+- Container ran with `PORT=8080` and was mapped to host port `18080`.
+- `GET /health` returned `status=ok`, `service=InsightAgent`, `version=v10`.
+- `GET /ready` returned `status=ready`.
+- `GET /docs` returned `404` with `DOCS_ENABLED=false`.
+- `POST /chat` without `x-api-key` returned `401`.
+- `POST /sessions` with `x-api-key=deploy-test-key` returned a successful session response.
+
+Next, the same behavior should be checked against the Cloud Run URL.
 
 ## 5. Storage Notes
 
@@ -114,7 +124,7 @@ Deployment plan coverage started:
 
 - repo cleanup: started and partially complete
 - production config review: inspected
-- Docker readiness: Dockerfile patched, build pending
+- Docker readiness: complete locally
 - cloud setup: pending
 - secret management: pending
 - Cloud Run deployment: pending
@@ -123,4 +133,4 @@ Deployment plan coverage started:
 
 ## 7. Interview Summary
 
-For deployment readiness, I first cleaned the repo boundary and container runtime. I ignored local runtime artifacts like SQLite DB files, uploads, and logs so they do not get committed, and I changed the Docker startup command to respect a platform-provided `PORT` while still defaulting to `8000` locally. This makes the image more suitable for Cloud Run and keeps source control clean before cloud deployment.
+For deployment readiness, I first cleaned the repo boundary and container runtime. I ignored local runtime artifacts like SQLite DB files, uploads, and logs so they do not get committed, and I changed the Docker startup command to respect a platform-provided `PORT` while still defaulting to `8000` locally. I then built the Docker image and ran a production-like local container smoke test to verify health, readiness, disabled docs, auth failure, and authenticated session creation before moving to Cloud Run.

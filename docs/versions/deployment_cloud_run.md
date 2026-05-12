@@ -15,11 +15,11 @@ Completed:
 - Repo cleanup for local runtime artifacts.
 - Docker runtime updated to respect the platform-provided `PORT`.
 - Local `insightagent.db` artifact removed.
+- Docker image builds locally.
+- Local production-like container smoke tests pass.
 
 Remaining:
 
-- Build Docker image locally.
-- Run local container smoke tests.
 - Prepare GCP services and secrets.
 - Push image to Artifact Registry.
 - Deploy to Cloud Run.
@@ -63,24 +63,36 @@ Managed database and object storage are future production improvements, not hidd
 
 ## Testing Status
 
-Not yet cloud-verified.
+Local container verification complete.
+Cloud verification pending.
 
 Current deployment verification completed:
 
 - Latest deployment-prep commit confirmed: `7a6dec6 deploy: prepare repo and docker runtime for cloud`
+- Docker image built successfully as `insightagent:deploy-verify`.
+- Temporary container ran with production-like settings:
+  - `PORT=8080`
+  - `APP_ENV=production`
+  - `APP_VERSION=v10`
+  - `DOCS_ENABLED=false`
+  - `API_KEY=deploy-test-key`
+  - `RATE_LIMIT_ENABLED=true`
+- `GET /health` returned `ok`.
+- `GET /ready` returned `ready`.
+- `GET /docs` returned `404`, confirming docs were disabled.
+- `POST /chat` without API key returned `401` with structured `UNAUTHORIZED` error.
+- `POST /sessions` with valid API key returned `success`.
 
 Next verification:
 
-- local Docker build
-- local container smoke tests
 - Cloud Run smoke tests after deployment
 
 ## Done When
 
 Deployment is complete when:
 
-- Docker image builds locally.
-- Container smoke tests pass.
+- Docker image builds locally. Complete.
+- Container smoke tests pass. Complete.
 - Cloud Run service is deployed.
 - Secrets are managed outside the repo.
 - `/health` and `/ready` work on the deployed URL.

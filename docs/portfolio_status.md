@@ -15,7 +15,7 @@ This file maps the V10 portfolio checklist to the public repository state.
 | API request/response examples | Complete | `docs/api_examples.md`. |
 | Local setup instructions | Complete | README Quick Start section. |
 | Docker run instructions | Complete | README Docker section. |
-| Deployment instructions | In progress | Docker and production env settings are documented; Cloud Run deployment pass has started. |
+| Deployment instructions | In progress | Docker and production env settings are documented; local container verification has passed. |
 | `.env.example` | Complete | `.env.example`. |
 | Evaluation section | Complete | README Evaluation section and V8 docs. |
 | How to evaluate locally | Complete | README Evaluation command. |
@@ -28,7 +28,7 @@ This file maps the V10 portfolio checklist to the public repository state.
 | Resume bullets | Local-only | Kept outside the repo for personal job material. |
 | Interview pitch | Local-only | Kept outside the repo for personal preparation. |
 | License | Deferred | Add only after choosing the intended license. |
-| Cloud Run deployment link | In progress | Deployment prep commit `7a6dec6` is complete; live Cloud Run URL is still pending. |
+| Cloud Run deployment link | In progress | Deployment prep and local Docker verification are complete; live Cloud Run URL is still pending. |
 | Final cleanup of unused files/dependencies | Complete | Tracked files were scanned; generated/runtime files are ignored and requirements are in use. |
 
 ## Current Verification Evidence

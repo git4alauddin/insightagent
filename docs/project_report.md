@@ -645,6 +645,8 @@ Status: in progress.
 - Prepared the repository for cloud deployment by ignoring local runtime artifacts.
 - Updated Docker runtime startup to respect the platform-provided `PORT`.
 - Removed the generated local `insightagent.db` artifact.
+- Built the deployment verification Docker image.
+- Ran a production-like local container smoke test.
 
 ### Why We Built It
 - To close the final gap between a local/container-ready portfolio backend and a cloud-verifiable deployed service.
@@ -654,12 +656,20 @@ Status: in progress.
 
 ### Tests Performed
 - Confirmed latest deployment-prep commit: `7a6dec6 deploy: prepare repo and docker runtime for cloud`.
-- Docker build and cloud smoke tests are still pending.
+- Built Docker image `insightagent:deploy-verify`.
+- Ran a temporary container with `PORT=8080`, `APP_ENV=production`, `APP_VERSION=v10`, `DOCS_ENABLED=false`, `API_KEY=deploy-test-key`, and `RATE_LIMIT_ENABLED=true`.
+- Verified `/health` returned `ok`.
+- Verified `/ready` returned `ready`.
+- Verified `/docs` returned `404` in production docs-disabled mode.
+- Verified `/chat` without API key returned `401`.
+- Verified `/sessions` with valid API key returned a successful session response.
+- Cloud smoke tests are still pending.
 
 ### What I Learned
 - Deployment readiness starts before cloud commands: repo hygiene and runtime configuration matter first.
 - A container image should respect runtime-provided configuration while keeping sensible local defaults.
+- Local container smoke tests are the bridge between "Docker builds" and "ready for Cloud Run".
 - Local SQLite and file uploads can be acceptable for a portfolio demo only when the limitation is documented honestly.
 
 ### Interview Explanation
-- After completing V10, I started a dedicated deployment pass to make InsightAgent cloud-verifiable. The first step cleaned the repo boundary and Docker runtime by ignoring generated local artifacts and updating the container startup command to use the runtime `PORT` with a local fallback. The remaining deployment work is Docker verification, Cloud Run setup, secret injection, deployed smoke testing, and documentation of the storage trade-off.
+- After completing V10, I started a dedicated deployment pass to make InsightAgent cloud-verifiable. I cleaned the repo boundary and Docker runtime by ignoring generated local artifacts and updating the container startup command to use the runtime `PORT` with a local fallback. I then built the Docker image and ran production-like local container smoke tests for health, readiness, disabled docs, auth failure, and authenticated session creation. The remaining deployment work is Cloud Run setup, secret injection, deployed smoke testing, and documentation of the storage trade-off.
