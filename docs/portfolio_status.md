@@ -6,7 +6,7 @@ This file maps the V10 portfolio checklist to the public repository state.
 
 | Checklist Item | Status | Repo Evidence |
 | --- | --- | --- |
-| Clean final repo structure | In progress | `app/`, `tests/`, `docs/`, `evals/`, and `scripts/` are separated by responsibility. |
+| Clean final repo structure | Complete | `app/`, `tests/`, `docs/`, `evals/`, and `scripts/` are separated by responsibility. |
 | Professional README | Complete | `README.md` is the main portfolio entrypoint. |
 | Recruiter-facing summary | Complete | README project snapshot and capability summary. |
 | Engineer-facing technical overview | Complete | `docs/architecture.md`. |
@@ -29,6 +29,7 @@ This file maps the V10 portfolio checklist to the public repository state.
 | Interview pitch | Local-only | Kept outside the repo for personal preparation. |
 | License | Deferred | Add only after choosing the intended license. |
 | Cloud Run deployment link | Deferred | Cloud Run deployment remains a future step. |
+| Final cleanup of unused files/dependencies | Complete | Tracked files were scanned; generated/runtime files are ignored and requirements are in use. |
 
 ## Current Verification Evidence
 
@@ -59,3 +60,10 @@ The actual recording script is intentionally kept outside the repository.
 - Add the demo link to README after publishing.
 - Add a license if the repo will be shared publicly with reuse permissions.
 - Deploy to Cloud Run and add the live URL when cloud setup is complete.
+
+## Hygiene Notes
+
+- `docs/demo_script.md` is not tracked.
+- `docs/resume_interview.md` is not tracked.
+- `.env`, virtual environment files, Python caches, pytest caches, logs, uploads, and eval result files are ignored.
+- No stale V10 commit placeholders remain except the current in-progress commit entry.

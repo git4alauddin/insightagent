@@ -138,7 +138,23 @@ It maps each portfolio packaging item to:
 
 This keeps the repo honest about Cloud Run, demo recording, license choice, and personal job materials without mixing private planning docs into the public project.
 
-## 9. Checklist Mapping
+## 9. Final Hygiene Pass
+
+Checked:
+- V10 commit log placeholders
+- local-only demo/resume doc paths
+- ignored generated/runtime files
+- tracked files for accidental cache, upload, log, or secret artifacts
+- requirements usage across app, scripts, and tests
+- public portfolio status alignment
+
+Result:
+- no tracked local-only demo or resume/interview docs
+- generated/runtime files remain ignored
+- dependencies are still used
+- final cleanup is complete for the public repo
+
+## 10. Checklist Mapping
 
 Started:
 - V10 version boundary
@@ -159,16 +175,16 @@ Started:
 - limitations documentation
 - future improvements documentation
 - public portfolio status checklist
+- final repo hygiene pass
 
-Pending:
-- visual architecture diagram if needed
+Public follow-ups:
 - demo recording/link
-- local-only resume bullets and interview pitch notes
-- final repo cleanup
+- license choice
+- Cloud Run URL
 
-## 10. Tests Added
+## 11. Tests Added
 
 No new tests were required for the scaffold beyond updating the existing health endpoint expectation.
 
-## 11. Interview Summary
-V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, evaluation proof, observability proof, trade-offs, limitations, future roadmap, and public portfolio status checklist. The main public artifacts are `README.md`, `docs/architecture.md`, `docs/api_examples.md`, `docs/tradeoffs.md`, and `docs/portfolio_status.md`; personal demo and interview prep notes stay outside the repo.
+## 12. Interview Summary
+V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, evaluation proof, observability proof, trade-offs, limitations, future roadmap, public portfolio status checklist, and final hygiene pass. The main public artifacts are `README.md`, `docs/architecture.md`, `docs/api_examples.md`, `docs/tradeoffs.md`, and `docs/portfolio_status.md`; personal demo and interview prep notes stay outside the repo.

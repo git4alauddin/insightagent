@@ -575,7 +575,7 @@ Status: complete.
 
 ## V10 Progress
 
-Status: started.
+Status: closeout-ready.
 
 ### What We Built
 - Updated app version reporting to V10.
@@ -588,6 +588,7 @@ Status: started.
 - Rewrote `README.md` as the main public portfolio entrypoint.
 - Added README sections for project snapshot, capabilities, documentation map, architecture, tech stack, local setup, Docker, API surface, evaluation, observability, verification, and trade-offs.
 - Added `docs/portfolio_status.md` to map V10 checklist items to complete, partial, deferred, and local-only status.
+- Completed a final repo hygiene pass for stale V10 placeholders, local-only docs, ignored runtime artifacts, and dependency usage.
 - Added V10 documentation files:
   - `docs/versions/v10_portfolio_packaging.md`
   - `docs/versions/v10_technical_walkthrough.md`
@@ -603,6 +604,7 @@ Status: started.
 - To make the repository homepage understandable for both recruiters and engineers.
 - To keep personal demo and interview preparation notes outside the public repo.
 - To make final portfolio status reviewable without guessing which checklist items are intentionally deferred.
+- To ensure the public repository does not include generated artifacts, local-only job notes, or stale documentation state.
 
 ### Tests Performed
 - Health endpoint test will verify V10 version reporting.
@@ -612,6 +614,7 @@ Status: started.
 - Trade-offs documentation was reviewed against the V10 checklist.
 - README foundation was reviewed against the V10 checklist.
 - Portfolio status documentation was reviewed against the V10 checklist.
+- Final hygiene scan confirmed local-only docs were not tracked and generated/runtime files were ignored.
 
 ### What I Learned
 - Portfolio packaging is its own version because presenting the project clearly is different from adding backend features.
@@ -620,6 +623,7 @@ Status: started.
 - Honest limitations make the project stronger, not weaker.
 - A portfolio README should summarize clearly and link outward instead of duplicating every detail.
 - A final checklist page helps separate public repo requirements from local-only job preparation materials.
+- A closeout pass is useful because small stale markers can make an otherwise finished project look unfinished.
 
 ### Interview Explanation
-- In V10, I started the portfolio packaging layer and added architecture, API examples, trade-offs documentation, a rewritten README foundation, and a public portfolio status checklist. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished public entrypoint, recruiter-facing summary, engineer-facing architecture, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and an honest view of what is complete, deferred, or kept local.
+- In V10, I completed the portfolio packaging layer by adding architecture, API examples, trade-offs documentation, a rewritten README foundation, a public portfolio status checklist, and a final repo hygiene pass. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished public entrypoint, recruiter-facing summary, engineer-facing architecture, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and an honest view of what is complete, deferred, or kept local.

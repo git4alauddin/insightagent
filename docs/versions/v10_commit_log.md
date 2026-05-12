@@ -80,7 +80,7 @@ This file maps each V10 commit heading to:
 - Reduced README clutter by linking to deeper support docs instead of duplicating every workflow inline.
 - Started closing the V10 professional README and recruiter-facing summary checklist items.
 
-### `<pending>` - `v10: finalize portfolio cleanup checklist`
+### `5b41ab1` - `v10: finalize portfolio cleanup checklist`
 **What we did**
 - Added `docs/portfolio_status.md`.
 - Mapped V10 checklist items to public repo status.
@@ -93,6 +93,20 @@ This file maps each V10 commit heading to:
 - Made the V10 closeout state explicit and honest.
 - Prevented private/personal planning files from being treated as missing public repo docs.
 - Gave future agents and reviewers one public page to verify portfolio packaging status.
+
+### `<pending>` - `v10: final repo hygiene pass`
+**What we did**
+- Scanned tracked files for stale V10 pending markers and local-only doc paths.
+- Confirmed `docs/demo_script.md` and `docs/resume_interview.md` are not tracked.
+- Confirmed generated/runtime files are ignored.
+- Confirmed project dependencies are still used by app, scripts, or tests.
+- Updated the portfolio status page to mark repo structure and cleanup as complete.
+- Recorded remaining public portfolio items as demo link, license choice, and Cloud Run URL.
+
+**What it solved / took care of**
+- Removed stale V10 bookkeeping from the previous commit.
+- Verified the public repo is not carrying private planning materials.
+- Put the repository in a closeout-ready state for V10.
 
 ## Reusable Entry Template
 

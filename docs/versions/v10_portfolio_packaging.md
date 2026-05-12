@@ -7,9 +7,9 @@ This version is not about adding new backend features. It is about making the ex
 
 ## Current Progress
 
-Status: in progress.
+Status: closeout-ready.
 
-V10 now has the version boundary, documentation scaffold, architecture documentation, API examples documentation, trade-offs documentation, a rewritten README foundation, and a public portfolio status checklist. Portfolio packaging work will continue in focused chunks.
+V10 now has the version boundary, documentation scaffold, architecture documentation, API examples documentation, trade-offs documentation, a rewritten README foundation, a public portfolio status checklist, and a final hygiene pass. Remaining public items are intentionally deferred: recorded demo link, license choice, and Cloud Run URL.
 
 ## Planned Scope
 
@@ -118,19 +118,28 @@ This document maps the V10 checklist to the public repository state:
 
 The README links to this page so reviewers can quickly see what is complete and what is intentionally deferred.
 
+## Final Hygiene Pass
+
+Checked:
+- no tracked local-only demo or resume/interview docs
+- generated/runtime files are ignored
+- no stale V10 commit placeholders except the current in-progress commit entry
+- requirements are still used by app, scripts, or tests
+- portfolio status accurately separates complete, local-only, partial, and deferred items
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented yet:
-- demo recording/link
-- local-only resume/interview notes
-- final cleanup
+- demo recording/link in README after publishing
+- license choice
+- Cloud Run URL after deployment
 
 ## Testing Status
 
-The scaffold will be verified through:
-- focused health endpoint test
-- full test suite
+Verified through:
+- previous full automated suite status: `247 passed`
 - documentation review against the V10 checklist
+- final hygiene scan for tracked local-only docs, ignored generated files, dependency usage, and stale V10 placeholders
 
 ## Interview Explanation
-In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I added architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, trade-offs documentation that captures design choices, limitations, and future improvements, a rewritten README that works as the main public entrypoint, and a portfolio status checklist that separates complete public docs from local-only or deferred materials. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through polished docs, evaluation proof, observability proof, and honest roadmap notes.
+In V10, I packaged InsightAgent as a portfolio-ready backend case study. I added architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, trade-offs documentation that captures design choices, limitations, and future improvements, a rewritten README that works as the main public entrypoint, a portfolio status checklist that separates complete public docs from local-only or deferred materials, and a final hygiene pass. The project is now clear for recruiters, technically credible for engineers, and ready for demo recording, with Cloud Run deployment, license choice, and public demo link intentionally left as follow-up items.
