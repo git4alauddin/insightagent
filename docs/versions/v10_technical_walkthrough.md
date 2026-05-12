@@ -49,6 +49,16 @@ Then rewritten as the main portfolio entrypoint with:
 - verification status
 - trade-off summary
 
+The opening README narrative was later refined before `Project Structure` with:
+- Overview
+- Why This Project Matters
+- Core Capabilities grouped by backend layer
+- Documentation
+- Current Status
+- Architecture Summary
+- Tech Stack
+- Version Journey
+
 ## 3. Planned Documentation Model
 
 The README is the first-stop portfolio document.
@@ -127,6 +137,8 @@ It now answers:
 
 This keeps the README concise while linking readers to deeper docs for architecture, API examples, and trade-offs.
 
+The setup, Docker, API, evaluation, observability, verification, and trade-off sections below `Project Structure` were left unchanged during the opening narrative refactor.
+
 ## 8. Portfolio Status Checklist
 
 ### `docs/portfolio_status.md`
@@ -163,6 +175,7 @@ Started:
 - V10 documentation files
 - README version alignment
 - professional README foundation
+- refined README opening narrative
 - recruiter-facing project summary
 - engineer-facing technical overview
 - architecture documentation under `docs/`

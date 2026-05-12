@@ -9,7 +9,7 @@ This version is not about adding new backend features. It is about making the ex
 
 Status: closeout-ready.
 
-V10 now has the version boundary, documentation scaffold, Mermaid architecture documentation, API examples documentation, trade-offs documentation, a rewritten README foundation, a public portfolio status checklist, and a final hygiene pass. Remaining public items are intentionally deferred: recorded demo link, license choice, and Cloud Run URL.
+V10 now has the version boundary, documentation scaffold, Mermaid architecture documentation, API examples documentation, trade-offs documentation, a refined README opening, a public portfolio status checklist, and a final hygiene pass. Remaining public items are intentionally deferred: recorded demo link, license choice, and Cloud Run URL.
 
 ## Planned Scope
 
@@ -105,6 +105,18 @@ The README is now the main public portfolio entrypoint. It includes:
 - trade-off summary with links to deeper docs
 
 Personal demo, resume, and interview guidance remain outside the repo.
+
+The opening README sections were later refined to make the first-read experience stronger:
+- Overview
+- Why This Project Matters
+- Core Capabilities
+- Documentation
+- Current Status
+- Architecture Summary
+- Tech Stack
+- Version Journey
+
+`Project Structure` and everything after it were kept stable.
 
 ## Portfolio Status Checklist
 

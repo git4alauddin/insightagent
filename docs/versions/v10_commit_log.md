@@ -108,7 +108,7 @@ This file maps each V10 commit heading to:
 - Verified the public repo is not carrying private planning materials.
 - Put the repository in a closeout-ready state for V10.
 
-### `<pending>` - `v10: convert architecture diagrams to mermaid`
+### `a6e81f4` - `v10: convert architecture diagrams to mermaid`
 **What we did**
 - Converted the high-level architecture flow in `docs/architecture.md` from ASCII to Mermaid.
 - Converted request lifecycle, agent workflow, CSV analysis workflow, and document Q&A workflow diagrams to Mermaid.
@@ -119,6 +119,18 @@ This file maps each V10 commit heading to:
 - Made architecture diagrams render visually on GitHub.
 - Improved the engineer-facing documentation without changing backend behavior.
 - Kept the V10 documentation trail aligned with the polish work.
+
+### `<pending>` - `v10: refine README opening narrative`
+**What we did**
+- Refactored the README content before `Project Structure`.
+- Replaced the previous opening with clearer Overview, Why This Project Matters, Core Capabilities, Documentation, Current Status, Architecture Summary, Tech Stack, and Version Journey sections.
+- Grouped capabilities by backend layer instead of listing them as one flat feature list.
+- Kept `Project Structure` and everything after it unchanged.
+
+**What it solved / took care of**
+- Made the README opening feel more intentional and portfolio-ready.
+- Improved the first-read path for recruiters and engineers.
+- Preserved the working setup/API/evaluation/observability sections below the opening.
 
 ## Reusable Entry Template
 

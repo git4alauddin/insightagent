@@ -1,29 +1,47 @@
 # InsightAgent
 
-InsightAgent is a production-style FastAPI backend for AI-powered chat, tool use, CSV analysis, document Q&A, evaluation, and observability.
+Production-style FastAPI backend for AI-powered chat, controlled tool orchestration, safe CSV analysis, document RAG, evaluation pipelines, and observability.
 
-## Project Snapshot
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-API_Backend-009688?logo=fastapi&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-Validation-E92063)
+![SQLite](https://img.shields.io/badge/SQLite-Storage-003B57?logo=sqlite&logoColor=white)
+![pandas](https://img.shields.io/badge/pandas-Data_Analysis-150458?logo=pandas&logoColor=white)
+![pytest](https://img.shields.io/badge/pytest-Testing-0A9EDC?logo=pytest&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?logo=docker&logoColor=white)
 
-InsightAgent demonstrates how an AI backend can move beyond a simple chat wrapper into a safer, testable application architecture. It includes structured LLM responses, controlled tool calling, session memory, safe dataset analysis, local RAG-style document Q&A with citations, an evaluation runner, request tracing, metrics summaries, Docker support, and portfolio-ready documentation.
+Python • FastAPI • Pydantic • SQLite • pandas • pytest • Docker
 
-**Current Version:** V10 - Portfolio Packaging
+## Overview
 
-Cloud Run deployment is intentionally deferred until the local and containerized backend are fully closed out for an external runtime.
+InsightAgent is an end-to-end AI backend case study. It lets users chat with an LLM, request structured JSON responses, route questions through controlled tools, upload CSV files for safe analysis, and ask grounded questions over uploaded documents.
 
-## What It Demonstrates
+The project is designed to show how an LLM app can be built as a real backend system: typed API contracts, explicit service boundaries, validated model output, allowlisted tool execution, persistence, evaluation, request tracing, and honest deployment trade-offs.
 
-- FastAPI backend design with separated routes, schemas, services, tools, prompts, and persistence.
-- Environment-driven configuration with no hardcoded secrets.
-- LLM chat and structured JSON output with validation, retry, and fallback behavior.
-- Backend-controlled agent tools for calculator, date/time, summarization, and file analysis.
-- SQLite-backed session memory with bounded context retrieval.
-- Safe CSV upload, metadata tracking, and allowlisted analysis operations.
-- Document upload, extraction, chunking, local embeddings, semantic retrieval, citations, and weak-context fallback.
-- Evaluation dataset and runner for chat, tools, CSV, and RAG flows.
-- Request IDs, structured logs, agent tool traces, and metrics summary reporting.
-- Docker-ready runtime and production-aware API configuration.
+## Why This Project Matters
 
-## Documentation Map
+This is not just a chat wrapper around an LLM API. The backend demonstrates the pieces that make AI applications easier to trust, test, debug, and explain:
+
+- Structured outputs are validated before they become API responses.
+- Tool calls are selected by the model but executed only through backend-approved tools.
+- CSV analysis uses safe, allowlisted pandas operations instead of arbitrary Python execution.
+- Document Q&A uses retrieval evidence, citations, and weak-context fallback.
+- Evaluation and observability make behavior measurable instead of purely manual.
+
+## Core Capabilities
+
+| Area | What It Proves |
+| --- | --- |
+| LLM API layer | Chat and structured responses with Pydantic validation, retry, and fallback behavior. |
+| Agent/tool layer | Controlled calculator, date/time, summarizer, file analyzer, and direct-answer paths. |
+| Memory layer | SQLite-backed sessions with bounded recent-context retrieval. |
+| CSV analysis layer | Upload validation, metadata tracking, intent routing, and safe analysis traces. |
+| Document Q&A layer | Text extraction, chunking, local embeddings, semantic retrieval, citations, and insufficient-context handling. |
+| Evaluation layer | JSONL eval cases, deterministic scoring, regression comparison, latency, and trace metadata. |
+| Observability layer | Request IDs, structured logs, tool traces, error categories, and metrics summaries. |
+| Deployment layer | Docker runtime, production env settings, API key auth, CORS, rate limiting, and readiness checks. |
+
+## Documentation
 
 | Area | Link |
 | --- | --- |
@@ -32,46 +50,43 @@ Cloud Run deployment is intentionally deferred until the local and containerized
 | Trade-offs and limitations | [docs/tradeoffs.md](docs/tradeoffs.md) |
 | Portfolio status | [docs/portfolio_status.md](docs/portfolio_status.md) |
 | Project report | [docs/project_report.md](docs/project_report.md) |
-| V10 notes | [docs/versions/v10_portfolio_packaging.md](docs/versions/v10_portfolio_packaging.md) |
 
-Version history:
+## Current Status
 
-- [V1 - FastAPI Basic Chat](docs/versions/v1_fastapi_basic_chat.md)
-- [V2 - Structured Output](docs/versions/v2_structured_output.md)
-- [V3 - Tool Calling / Agentic Layer](docs/versions/v3_tool_calling_agentic.md)
-- [V4 - Memory and Context](docs/versions/v4_memory_context.md)
-- [V5 - Data Analysis Assistant](docs/versions/v5_data_analysis_assistant.md)
-- [V6 - Backend Maturity](docs/versions/v6_backend_maturity.md)
-- [V7 - Document Q&A](docs/versions/v7_document_qa.md)
-- [V8 - Evaluation Layer](docs/versions/v8_evaluation_layer.md)
-- [V9 - Observability + Metrics](docs/versions/v9_observability_metrics.md)
-- [V10 - Portfolio Packaging](docs/versions/v10_portfolio_packaging.md)
+**Current Version:** V10 - Portfolio Packaging
 
-## Architecture
+The local and containerized backend is portfolio-ready. Cloud Run deployment, a public demo link, and license choice are intentionally tracked as follow-up items in [docs/portfolio_status.md](docs/portfolio_status.md).
 
-```text
-Client
-  -> FastAPI routes
-  -> Pydantic schemas
-  -> service layer
-  -> LLM provider / tool registry / SQLite / local file storage
-  -> structured response with request trace metadata
+## Architecture Summary
+
+```mermaid
+flowchart LR
+    Client["Client / API user"] --> API["FastAPI routes"]
+    API --> Schemas["Pydantic contracts"]
+    Schemas --> Services["Service layer"]
+    Services --> LLM["LLM provider"]
+    Services --> Tools["Tool registry"]
+    Services --> Data["SQLite + local storage"]
+    Services --> Response["Structured responses + trace metadata"]
 ```
 
-The backend is organized around explicit contracts and controlled execution. The LLM can propose structured output or tool decisions, but backend services validate responses, route only to allowlisted tools, enforce dataset/document guardrails, and return predictable API shapes.
+The LLM can propose structured output or tool decisions, but backend services validate responses, route only to allowlisted tools, enforce dataset/document guardrails, and return predictable API shapes.
 
-For the deeper system walkthrough, see [docs/architecture.md](docs/architecture.md).
 
-## Tech Stack
+## Version Journey
 
-- Python
-- FastAPI
-- Pydantic
-- SQLite
-- pandas
-- OpenAI-compatible LLM client flow through environment configuration
-- pytest
-- Docker
+| Version | Focus |
+| --- | --- |
+| [V1](docs/versions/v1_fastapi_basic_chat.md) | FastAPI foundation and basic chat. |
+| [V2](docs/versions/v2_structured_output.md) | Prompting and structured output validation. |
+| [V3](docs/versions/v3_tool_calling_agentic.md) | Controlled tool-calling agent layer. |
+| [V4](docs/versions/v4_memory_context.md) | Sessions, persistence, and memory-aware chat. |
+| [V5](docs/versions/v5_data_analysis_assistant.md) | Safe CSV upload and analysis assistant. |
+| [V6](docs/versions/v6_backend_maturity.md) | Auth, errors, CORS, rate limiting, Docker, and readiness. |
+| [V7](docs/versions/v7_document_qa.md) | Document upload, retrieval, citations, and grounded Q&A. |
+| [V8](docs/versions/v8_evaluation_layer.md) | Evaluation dataset, runner, scoring, and regression comparison. |
+| [V9](docs/versions/v9_observability_metrics.md) | Request tracing, structured logs, and metrics summaries. |
+| [V10](docs/versions/v10_portfolio_packaging.md) | Portfolio packaging, docs, README, status, and repo hygiene. |
 
 ## Project Structure
 
