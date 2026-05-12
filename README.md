@@ -315,7 +315,21 @@ The saved result file includes:
 - `summary.pass_rate`
 - `summary.failure_categories`
 - `summary.usage` with available/unavailable usage counts and token/cost totals when present
-- per-case HTTP status, latency, pass/fail result, score breakdown, failure categories, optional usage metadata, and response body
+- per-case HTTP status, latency, pass/fail result, score breakdown, failure categories, request trace metadata, optional usage metadata, and response body
+
+Each eval case sends a stable `x-request-id` such as `eval_rag_refund_policy_main`. Saved results include a `trace` block so eval failures can be connected back to runtime request logs:
+
+```json
+{
+  "trace": {
+    "request_id": "eval_rag_refund_policy_main",
+    "response_request_id": "eval_rag_refund_policy_main",
+    "setup_request_ids": {
+      "upload_document": "eval_rag_refund_policy_setup_document"
+    }
+  }
+}
+```
 
 `evals/results/` is ignored by Git so local evaluation runs do not create commit noise.
 

@@ -526,6 +526,7 @@ Status: started.
 - Added agent tool trace logs with request id, tool used, tool status, agent status, and output summary.
 - Added a metrics summary script for structured request and agent tool logs.
 - Added README observability proof with log shapes, lifecycle example, and metrics summary command.
+- Linked eval results to request traces through stable `x-request-id` values and saved trace metadata.
 - Added V9 documentation files:
   - `docs/versions/v9_observability_metrics.md`
   - `docs/versions/v9_technical_walkthrough.md`
@@ -539,6 +540,7 @@ Status: started.
 - To start tracing the API -> agent -> tool path before building metrics summaries.
 - To turn structured logs into reusable request and tool usage metrics.
 - To make the observability behavior understandable from the README without reading implementation files.
+- To make failed eval cases easier to connect back to runtime request logs.
 
 ### Tests Performed
 - Health endpoint test verified V9 version reporting.
@@ -546,6 +548,8 @@ Status: started.
 - Error handler tests verified the typing diagnostic fix did not change error behavior.
 - Agent endpoint tests verify tool trace log fields.
 - Metrics summary tests verify JSON log parsing, request summaries, tool summaries, and output writing.
+- Eval runner tests verify stable request id generation and saved trace metadata.
+- Eval runner flow tests verify CSV/RAG eval traces through in-process API calls.
 - README/docs were reviewed against the V9 checklist for log format documentation, request lifecycle trace example, and observability proof.
 - Full suite verified the scaffold did not regress existing behavior.
 
@@ -556,6 +560,7 @@ Status: started.
 - Tool metrics need a stable tool trace event before frequency and success-rate summaries can be reliable.
 - Metrics scripts are simpler and more reliable when runtime logs use stable event names and fields.
 - A request lifecycle example makes observability easier to explain than field lists alone.
+- Evaluation results become much more useful when each failed case carries a request id that can be searched in logs.
 
 ### Interview Explanation
-- In V9, I started the observability and metrics layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, and README-level observability proof. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script parses structured log lines and reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, and tool success/failure counts. The README shows how one request id connects API request logs to agent tool logs and metrics summaries.
+- In V9, I started the observability and metrics layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README-level observability proof, and eval-to-request trace linking. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script parses structured log lines and reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, and tool success/failure counts. Eval results now store stable request ids so failed cases can be searched in runtime logs.

@@ -10,6 +10,7 @@ import httpx
 DEFAULT_BASE_URL = "http://127.0.0.1:8000"
 DEFAULT_DATASET_PATH = Path("evals/evaluation_dataset.jsonl")
 DEFAULT_RESULTS_PATH = Path("evals/results/latest_eval_results.json")
+REQUEST_ID_HEADER = "x-request-id"
 
 
 class EvalRunnerError(Exception):
@@ -84,11 +85,12 @@ def run_eval_case(
     api_key: str,
 ) -> dict[str, Any]:
     prepared_case = prepare_case(client, case, api_key=api_key)
+    request_id = prepared_case["trace"]["request_id"]
     started_at = time.perf_counter()
     response = client.request(
         prepared_case["method"],
         prepared_case["endpoint"],
-        headers=build_headers(api_key),
+        headers=build_headers(api_key, request_id=request_id),
         json=prepared_case["payload"],
     )
     latency_ms = round((time.perf_counter() - started_at) * 1000, 2)
@@ -98,7 +100,17 @@ def run_eval_case(
     except ValueError:
         response_body = response.text
 
-    return score_eval_response(case, response.status_code, response_body, latency_ms)
+    trace = {
+        **prepared_case["trace"],
+        "response_request_id": response.headers.get(REQUEST_ID_HEADER),
+    }
+    return score_eval_response(
+        case,
+        response.status_code,
+        response_body,
+        latency_ms,
+        trace=trace,
+    )
 
 
 def prepare_case(
@@ -109,31 +121,44 @@ def prepare_case(
 ) -> dict[str, Any]:
     endpoint = str(case["endpoint"])
     setup = case.get("setup", {})
+    case_id = str(case["id"])
+    setup_request_ids: dict[str, str | None] = {}
 
     if "upload_dataset" in setup:
+        request_id = build_eval_request_id(case_id, "setup_dataset")
         dataset_id = upload_setup_file(
             client,
             "/datasets/upload",
             setup["upload_dataset"],
             api_key=api_key,
             id_key="dataset_id",
+            request_id=request_id,
         )
         endpoint = endpoint.replace("{dataset_id}", dataset_id)
+        setup_request_ids["upload_dataset"] = request_id
 
     if "upload_document" in setup:
+        request_id = build_eval_request_id(case_id, "setup_document")
         document_id = upload_setup_file(
             client,
             "/documents/upload",
             setup["upload_document"],
             api_key=api_key,
             id_key="document_id",
+            request_id=request_id,
         )
         endpoint = endpoint.replace("{document_id}", document_id)
+        setup_request_ids["upload_document"] = request_id
 
     return {
         "method": case["method"],
         "endpoint": endpoint,
         "payload": case["payload"],
+        "trace": {
+            "request_id": build_eval_request_id(case_id, "main"),
+            "response_request_id": None,
+            "setup_request_ids": setup_request_ids,
+        },
     }
 
 
@@ -144,6 +169,7 @@ def upload_setup_file(
     *,
     api_key: str,
     id_key: str,
+    request_id: str,
 ) -> str:
     files = {
         "file": (
@@ -152,7 +178,11 @@ def upload_setup_file(
             upload_spec["content_type"],
         )
     }
-    response = client.post(endpoint, headers=build_headers(api_key), files=files)
+    response = client.post(
+        endpoint,
+        headers=build_headers(api_key, request_id=request_id),
+        files=files,
+    )
     response.raise_for_status()
     response_body = response.json()
     return str(response_body[id_key])
@@ -163,6 +193,7 @@ def score_eval_response(
     status_code: int,
     response_body: Any,
     latency_ms: float,
+    trace: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     expected_status = int(case["expected_status"])
     scores = build_score_breakdown(case, status_code, response_body)
@@ -178,8 +209,28 @@ def score_eval_response(
         "passed": passed,
         "scores": scores,
         "failure_categories": failure_categories,
+        "trace": normalize_trace_metadata(trace),
         "usage": extract_usage_metadata(response_body),
         "response": response_body,
+    }
+
+
+def normalize_trace_metadata(trace: dict[str, Any] | None) -> dict[str, Any]:
+    if trace is None:
+        return {
+            "request_id": None,
+            "response_request_id": None,
+            "setup_request_ids": {},
+        }
+
+    setup_request_ids = trace.get("setup_request_ids", {})
+    if not isinstance(setup_request_ids, dict):
+        setup_request_ids = {}
+
+    return {
+        "request_id": trace.get("request_id"),
+        "response_request_id": trace.get("response_request_id"),
+        "setup_request_ids": setup_request_ids,
     }
 
 
@@ -707,8 +758,23 @@ def save_results(
     results_path.write_text(json.dumps(output, indent=2), encoding="utf-8")
 
 
-def build_headers(api_key: str) -> dict[str, str]:
-    return {"x-api-key": api_key}
+def build_eval_request_id(case_id: str, step: str) -> str:
+    return f"eval_{sanitize_request_id_part(case_id)}_{sanitize_request_id_part(step)}"
+
+
+def sanitize_request_id_part(value: str) -> str:
+    sanitized = "".join(
+        character.lower() if character.isalnum() else "_"
+        for character in value.strip()
+    ).strip("_")
+    return sanitized or "unknown"
+
+
+def build_headers(api_key: str, request_id: str | None = None) -> dict[str, str]:
+    headers = {"x-api-key": api_key}
+    if request_id is not None:
+        headers[REQUEST_ID_HEADER] = request_id
+    return headers
 
 
 def parse_args() -> argparse.Namespace:

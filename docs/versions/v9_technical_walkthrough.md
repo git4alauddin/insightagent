@@ -173,11 +173,12 @@ Started:
 - log format documentation
 - request lifecycle trace example
 - observability section in README
+- evaluation result to request log linking
 
 Pending:
 - deeper service-level tool execution tracing
 - token/cost tracking in runtime logs
-- link evaluation result to request logs where possible
+- deeper service-level token/cost fields where available
 
 ## 8. Tests Added
 
@@ -203,6 +204,18 @@ Verifies:
 - request metrics are summarized
 - agent tool metrics are summarized
 - summary JSON can be written to disk
+
+### `tests/unit/test_eval_runner.py`
+Verifies:
+- stable eval request id generation
+- eval request id headers
+- per-case trace metadata in scored results
+
+### `tests/integration/test_eval_runner_flow.py`
+Verifies:
+- CSV and RAG eval cases send stable request ids
+- setup uploads receive their own request ids
+- response request ids are saved into eval results
 
 ## 9. Log Format And Lifecycle Proof
 
@@ -237,5 +250,35 @@ The README now includes:
 - metrics summary command
 - metrics output categories
 
-## 10. Interview Summary
-I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, a metrics summary script, and README/docs observability proof. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, and tool success/failure counts. The README explains how a request id ties the API request log and agent tool log together.
+## 10. Eval Trace Linking
+
+### `scripts/run_eval.py`
+The eval runner now generates stable request ids for eval traffic.
+
+Primary request:
+
+```text
+eval_<case_id>_main
+```
+
+Dataset setup upload:
+
+```text
+eval_<case_id>_setup_dataset
+```
+
+Document setup upload:
+
+```text
+eval_<case_id>_setup_document
+```
+
+Each saved eval result includes:
+- `trace.request_id`
+- `trace.response_request_id`
+- `trace.setup_request_ids`
+
+This lets a failed eval case point back to matching runtime logs.
+
+## 11. Interview Summary
+I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, and eval-to-request trace linking. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, and tool success/failure counts. Eval results now include request trace metadata so failed cases can be searched in runtime logs.

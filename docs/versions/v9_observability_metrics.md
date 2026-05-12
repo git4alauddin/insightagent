@@ -15,7 +15,7 @@ The target flow is:
 
 Status: started.
 
-V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, metrics summary script foundation, log format documentation, request lifecycle example, and README observability proof. Runtime tracing will continue in small follow-up chunks.
+V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, metrics summary script foundation, log format documentation, request lifecycle example, README observability proof, and eval-to-request trace linking. Runtime tracing will continue in small follow-up chunks.
 
 ## Planned Scope
 
@@ -240,11 +240,48 @@ Debugging path:
 - use `latency_ms` to identify slow requests
 - run `scripts/metrics_summary.py` to summarize repeated behavior over many requests
 
+## Evaluation Result Trace Linking
+
+The V8 eval runner now contributes to V9 observability by sending stable request ids and storing them in saved results.
+
+Primary eval request id format:
+
+```text
+eval_<case_id>_main
+```
+
+Setup request id formats:
+
+```text
+eval_<case_id>_setup_dataset
+eval_<case_id>_setup_document
+```
+
+Saved per-case result trace shape:
+
+```json
+{
+  "trace": {
+    "request_id": "eval_rag_refund_policy_main",
+    "response_request_id": "eval_rag_refund_policy_main",
+    "setup_request_ids": {
+      "upload_document": "eval_rag_refund_policy_setup_document"
+    }
+  }
+}
+```
+
+This links evaluation failures to runtime logs:
+- find the failed case id in the eval result file
+- copy `trace.request_id`
+- search runtime logs for the matching `request_id`
+- inspect `request_completed`, `agent_tool_completed`, and error category fields for that request
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented in this scaffold chunk:
 - token/cost runtime logging
-- link evaluation result to request logs where possible
+- deeper service-level token/cost fields where available
 
 ## Testing Status
 
@@ -254,7 +291,8 @@ The scaffold will be verified through:
 - focused request ID middleware tests
 - focused agent endpoint trace tests
 - focused metrics summary tests
+- focused eval runner trace tests
 - README/docs review against V9 checklist
 
 ## Interview Explanation
-In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, and clear observability proof in README/docs. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, request lifecycle traces, and tool usage metrics without mixing observability work into the completed V8 evaluation layer.
+In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, and eval-to-request trace linking. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, request lifecycle traces, tool usage metrics, and failed-eval debugging without mixing observability work into the completed V8 evaluation layer.

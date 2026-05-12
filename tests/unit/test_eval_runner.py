@@ -5,6 +5,8 @@ import pytest
 
 from scripts.run_eval import (
     EvalRunnerError,
+    build_eval_request_id,
+    build_headers,
     build_summary,
     build_score_breakdown,
     compare_eval_results,
@@ -81,6 +83,50 @@ def test_score_eval_response_passes_when_status_and_keys_match() -> None:
         "output_tokens": None,
         "total_tokens": None,
         "estimated_cost_usd": None,
+    }
+    assert result["trace"] == {
+        "request_id": None,
+        "response_request_id": None,
+        "setup_request_ids": {},
+    }
+
+
+def test_score_eval_response_includes_request_trace_metadata() -> None:
+    result = score_eval_response(
+        {
+            "id": "case_1",
+            "flow": "chat",
+            "expected_status": 200,
+            "expected_keys": ["answer"],
+        },
+        200,
+        {"answer": "Hello"},
+        12.5,
+        trace={
+            "request_id": "eval_case_1_main",
+            "response_request_id": "eval_case_1_main",
+            "setup_request_ids": {"upload_document": "eval_case_1_setup_document"},
+        },
+    )
+
+    assert result["trace"] == {
+        "request_id": "eval_case_1_main",
+        "response_request_id": "eval_case_1_main",
+        "setup_request_ids": {"upload_document": "eval_case_1_setup_document"},
+    }
+
+
+def test_build_eval_request_id_sanitizes_case_and_step_names() -> None:
+    assert (
+        build_eval_request_id("RAG Refund Policy!", "Main Request")
+        == "eval_rag_refund_policy_main_request"
+    )
+
+
+def test_build_headers_can_include_request_id() -> None:
+    assert build_headers("test-key", request_id="eval_case_main") == {
+        "x-api-key": "test-key",
+        "x-request-id": "eval_case_main",
     }
 
 

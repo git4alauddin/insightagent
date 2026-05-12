@@ -72,7 +72,7 @@ This file maps each V9 commit heading to:
 - Turned structured request and agent tool logs into reusable operational metrics.
 - Made tool usage frequency and tool success/failure counts measurable from logs.
 
-### `<pending>` - `v9: document observability proof`
+### `274f1f4` - `v9: document observability proof`
 **What we did**
 - Added README observability documentation.
 - Documented request completion and agent tool log formats.
@@ -84,6 +84,21 @@ This file maps each V9 commit heading to:
 - Made the V9 observability behavior explainable from the README.
 - Covered the checklist items for log format documentation, request lifecycle trace example, and README observability section.
 - Helped show how logs can debug failed requests and summarize runtime behavior.
+
+### `<pending>` - `v9: link eval results to request traces`
+**What we did**
+- Added stable eval request id generation.
+- Sent `x-request-id` on each primary eval request.
+- Sent setup request ids for dataset and document upload steps.
+- Captured the response request id from API responses.
+- Added a `trace` block to each saved eval result.
+- Documented how eval failures can be connected to runtime request logs.
+- Added unit and integration coverage for eval trace metadata.
+
+**What it solved / took care of**
+- Linked evaluation results to request logs where possible.
+- Made failed eval cases easier to debug through `request_id`.
+- Preserved existing eval scoring while adding observability metadata.
 
 ## Reusable Entry Template
 

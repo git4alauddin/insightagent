@@ -103,4 +103,21 @@ def test_eval_runner_executes_csv_and_rag_cases_in_process(tmp_path: Path) -> No
         "rag_refund_policy_in_process",
     ]
     assert all(result["passed"] for result in results)
+    assert results[0]["trace"] == {
+        "request_id": "eval_csv_missing_values_in_process_main",
+        "response_request_id": "eval_csv_missing_values_in_process_main",
+        "setup_request_ids": {
+            "upload_dataset": "eval_csv_missing_values_in_process_setup_dataset"
+        },
+    }
+    assert results[1]["trace"] == {
+        "request_id": "eval_rag_refund_policy_in_process_main",
+        "response_request_id": "eval_rag_refund_policy_in_process_main",
+        "setup_request_ids": {
+            "upload_document": "eval_rag_refund_policy_in_process_setup_document"
+        },
+    }
     assert saved["summary"] == summary
+    assert saved["results"][0]["trace"]["request_id"] == (
+        "eval_csv_missing_values_in_process_main"
+    )
