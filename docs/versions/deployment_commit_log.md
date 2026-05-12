@@ -16,7 +16,7 @@
 - Preserved local Docker behavior through the `8000` default.
 - Created a cleaner starting point for Docker and Cloud Run verification.
 
-### `<pending>` - `deploy: verify docker runtime locally`
+### `9f9cfb4` - `deploy: verify docker runtime locally`
 
 **What we did**
 
@@ -31,3 +31,19 @@
 - Proved the app starts correctly inside the container.
 - Proved the container respects runtime port configuration.
 - Proved production docs disabling and API-key protection work in the container runtime.
+
+### `<pending>` - `deploy: verify cloud run deployment`
+
+**What we did**
+
+- Built and pushed the deployment image through Google Cloud Build.
+- Deployed image `us-central1-docker.pkg.dev/insightagent-496120/insightagent/insightagent:v10` to Cloud Run.
+- Fixed the production startup failure caused by wildcard CORS in production config.
+- Verified deployed `/health`, `/ready`, disabled `/docs`, unauthorized `/chat`, and authenticated `/sessions`.
+
+**What it solved / took care of**
+
+- Proved the project runs outside the local machine.
+- Confirmed Secret Manager-backed `API_KEY` works with Cloud Run.
+- Confirmed the app fails safely on unauthenticated protected endpoints.
+- Confirmed production docs exposure is disabled on the live service.

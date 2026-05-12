@@ -24,9 +24,15 @@ The project is built to show production-minded AI backend design: typed contract
 
 ## Current Status
 
-**Current Version:** V10 - Portfolio Packaging
+**Current Version:** V10 - Portfolio Packaging + Cloud Run Deployment
 
-The local and containerized backend is portfolio-ready. Cloud Run deployment, public demo link, and final license choice are tracked as follow-up items in [docs/portfolio_status.md](docs/portfolio_status.md).
+The backend is portfolio-ready and deployed on Cloud Run. Public demo recording and final license choice are tracked as follow-up items in [docs/portfolio_status.md](docs/portfolio_status.md).
+
+Live API:
+
+```text
+https://insightagent-1089133393572.us-central1.run.app
+```
 
 This is not a thin chat wrapper over an LLM API. It demonstrates backend patterns that make AI systems easier to trust, test, debug, and explain:
 - structured outputs are validated before becoming API responses

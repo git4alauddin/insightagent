@@ -102,7 +102,54 @@ Verification commands/results:
 
 Next, the same behavior should be checked against the Cloud Run URL.
 
-## 5. Storage Notes
+## 5. Cloud Run Verification
+
+Deployment target:
+
+```text
+https://insightagent-1089133393572.us-central1.run.app
+```
+
+Image:
+
+```text
+us-central1-docker.pkg.dev/insightagent-496120/insightagent/insightagent:v10
+```
+
+Cloud verification results:
+
+- Cloud Build status: success.
+- Cloud Run service deployed in `us-central1`.
+- `/health` returned `ok`.
+- `/ready` returned `ready`.
+- `/docs` returned `404`.
+- `/chat` without API key returned `401`.
+- `/sessions` with the Secret Manager-backed API key returned `success`.
+
+## 6. Production CORS Startup Fix
+
+Initial Cloud Run deployment failed with a generic container startup/port message.
+
+Root cause:
+
+```text
+APP_ENV=production
+CORS_ALLOWED_ORIGINS=*
+```
+
+The app intentionally rejects wildcard CORS origins in production. This is good production behavior, but Cloud Run surfaced it as a startup failure because the app exited before listening on `PORT=8080`.
+
+Fix:
+
+- Replace wildcard CORS with a non-wildcard origin value.
+- Redeploy the Cloud Run revision.
+
+Result:
+
+- Service started successfully.
+- Deployed smoke tests passed.
+
+## 7. Storage Notes
 
 Current local persistence:
 
@@ -118,19 +165,19 @@ Portfolio decision:
 - acceptable if documented as a demo limitation
 - managed database/object storage should be listed as future production work
 
-## 6. Checklist Mapping
+## 8. Checklist Mapping
 
 Deployment plan coverage started:
 
 - repo cleanup: started and partially complete
 - production config review: inspected
 - Docker readiness: complete locally
-- cloud setup: pending
-- secret management: pending
-- Cloud Run deployment: pending
-- deployed smoke tests: pending
+- cloud setup: complete
+- secret management: complete
+- Cloud Run deployment: complete
+- deployed smoke tests: complete
 - docs update: started
 
-## 7. Interview Summary
+## 9. Interview Summary
 
-For deployment readiness, I first cleaned the repo boundary and container runtime. I ignored local runtime artifacts like SQLite DB files, uploads, and logs so they do not get committed, and I changed the Docker startup command to respect a platform-provided `PORT` while still defaulting to `8000` locally. I then built the Docker image and ran a production-like local container smoke test to verify health, readiness, disabled docs, auth failure, and authenticated session creation before moving to Cloud Run.
+For deployment readiness, I first cleaned the repo boundary and container runtime. I ignored local runtime artifacts like SQLite DB files, uploads, and logs so they do not get committed, and I changed the Docker startup command to respect a platform-provided `PORT` while still defaulting to `8000` locally. I built and smoke-tested the Docker image locally, pushed it to Artifact Registry through Cloud Build, deployed it to Cloud Run with Secret Manager-backed keys, fixed a production CORS configuration failure, and verified the deployed API through public and authenticated smoke tests.

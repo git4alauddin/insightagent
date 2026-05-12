@@ -18,7 +18,8 @@ This document captures the engineering judgment behind InsightAgent and the hone
 
 ## Current Limitations
 
-- Cloud Run deployment is documented as a target but intentionally deferred.
+- Cloud Run deployment is complete for portfolio/demo use.
+- Cloud Run uses local SQLite and local file storage inside the container, so persistence is not durable across instances or revisions.
 - API key authentication is service-level, not user-level.
 - Uploads are stored locally, so multi-instance deployment would need shared storage.
 - SQLite is not ideal for high-concurrency production traffic.
@@ -33,7 +34,6 @@ This document captures the engineering judgment behind InsightAgent and the hone
 ## Future Improvements
 
 High-value next steps:
-- Deploy to Google Cloud Run and publish the live URL.
 - Add PostgreSQL for persistent multi-user data.
 - Add cloud object storage for uploaded datasets and documents.
 - Add a managed vector database or pgvector.
@@ -49,4 +49,4 @@ High-value next steps:
 
 These choices keep the project focused on backend architecture, safety, evaluation, and observability without overbuilding infrastructure too early.
 
-The current system is strong as a local and containerized AI backend case study. The future improvements describe the path from portfolio backend to production-ready service.
+The current system is strong as a local, containerized, and Cloud Run-deployed AI backend case study. The future improvements describe the path from portfolio/demo deployment to production-ready service.
