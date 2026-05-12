@@ -100,7 +100,7 @@ This file maps each V9 commit heading to:
 - Made failed eval cases easier to debug through `request_id`.
 - Preserved existing eval scoring while adding observability metadata.
 
-### `<pending>` - `v9: summarize usage metrics when available`
+### `14b8924` - `v9: summarize usage metrics when available`
 **What we did**
 - Added nullable token/cost fields to request completion logs.
 - Read token/cost data from `request.state.usage` when a route or service provides it.
@@ -113,6 +113,19 @@ This file maps each V9 commit heading to:
 - Covered token/cost observability where usage data is available.
 - Avoided fake estimates when providers or endpoints do not expose usage.
 - Made metrics summaries include token/cost totals without changing API response contracts.
+
+### `<pending>` - `v9: close observability checklist`
+**What we did**
+- Marked V9 documentation as complete.
+- Added checklist coverage mapping for the V9 implementation and Done When items.
+- Updated the project report with V9 closeout status.
+- Updated README automated verification count.
+- Recorded provider-specific usage extraction as a future improvement, not a blocker.
+
+**What it solved / took care of**
+- Closed the V9 observability and metrics milestone.
+- Confirmed the checklist is covered by runtime logs, tool traces, metrics summaries, eval trace linking, and README/docs proof.
+- Prepared the project to move to V10 portfolio packaging.
 
 ## Reusable Entry Template
 

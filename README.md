@@ -352,5 +352,5 @@ Comparison output reports pass-rate delta, newly failing cases, newly passing ca
 Current automated verification:
 
 ```text
-245 passed
+247 passed
 ```

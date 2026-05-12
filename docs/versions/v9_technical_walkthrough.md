@@ -180,9 +180,9 @@ Started:
 - observability section in README
 - evaluation result to request log linking
 
-Pending:
-- deeper service-level tool execution tracing
-- deeper service-level provider usage extraction where available
+Future improvements:
+- deeper provider-specific usage extraction where available
+- broader service-level trace events if future debugging needs them
 
 ## 8. Tests Added
 
@@ -309,5 +309,20 @@ Usage summary fields:
 
 This keeps usage tracking honest: available values are summarized, unavailable values stay unavailable.
 
-## 12. Interview Summary
-I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, latency, and nullable token/cost fields for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, tool success/failure counts, and usage totals when available. Eval results include request trace metadata so failed cases can be searched in runtime logs.
+## 12. Final Checklist Coverage
+
+V9 closes the checklist through:
+- request completion logs for every request
+- request id propagation through responses and logs
+- endpoint/status/latency/error category fields
+- optional session id tracking
+- agent tool trace logs for tool usage and status
+- nullable usage fields for token/cost values where available
+- metrics summary script for request, tool, error, latency, and usage summaries
+- eval result trace metadata for failed-case debugging
+- README and version docs with log format and lifecycle proof
+
+The remaining provider-specific usage extraction work is a future improvement because the current app does not consistently receive token/cost metadata from every endpoint/provider path.
+
+## 13. Interview Summary
+In V9, I built the observability version by enriching request completion logs, adding agent tool trace logs, adding a metrics summary script, documenting observability proof, linking eval results back to request ids, and summarizing token/cost fields where usage data is available. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, latency, and nullable usage fields for each request. Agent queries emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, tool success/failure counts, and usage totals when available.

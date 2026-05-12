@@ -514,7 +514,7 @@ Status: complete.
 
 ## V9 Progress
 
-Status: started.
+Status: complete.
 
 ### What We Built
 - Updated app version reporting to V9.
@@ -528,6 +528,7 @@ Status: started.
 - Added README observability proof with log shapes, lifecycle example, and metrics summary command.
 - Linked eval results to request traces through stable `x-request-id` values and saved trace metadata.
 - Added nullable token/cost fields to request completion logs and usage totals to metrics summaries.
+- Closed V9 with checklist coverage mapping and future-improvement notes.
 - Added V9 documentation files:
   - `docs/versions/v9_observability_metrics.md`
   - `docs/versions/v9_technical_walkthrough.md`
@@ -555,7 +556,7 @@ Status: started.
 - Request middleware tests verify nullable and available usage logging.
 - Metrics summary tests verify usage aggregation when token/cost fields exist.
 - README/docs were reviewed against the V9 checklist for log format documentation, request lifecycle trace example, and observability proof.
-- Full suite verified the scaffold did not regress existing behavior.
+- Full suite status at V9 closeout: `247 passed`.
 
 ### What I Learned
 - Version boundaries make it easier to explain which capabilities belong to which milestone.
@@ -568,4 +569,4 @@ Status: started.
 - Usage observability should distinguish unavailable metadata from real zero values.
 
 ### Interview Explanation
-- In V9, I started the observability and metrics layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README-level observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, latency, and nullable usage fields for each request. Agent queries also emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script parses structured log lines and reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, tool success/failure counts, and usage totals when available. Eval results store stable request ids so failed cases can be searched in runtime logs.
+- In V9, I built the observability and metrics layer by creating the version boundary, enriched request completion logs, agent tool trace logs, a metrics summary script, README-level observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. The API logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, latency, and nullable usage fields for each request. Agent queries emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, tool success/failure counts, and usage totals when available. Eval results store stable request ids so failed cases can be searched in runtime logs.

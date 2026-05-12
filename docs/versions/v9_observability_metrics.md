@@ -13,9 +13,9 @@ The target flow is:
 
 ## Current Progress
 
-Status: started.
+Status: complete.
 
-V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, metrics summary script foundation, log format documentation, request lifecycle example, README observability proof, eval-to-request trace linking, and usage metric summaries where token/cost data is available. Runtime tracing will continue in small follow-up chunks.
+V9 now has the version boundary, enriched request completion logs, agent tool trace logs, metrics summary script, log format documentation, request lifecycle example, README observability proof, eval-to-request trace linking, and usage metric summaries where token/cost data is available.
 
 ## Planned Scope
 
@@ -330,14 +330,51 @@ Metrics usage summary shape:
 }
 ```
 
-## Deferred To Follow-Up Chunks
+## Checklist Closeout
 
-Not implemented in this scaffold chunk:
-- deeper service-level provider usage extraction where available
+Implemented:
+- request tracing across API -> agent -> tool
+- request id logging in request completion logs and agent tool logs
+- endpoint path tracking
+- optional session id tracking
+- tool used and tool status tracking
+- latency tracking
+- nullable input/output/total token and estimated cost fields
+- tool usage frequency summary
+- tool success/failure summary
+- error categorization
+- failed request logs with error category
+- successful request logs with latency and usage fields where available
+- metrics summary script
+- metrics summary output example
+- eval result to request log linking
+- log format documentation
+- request lifecycle trace example
+- README observability section
+
+Done When coverage:
+- every request has traceable logs through `request_completed`
+- logs include request id
+- logs include endpoint and status
+- latency is recorded
+- tool usage is recorded through `agent_tool_completed`
+- token/cost info is recorded when available through nullable usage fields
+- failed requests include error category
+- metrics summary script works
+- tool usage can be summarized
+- error categories are visible
+- logs help debug failed requests through request id and eval trace linking
+- README shows observability proof
+
+## Future Improvements
+
+Not required to close V9, but useful later:
+- deeper provider-specific usage extraction from LLM responses where the provider exposes token/cost metadata
+- broader service-level trace events for dataset/document internals if runtime debugging needs more detail
 
 ## Testing Status
 
-The scaffold will be verified through:
+V9 was verified through:
 - focused health endpoint test
 - full test suite
 - focused request ID middleware tests
@@ -347,5 +384,11 @@ The scaffold will be verified through:
 - focused usage logging tests
 - README/docs review against V9 checklist
 
+Latest full suite status:
+
+```text
+247 passed
+```
+
 ## Interview Explanation
-In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, request lifecycle traces, tool usage metrics, usage totals, and failed-eval debugging without mixing observability work into the completed V8 evaluation layer.
+In V9, I built the observability layer by creating the version boundary, enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. The project can now explain runtime behavior through request status, endpoint activity, latency, error categories, request lifecycle traces, tool usage metrics, usage totals, and failed-eval debugging without mixing observability work into the completed V8 evaluation layer.
