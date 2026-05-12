@@ -138,11 +138,7 @@ def sum_optional_int_field(
     events: list[dict[str, Any]],
     field_name: str,
 ) -> int | None:
-    values = [
-        coerce_number(event.get(field_name))
-        for event in events
-        if coerce_number(event.get(field_name)) is not None
-    ]
+    values = collect_numeric_values(events, field_name)
     if not values:
         return None
     return int(sum(values))
@@ -152,14 +148,22 @@ def sum_optional_float_field(
     events: list[dict[str, Any]],
     field_name: str,
 ) -> float | None:
-    values = [
-        coerce_number(event.get(field_name))
-        for event in events
-        if coerce_number(event.get(field_name)) is not None
-    ]
+    values = collect_numeric_values(events, field_name)
     if not values:
         return None
     return round(float(sum(values)), 6)
+
+
+def collect_numeric_values(
+    events: list[dict[str, Any]],
+    field_name: str,
+) -> list[float]:
+    values: list[float] = []
+    for event in events:
+        value = coerce_number(event.get(field_name))
+        if value is not None:
+            values.append(value)
+    return values
 
 
 def is_successful_request(event: dict[str, Any]) -> bool:
@@ -169,10 +173,20 @@ def is_successful_request(event: dict[str, Any]) -> bool:
     if status == "failed":
         return False
 
-    status_code = event.get("status_code")
-    if is_number(status_code):
-        return int(status_code) < 400
+    status_code = coerce_int(event.get("status_code"))
+    if status_code is not None:
+        return status_code < 400
     return False
+
+
+def coerce_int(value: Any) -> int | None:
+    if value is None or isinstance(value, bool):
+        return None
+
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def coerce_number(value: Any) -> float | None:
