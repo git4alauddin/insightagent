@@ -66,7 +66,7 @@ This file maps each V10 commit heading to:
 - Made the project read as more mature and honest.
 - Created README-ready maturity content.
 
-### `<pending>` - `v10: rewrite portfolio README foundation`
+### `aa56db7` - `v10: rewrite portfolio README foundation`
 **What we did**
 - Rewrote the README as the main public portfolio entrypoint.
 - Added a recruiter-friendly project snapshot.
@@ -79,6 +79,20 @@ This file maps each V10 commit heading to:
 - Made the repository easier to understand quickly from the first page.
 - Reduced README clutter by linking to deeper support docs instead of duplicating every workflow inline.
 - Started closing the V10 professional README and recruiter-facing summary checklist items.
+
+### `<pending>` - `v10: finalize portfolio cleanup checklist`
+**What we did**
+- Added `docs/portfolio_status.md`.
+- Mapped V10 checklist items to public repo status.
+- Marked demo script, resume bullets, and interview pitch as local-only project materials.
+- Marked Cloud Run URL, published demo link, and license as deferred items.
+- Linked portfolio status from the README.
+- Updated V10 docs and project report with the cleanup checklist status.
+
+**What it solved / took care of**
+- Made the V10 closeout state explicit and honest.
+- Prevented private/personal planning files from being treated as missing public repo docs.
+- Gave future agents and reviewers one public page to verify portfolio packaging status.
 
 ## Reusable Entry Template
 

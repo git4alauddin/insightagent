@@ -30,6 +30,7 @@ Cloud Run deployment is intentionally deferred until the local and containerized
 | Architecture overview | [docs/architecture.md](docs/architecture.md) |
 | API examples | [docs/api_examples.md](docs/api_examples.md) |
 | Trade-offs and limitations | [docs/tradeoffs.md](docs/tradeoffs.md) |
+| Portfolio status | [docs/portfolio_status.md](docs/portfolio_status.md) |
 | Project report | [docs/project_report.md](docs/project_report.md) |
 | V10 notes | [docs/versions/v10_portfolio_packaging.md](docs/versions/v10_portfolio_packaging.md) |
 
@@ -224,6 +225,8 @@ Current automated test status:
 ```
 
 The test suite covers route contracts, services, schemas, tool behavior, dataset workflows, document Q&A, evaluation logic, error handling, auth, request middleware, observability, and metrics summaries.
+
+Portfolio packaging status is tracked in [docs/portfolio_status.md](docs/portfolio_status.md).
 
 ## Trade-Offs
 

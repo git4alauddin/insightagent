@@ -9,7 +9,7 @@ This version is not about adding new backend features. It is about making the ex
 
 Status: in progress.
 
-V10 now has the version boundary, documentation scaffold, architecture documentation, API examples documentation, trade-offs documentation, and a rewritten README foundation. Portfolio packaging work will continue in focused chunks.
+V10 now has the version boundary, documentation scaffold, architecture documentation, API examples documentation, trade-offs documentation, a rewritten README foundation, and a public portfolio status checklist. Portfolio packaging work will continue in focused chunks.
 
 ## Planned Scope
 
@@ -104,6 +104,20 @@ The README is now the main public portfolio entrypoint. It includes:
 
 Personal demo, resume, and interview guidance remain outside the repo.
 
+## Portfolio Status Checklist
+
+Added:
+- `docs/portfolio_status.md`
+
+This document maps the V10 checklist to the public repository state:
+- complete public docs
+- partial/deferred deployment and demo items
+- local-only personal materials
+- current verification evidence
+- remaining public portfolio tasks
+
+The README links to this page so reviewers can quickly see what is complete and what is intentionally deferred.
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented yet:
@@ -119,4 +133,4 @@ The scaffold will be verified through:
 - documentation review against the V10 checklist
 
 ## Interview Explanation
-In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I added architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, trade-offs documentation that captures design choices, limitations, and future improvements, and a rewritten README that works as the main public entrypoint. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through polished docs, evaluation proof, observability proof, and honest roadmap notes.
+In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I added architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, trade-offs documentation that captures design choices, limitations, and future improvements, a rewritten README that works as the main public entrypoint, and a portfolio status checklist that separates complete public docs from local-only or deferred materials. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through polished docs, evaluation proof, observability proof, and honest roadmap notes.
