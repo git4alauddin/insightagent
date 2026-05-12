@@ -9,7 +9,7 @@ This version is not about adding new backend features. It is about making the ex
 
 Status: started.
 
-V10 now has the version boundary and documentation scaffold. Portfolio packaging work will proceed in focused chunks.
+V10 now has the version boundary, documentation scaffold, and initial architecture documentation. Portfolio packaging work will proceed in focused chunks.
 
 ## Planned Scope
 
@@ -44,11 +44,25 @@ Updated:
 - local health endpoint expectation to `v10`
 - README current version, Docker examples, health example, and V10 docs link
 
+## Architecture Documentation
+
+Added:
+- `docs/architecture.md`
+
+This document gives engineers a fast technical overview of:
+- high-level system flow
+- core package responsibilities
+- request lifecycle
+- agent workflow
+- CSV analysis workflow
+- document Q&A workflow
+- evaluation and observability flow
+- key architecture trade-offs
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented in this scaffold chunk:
 - README rewrite
-- architecture diagram
 - API examples
 - demo script
 - resume bullets
@@ -59,6 +73,7 @@ Not implemented in this scaffold chunk:
 The scaffold will be verified through:
 - focused health endpoint test
 - full test suite
+- documentation review against the V10 checklist
 
 ## Interview Explanation
-In V10, I am packaging InsightAgent as a portfolio-ready backend case study. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through a polished README, architecture docs, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and resume-ready summaries.
+In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I started by adding architecture documentation that explains the system flow, core components, agent workflow, CSV analysis workflow, RAG workflow, evaluation, observability, and trade-offs. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through a polished README, architecture docs, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and resume-ready summaries.

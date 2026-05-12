@@ -49,18 +49,36 @@ Supporting docs can cover deeper areas:
 
 These files may be added incrementally as V10 progresses.
 
-## 4. Checklist Mapping
+## 4. Architecture Documentation
+
+### `docs/architecture.md`
+Added the first V10 portfolio support document.
+
+It covers:
+- high-level backend flow
+- main component responsibilities
+- request lifecycle
+- agent workflow
+- CSV analysis workflow
+- document Q&A workflow
+- evaluation and observability
+- key architecture trade-offs
+
+This is the engineer-facing technical overview foundation. The final README can keep a shorter architecture section and link to this deeper doc.
+
+## 5. Checklist Mapping
 
 Started:
 - V10 version boundary
 - V10 documentation files
 - README version alignment
+- engineer-facing technical overview
+- architecture documentation under `docs/`
 
 Pending:
 - professional README
 - recruiter-facing summary
-- engineer-facing technical overview
-- architecture diagram
+- visual architecture diagram if needed
 - API endpoint table and examples
 - demo script
 - evaluation results section
@@ -69,9 +87,9 @@ Pending:
 - resume bullets and interview pitch
 - final repo cleanup
 
-## 5. Tests Added
+## 6. Tests Added
 
 No new tests were required for the scaffold beyond updating the existing health endpoint expectation.
 
-## 6. Interview Summary
-V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, future roadmap, resume bullets, and interview pitch.
+## 7. Interview Summary
+V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, future roadmap, resume bullets, and interview pitch. The first portfolio artifact is `docs/architecture.md`, which gives engineers the system overview and workflow map.

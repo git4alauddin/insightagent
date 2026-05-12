@@ -582,6 +582,7 @@ Status: started.
 - Updated `.env.example` to `APP_VERSION=v10`.
 - Updated health endpoint test expectation to V10.
 - Updated README current version, Docker image examples, health response example, and V10 docs link.
+- Added engineer-facing architecture documentation in `docs/architecture.md`.
 - Added V10 documentation files:
   - `docs/versions/v10_portfolio_packaging.md`
   - `docs/versions/v10_technical_walkthrough.md`
@@ -591,13 +592,16 @@ Status: started.
 - To create a clean V10 boundary after closing V9.
 - To keep portfolio packaging separate from backend feature work.
 - To prepare dedicated docs for README polish, architecture, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, resume bullets, and interview pitch.
+- To give engineers a fast architecture overview before the final README rewrite.
 
 ### Tests Performed
 - Health endpoint test will verify V10 version reporting.
 - Full suite will verify the scaffold did not regress existing behavior.
+- Architecture documentation was reviewed against the V10 checklist.
 
 ### What I Learned
 - Portfolio packaging is its own version because presenting the project clearly is different from adding backend features.
+- Engineer-facing docs should explain workflows and trade-offs without forcing someone to read the code first.
 
 ### Interview Explanation
-- In V10, I started the portfolio packaging layer. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished README, recruiter-facing summary, engineer-facing architecture, API examples, demo script, evaluation proof, observability proof, trade-offs, limitations, future improvements, resume bullets, and interview pitch.
+- In V10, I started the portfolio packaging layer and added architecture documentation. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished README, recruiter-facing summary, engineer-facing architecture, API examples, demo script, evaluation proof, observability proof, trade-offs, limitations, future improvements, resume bullets, and interview pitch.

@@ -6,7 +6,7 @@ This file maps each V10 commit heading to:
 
 ## Commit-by-Commit (V10)
 
-### `<pending>` - `v10: start portfolio packaging scaffold`
+### `b214d68` - `v10: start portfolio packaging scaffold`
 **What we did**
 - Updated app version defaults to V10.
 - Updated `.env.example` to V10.
@@ -21,6 +21,21 @@ This file maps each V10 commit heading to:
 - Created a clean V10 boundary after closing V9.
 - Prepared dedicated documentation space for portfolio packaging work.
 - Kept the scaffold separate from the larger README, architecture, API, and demo polish chunks.
+
+### `<pending>` - `v10: add portfolio architecture docs`
+**What we did**
+- Added `docs/architecture.md`.
+- Documented the high-level system flow.
+- Added a component responsibility map.
+- Documented request lifecycle, agent workflow, CSV analysis workflow, and document Q&A workflow.
+- Added evaluation and observability architecture notes.
+- Added key architecture trade-offs.
+- Updated V10 version docs and project report.
+
+**What it solved / took care of**
+- Started the engineer-facing technical overview for V10.
+- Added an architecture artifact under `docs/`.
+- Created the technical backbone that the final README can link to.
 
 ## Reusable Entry Template
 
