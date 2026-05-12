@@ -29,25 +29,36 @@ Updated:
 Updated expected health version to `v10`.
 
 ### `README.md`
-Updated:
+First updated:
 - current version label
 - Docker image examples
 - expected health version
 - V10 documentation link
 
+Then rewritten as the main portfolio entrypoint with:
+- project snapshot
+- capability summary
+- documentation map
+- architecture overview
+- tech stack
+- quick start
+- Docker instructions
+- endpoint table
+- evaluation summary
+- observability summary
+- verification status
+- trade-off summary
+
 ## 3. Planned Documentation Model
 
-The README should become the first-stop portfolio document.
+The README is the first-stop portfolio document.
 
-Supporting docs can cover deeper areas:
+Supporting docs cover deeper areas:
 - `docs/architecture.md`
 - `docs/api_examples.md`
-- `docs/demo_script.md`
-- `docs/evaluation.md`
 - `docs/tradeoffs.md`
-- `docs/resume_interview.md`
 
-These files may be added incrementally as V10 progresses.
+Personal demo, resume, and interview guidance are kept outside the repo so the public documentation stays focused on the project artifact.
 
 ## 4. Architecture Documentation
 
@@ -95,34 +106,54 @@ It covers:
 
 This gives the final README a clear source for trade-offs, limitations, and roadmap sections.
 
-## 7. Checklist Mapping
+## 7. README Foundation
+
+### `README.md`
+Rewritten to act as the first-stop portfolio document.
+
+It now answers:
+- what the project is
+- what backend capabilities it demonstrates
+- where to find deeper docs
+- how the architecture is shaped
+- how to run locally and with Docker
+- which endpoints exist
+- how evaluation and observability work
+- what the current verification status is
+- what trade-offs and limitations are documented
+
+This keeps the README concise while linking readers to deeper docs for architecture, API examples, and trade-offs.
+
+## 8. Checklist Mapping
 
 Started:
 - V10 version boundary
 - V10 documentation files
 - README version alignment
+- professional README foundation
+- recruiter-facing project summary
 - engineer-facing technical overview
 - architecture documentation under `docs/`
 - API endpoint table
 - API request/response examples
 - curl/Postman-style examples through PowerShell commands
+- local setup instructions
+- Docker run instructions
+- evaluation results/process section
+- observability examples/summary
 - trade-offs documentation
 - limitations documentation
 - future improvements documentation
 
 Pending:
-- professional README
-- recruiter-facing summary
 - visual architecture diagram if needed
-- demo script
-- evaluation results section
-- observability examples
-- resume bullets and interview pitch
+- demo recording/link
+- local-only resume bullets and interview pitch notes
 - final repo cleanup
 
-## 8. Tests Added
+## 9. Tests Added
 
 No new tests were required for the scaffold beyond updating the existing health endpoint expectation.
 
-## 9. Interview Summary
-V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, future roadmap, resume bullets, and interview pitch. The first portfolio artifacts are `docs/architecture.md` for engineer-facing architecture, `docs/api_examples.md` for endpoint usage, and `docs/tradeoffs.md` for maturity and roadmap discussion.
+## 10. Interview Summary
+V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, evaluation proof, observability proof, trade-offs, limitations, and future roadmap. The main public artifacts are `README.md`, `docs/architecture.md`, `docs/api_examples.md`, and `docs/tradeoffs.md`; personal demo and interview prep notes stay outside the repo.

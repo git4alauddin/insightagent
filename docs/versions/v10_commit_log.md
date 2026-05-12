@@ -52,7 +52,7 @@ This file maps each V10 commit heading to:
 - Made core endpoint usage easier to inspect without reading route files.
 - Created README-ready API reference material.
 
-### `<pending>` - `v10: add portfolio tradeoffs docs`
+### `58ef3cf` - `v10: add portfolio tradeoffs docs`
 **What we did**
 - Added `docs/tradeoffs.md`.
 - Documented key engineering trade-offs.
@@ -65,6 +65,20 @@ This file maps each V10 commit heading to:
 - Added the trade-offs, limitations, and future improvements artifact required by V10.
 - Made the project read as more mature and honest.
 - Created README-ready maturity content.
+
+### `<pending>` - `v10: rewrite portfolio README foundation`
+**What we did**
+- Rewrote the README as the main public portfolio entrypoint.
+- Added a recruiter-friendly project snapshot.
+- Added a concise capability summary.
+- Added documentation map links for architecture, API examples, trade-offs, project report, and V10 notes.
+- Added a compact architecture overview, tech stack, setup instructions, Docker instructions, endpoint table, evaluation summary, observability summary, verification status, and trade-off summary.
+- Kept personal demo, resume, and interview guidance out of the repo README.
+
+**What it solved / took care of**
+- Made the repository easier to understand quickly from the first page.
+- Reduced README clutter by linking to deeper support docs instead of duplicating every workflow inline.
+- Started closing the V10 professional README and recruiter-facing summary checklist items.
 
 ## Reusable Entry Template
 

@@ -585,6 +585,8 @@ Status: started.
 - Added engineer-facing architecture documentation in `docs/architecture.md`.
 - Added API examples documentation in `docs/api_examples.md`.
 - Added trade-offs, limitations, and future improvements documentation in `docs/tradeoffs.md`.
+- Rewrote `README.md` as the main public portfolio entrypoint.
+- Added README sections for project snapshot, capabilities, documentation map, architecture, tech stack, local setup, Docker, API surface, evaluation, observability, verification, and trade-offs.
 - Added V10 documentation files:
   - `docs/versions/v10_portfolio_packaging.md`
   - `docs/versions/v10_technical_walkthrough.md`
@@ -597,6 +599,8 @@ Status: started.
 - To give engineers a fast architecture overview before the final README rewrite.
 - To make endpoint usage understandable without reading route implementation files.
 - To document mature engineering judgment, known limits, and future roadmap clearly.
+- To make the repository homepage understandable for both recruiters and engineers.
+- To keep personal demo and interview preparation notes outside the public repo.
 
 ### Tests Performed
 - Health endpoint test will verify V10 version reporting.
@@ -604,12 +608,14 @@ Status: started.
 - Architecture documentation was reviewed against the V10 checklist.
 - API examples documentation was reviewed against the V10 checklist.
 - Trade-offs documentation was reviewed against the V10 checklist.
+- README foundation was reviewed against the V10 checklist.
 
 ### What I Learned
 - Portfolio packaging is its own version because presenting the project clearly is different from adding backend features.
 - Engineer-facing docs should explain workflows and trade-offs without forcing someone to read the code first.
 - API docs should show realistic request/response shapes without pretending every demo value is fixed.
 - Honest limitations make the project stronger, not weaker.
+- A portfolio README should summarize clearly and link outward instead of duplicating every detail.
 
 ### Interview Explanation
-- In V10, I started the portfolio packaging layer and added architecture, API examples, and trade-offs documentation. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished README, recruiter-facing summary, engineer-facing architecture, API examples, demo script, evaluation proof, observability proof, trade-offs, limitations, future improvements, resume bullets, and interview pitch.
+- In V10, I started the portfolio packaging layer and added architecture, API examples, trade-offs documentation, and a rewritten README foundation. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished public entrypoint, recruiter-facing summary, engineer-facing architecture, API examples, evaluation proof, observability proof, trade-offs, limitations, and future improvements.

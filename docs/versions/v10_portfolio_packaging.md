@@ -7,9 +7,9 @@ This version is not about adding new backend features. It is about making the ex
 
 ## Current Progress
 
-Status: started.
+Status: in progress.
 
-V10 now has the version boundary, documentation scaffold, initial architecture documentation, API examples documentation, and trade-offs documentation. Portfolio packaging work will proceed in focused chunks.
+V10 now has the version boundary, documentation scaffold, architecture documentation, API examples documentation, trade-offs documentation, and a rewritten README foundation. Portfolio packaging work will continue in focused chunks.
 
 ## Planned Scope
 
@@ -83,12 +83,32 @@ This document covers:
 - future improvements
 - portfolio explanation for the chosen scope
 
+## README Foundation
+
+Updated:
+- `README.md`
+
+The README is now the main public portfolio entrypoint. It includes:
+- recruiter-friendly project snapshot
+- capability summary
+- documentation map
+- architecture overview
+- tech stack
+- local setup
+- Docker run instructions
+- endpoint table
+- evaluation summary
+- observability summary
+- verification status
+- trade-off summary with links to deeper docs
+
+Personal demo, resume, and interview guidance remain outside the repo.
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented yet:
-- README rewrite
-- demo script
-- resume bullets
+- demo recording/link
+- local-only resume/interview notes
 - final cleanup
 
 ## Testing Status
@@ -99,4 +119,4 @@ The scaffold will be verified through:
 - documentation review against the V10 checklist
 
 ## Interview Explanation
-In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I started by adding architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, and trade-offs documentation that captures design choices, limitations, and future improvements. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through a polished README, architecture docs, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and resume-ready summaries.
+In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I added architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, trade-offs documentation that captures design choices, limitations, and future improvements, and a rewritten README that works as the main public entrypoint. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through polished docs, evaluation proof, observability proof, and honest roadmap notes.
