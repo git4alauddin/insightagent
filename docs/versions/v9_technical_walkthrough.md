@@ -52,6 +52,10 @@ Current fields:
 - `status`
 - `error_category`
 - `latency_ms`
+- `input_tokens`
+- `output_tokens`
+- `total_tokens`
+- `estimated_cost_usd`
 
 Status mapping:
 - `success` for status codes below 400
@@ -170,6 +174,7 @@ Started:
 - tool usage summary
 - tool success/failure summary
 - error categories visible in summaries
+- token/cost fields recorded where available
 - log format documentation
 - request lifecycle trace example
 - observability section in README
@@ -177,8 +182,7 @@ Started:
 
 Pending:
 - deeper service-level tool execution tracing
-- token/cost tracking in runtime logs
-- deeper service-level token/cost fields where available
+- deeper service-level provider usage extraction where available
 
 ## 8. Tests Added
 
@@ -203,6 +207,7 @@ Verifies:
 - missing log files return controlled errors
 - request metrics are summarized
 - agent tool metrics are summarized
+- usage metrics are summarized when available
 - summary JSON can be written to disk
 
 ### `tests/unit/test_eval_runner.py`
@@ -280,5 +285,29 @@ Each saved eval result includes:
 
 This lets a failed eval case point back to matching runtime logs.
 
-## 11. Interview Summary
-I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, and eval-to-request trace linking. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, and tool success/failure counts. Eval results now include request trace metadata so failed cases can be searched in runtime logs.
+## 11. Usage Metrics
+
+### `app/api/middleware.py`
+Request completion logs now include nullable usage fields:
+- `input_tokens`
+- `output_tokens`
+- `total_tokens`
+- `estimated_cost_usd`
+
+The middleware reads these from `request.state.usage` when present. If no route or service provides usage metadata, the log fields remain `null`.
+
+### `scripts/metrics_summary.py`
+The metrics summary script totals numeric usage fields across all parsed events.
+
+Usage summary fields:
+- `available_events`
+- `unavailable_events`
+- `input_tokens`
+- `output_tokens`
+- `total_tokens`
+- `estimated_cost_usd`
+
+This keeps usage tracking honest: available values are summarized, unavailable values stay unavailable.
+
+## 12. Interview Summary
+I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, latency, and nullable token/cost fields for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, tool success/failure counts, and usage totals when available. Eval results include request trace metadata so failed cases can be searched in runtime logs.

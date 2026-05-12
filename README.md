@@ -245,7 +245,11 @@ Request completion logs use this JSON payload shape:
   "status_code": 200,
   "status": "success",
   "error_category": null,
-  "latency_ms": 12.34
+  "latency_ms": 12.34,
+  "input_tokens": null,
+  "output_tokens": null,
+  "total_tokens": null,
+  "estimated_cost_usd": null
 }
 ```
 
@@ -289,6 +293,7 @@ The output includes:
 - error category counts
 - tool usage counts
 - tool success/failure counts
+- token/cost totals when log events expose them
 
 ## Run Evaluations
 Start the API locally, then run the V8 evaluation dataset:
@@ -347,5 +352,5 @@ Comparison output reports pass-rate delta, newly failing cases, newly passing ca
 Current automated verification:
 
 ```text
-242 passed
+245 passed
 ```

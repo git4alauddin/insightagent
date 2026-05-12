@@ -85,7 +85,7 @@ This file maps each V9 commit heading to:
 - Covered the checklist items for log format documentation, request lifecycle trace example, and README observability section.
 - Helped show how logs can debug failed requests and summarize runtime behavior.
 
-### `<pending>` - `v9: link eval results to request traces`
+### `203650c` - `v9: link eval results to request traces`
 **What we did**
 - Added stable eval request id generation.
 - Sent `x-request-id` on each primary eval request.
@@ -99,6 +99,20 @@ This file maps each V9 commit heading to:
 - Linked evaluation results to request logs where possible.
 - Made failed eval cases easier to debug through `request_id`.
 - Preserved existing eval scoring while adding observability metadata.
+
+### `<pending>` - `v9: summarize usage metrics when available`
+**What we did**
+- Added nullable token/cost fields to request completion logs.
+- Read token/cost data from `request.state.usage` when a route or service provides it.
+- Kept unavailable token/cost values as `null`.
+- Added usage totals to the metrics summary script.
+- Added tests for default unavailable usage and available usage aggregation.
+- Updated README and V9 docs with the token/cost behavior.
+
+**What it solved / took care of**
+- Covered token/cost observability where usage data is available.
+- Avoided fake estimates when providers or endpoints do not expose usage.
+- Made metrics summaries include token/cost totals without changing API response contracts.
 
 ## Reusable Entry Template
 

@@ -15,7 +15,7 @@ The target flow is:
 
 Status: started.
 
-V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, metrics summary script foundation, log format documentation, request lifecycle example, README observability proof, and eval-to-request trace linking. Runtime tracing will continue in small follow-up chunks.
+V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, metrics summary script foundation, log format documentation, request lifecycle example, README observability proof, eval-to-request trace linking, and usage metric summaries where token/cost data is available. Runtime tracing will continue in small follow-up chunks.
 
 ## Planned Scope
 
@@ -59,7 +59,11 @@ Current completion log shape:
   "status_code": 200,
   "status": "success",
   "error_category": null,
-  "latency_ms": 12.34
+  "latency_ms": 12.34,
+  "input_tokens": null,
+  "output_tokens": null,
+  "total_tokens": null,
+  "estimated_cost_usd": null
 }
 ```
 
@@ -146,6 +150,14 @@ Current summary shape:
       "failed": 1,
       "success": 2
     }
+  },
+  "usage": {
+    "available_events": 2,
+    "unavailable_events": 4,
+    "input_tokens": 30,
+    "output_tokens": 15,
+    "total_tokens": 45,
+    "estimated_cost_usd": 0.0035
   }
 }
 ```
@@ -157,6 +169,7 @@ This gives V9 a first reusable way to prove:
 - visible error categories
 - tool usage frequency
 - tool success/failure counts
+- token/cost totals when log events expose them
 
 ## Log Format Documentation
 
@@ -179,6 +192,10 @@ Request log fields:
 - `status`: `success` or `failed`
 - `error_category`: categorized failure reason, or `null`
 - `latency_ms`: request duration in milliseconds
+- `input_tokens`: input token count when available, otherwise `null`
+- `output_tokens`: output token count when available, otherwise `null`
+- `total_tokens`: total token count when available, otherwise `null`
+- `estimated_cost_usd`: estimated cost when available, otherwise `null`
 
 Agent tool log fields:
 - `event`: always `agent_tool_completed`
@@ -277,11 +294,46 @@ This links evaluation failures to runtime logs:
 - search runtime logs for the matching `request_id`
 - inspect `request_completed`, `agent_tool_completed`, and error category fields for that request
 
+## Token And Cost Metrics
+
+Request completion logs include token/cost fields as nullable values.
+
+Current behavior:
+- if `request.state.usage` is not set, token/cost fields are logged as `null`
+- if a route or service sets `request.state.usage`, numeric values are logged
+- the metrics summary script totals only available numeric values
+- no token/cost values are invented
+
+Expected `request.state.usage` shape:
+
+```python
+request.state.usage = {
+    "input_tokens": 12,
+    "output_tokens": 8,
+    "total_tokens": 20,
+    "estimated_cost_usd": 0.0004,
+}
+```
+
+Metrics usage summary shape:
+
+```json
+{
+  "usage": {
+    "available_events": 1,
+    "unavailable_events": 5,
+    "input_tokens": 12,
+    "output_tokens": 8,
+    "total_tokens": 20,
+    "estimated_cost_usd": 0.0004
+  }
+}
+```
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented in this scaffold chunk:
-- token/cost runtime logging
-- deeper service-level token/cost fields where available
+- deeper service-level provider usage extraction where available
 
 ## Testing Status
 
@@ -292,7 +344,8 @@ The scaffold will be verified through:
 - focused agent endpoint trace tests
 - focused metrics summary tests
 - focused eval runner trace tests
+- focused usage logging tests
 - README/docs review against V9 checklist
 
 ## Interview Explanation
-In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, and eval-to-request trace linking. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, request lifecycle traces, tool usage metrics, and failed-eval debugging without mixing observability work into the completed V8 evaluation layer.
+In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README/docs observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, request lifecycle traces, tool usage metrics, usage totals, and failed-eval debugging without mixing observability work into the completed V8 evaluation layer.

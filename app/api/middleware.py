@@ -53,6 +53,39 @@ def _error_category(status_code: int) -> str | None:
     return "HTTP_ERROR"
 
 
+def _coerce_int(value) -> int | None:
+    if value is None or isinstance(value, bool):
+        return None
+
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _coerce_float(value) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _request_usage(request: Request) -> dict[str, int | float | None]:
+    usage = getattr(request.state, "usage", None)
+    if not isinstance(usage, dict):
+        usage = {}
+
+    return {
+        "input_tokens": _coerce_int(usage.get("input_tokens")),
+        "output_tokens": _coerce_int(usage.get("output_tokens")),
+        "total_tokens": _coerce_int(usage.get("total_tokens")),
+        "estimated_cost_usd": _coerce_float(usage.get("estimated_cost_usd")),
+    }
+
+
 def register_request_id_middleware(app: FastAPI) -> None:
     @app.middleware("http")
     async def request_id_middleware(request: Request, call_next):
@@ -78,6 +111,7 @@ def register_request_id_middleware(app: FastAPI) -> None:
                     "status": status,
                     "error_category": _error_category(response.status_code),
                     "latency_ms": latency_ms,
+                    **_request_usage(request),
                 }
             )
         )

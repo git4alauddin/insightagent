@@ -51,6 +51,7 @@ def build_metrics_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
     return {
         "requests": build_request_summary(request_events),
         "agent_tools": build_agent_tool_summary(tool_events),
+        "usage": build_usage_summary(events),
     }
 
 
@@ -105,6 +106,62 @@ def build_agent_tool_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def build_usage_summary(events: list[dict[str, Any]]) -> dict[str, Any]:
+    usage_events = [event for event in events if event_has_usage(event)]
+
+    return {
+        "available_events": len(usage_events),
+        "unavailable_events": len(events) - len(usage_events),
+        "input_tokens": sum_optional_int_field(usage_events, "input_tokens"),
+        "output_tokens": sum_optional_int_field(usage_events, "output_tokens"),
+        "total_tokens": sum_optional_int_field(usage_events, "total_tokens"),
+        "estimated_cost_usd": sum_optional_float_field(
+            usage_events,
+            "estimated_cost_usd",
+        ),
+    }
+
+
+def event_has_usage(event: dict[str, Any]) -> bool:
+    return any(
+        coerce_number(event.get(field_name)) is not None
+        for field_name in (
+            "input_tokens",
+            "output_tokens",
+            "total_tokens",
+            "estimated_cost_usd",
+        )
+    )
+
+
+def sum_optional_int_field(
+    events: list[dict[str, Any]],
+    field_name: str,
+) -> int | None:
+    values = [
+        coerce_number(event.get(field_name))
+        for event in events
+        if coerce_number(event.get(field_name)) is not None
+    ]
+    if not values:
+        return None
+    return int(sum(values))
+
+
+def sum_optional_float_field(
+    events: list[dict[str, Any]],
+    field_name: str,
+) -> float | None:
+    values = [
+        coerce_number(event.get(field_name))
+        for event in events
+        if coerce_number(event.get(field_name)) is not None
+    ]
+    if not values:
+        return None
+    return round(float(sum(values)), 6)
+
+
 def is_successful_request(event: dict[str, Any]) -> bool:
     status = event.get("status")
     if status == "success":
@@ -116,6 +173,16 @@ def is_successful_request(event: dict[str, Any]) -> bool:
     if is_number(status_code):
         return int(status_code) < 400
     return False
+
+
+def coerce_number(value: Any) -> float | None:
+    if value is None or isinstance(value, bool):
+        return None
+
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def is_number(value: Any) -> bool:

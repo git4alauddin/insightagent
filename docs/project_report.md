@@ -527,6 +527,7 @@ Status: started.
 - Added a metrics summary script for structured request and agent tool logs.
 - Added README observability proof with log shapes, lifecycle example, and metrics summary command.
 - Linked eval results to request traces through stable `x-request-id` values and saved trace metadata.
+- Added nullable token/cost fields to request completion logs and usage totals to metrics summaries.
 - Added V9 documentation files:
   - `docs/versions/v9_observability_metrics.md`
   - `docs/versions/v9_technical_walkthrough.md`
@@ -541,6 +542,7 @@ Status: started.
 - To turn structured logs into reusable request and tool usage metrics.
 - To make the observability behavior understandable from the README without reading implementation files.
 - To make failed eval cases easier to connect back to runtime request logs.
+- To record token/cost data when available without inventing values when unavailable.
 
 ### Tests Performed
 - Health endpoint test verified V9 version reporting.
@@ -550,6 +552,8 @@ Status: started.
 - Metrics summary tests verify JSON log parsing, request summaries, tool summaries, and output writing.
 - Eval runner tests verify stable request id generation and saved trace metadata.
 - Eval runner flow tests verify CSV/RAG eval traces through in-process API calls.
+- Request middleware tests verify nullable and available usage logging.
+- Metrics summary tests verify usage aggregation when token/cost fields exist.
 - README/docs were reviewed against the V9 checklist for log format documentation, request lifecycle trace example, and observability proof.
 - Full suite verified the scaffold did not regress existing behavior.
 
@@ -561,6 +565,7 @@ Status: started.
 - Metrics scripts are simpler and more reliable when runtime logs use stable event names and fields.
 - A request lifecycle example makes observability easier to explain than field lists alone.
 - Evaluation results become much more useful when each failed case carries a request id that can be searched in logs.
+- Usage observability should distinguish unavailable metadata from real zero values.
 
 ### Interview Explanation
-- In V9, I started the observability and metrics layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README-level observability proof, and eval-to-request trace linking. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script parses structured log lines and reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, and tool success/failure counts. Eval results now store stable request ids so failed cases can be searched in runtime logs.
+- In V9, I started the observability and metrics layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, README-level observability proof, eval-to-request trace linking, and token/cost summaries where usage data is available. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, latency, and nullable usage fields for each request. Agent queries also emit tool trace logs with request id, tool used, tool status, agent status, and output summary. The metrics script parses structured log lines and reports request totals, success/failure rate, average latency, endpoint counts, error categories, tool usage, tool success/failure counts, and usage totals when available. Eval results store stable request ids so failed cases can be searched in runtime logs.

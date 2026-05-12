@@ -132,6 +132,51 @@ def test_build_metrics_summary_counts_requests_and_tool_usage() -> None:
             "success": 2,
         },
     }
+    assert summary["usage"] == {
+        "available_events": 0,
+        "unavailable_events": 6,
+        "input_tokens": None,
+        "output_tokens": None,
+        "total_tokens": None,
+        "estimated_cost_usd": None,
+    }
+
+
+def test_build_metrics_summary_sums_usage_when_available() -> None:
+    summary = build_metrics_summary(
+        [
+            {
+                "event": "request_completed",
+                "status": "success",
+                "input_tokens": 10,
+                "output_tokens": 5,
+                "total_tokens": 15,
+                "estimated_cost_usd": 0.001,
+            },
+            {
+                "event": "request_completed",
+                "status": "success",
+                "input_tokens": "20",
+                "output_tokens": "10",
+                "total_tokens": "30",
+                "estimated_cost_usd": "0.0025",
+            },
+            {
+                "event": "agent_tool_completed",
+                "tool_used": "calculator",
+                "tool_status": "success",
+            },
+        ]
+    )
+
+    assert summary["usage"] == {
+        "available_events": 2,
+        "unavailable_events": 1,
+        "input_tokens": 30,
+        "output_tokens": 15,
+        "total_tokens": 45,
+        "estimated_cost_usd": 0.0035,
+    }
 
 
 def test_build_metrics_summary_falls_back_to_status_code_and_unknown_names() -> None:
