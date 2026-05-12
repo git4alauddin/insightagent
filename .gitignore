@@ -9,4 +9,7 @@ pytest-cache-files-*/
 .ruff_cache/
 
 *.log
+logs/
+uploads/
+insightagent.db
 evals/results/
