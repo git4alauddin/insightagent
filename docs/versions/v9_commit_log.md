@@ -58,7 +58,7 @@ This file maps each V9 commit heading to:
 - Covered the first tool-used and tool-status observability fields.
 - Prepared agent logs for later tool usage frequency and success/failure metrics.
 
-### `<pending>` - `v9: add metrics summary script foundation`
+### `07a09c1` - `v9: add metrics summary script foundation`
 **What we did**
 - Added `scripts/metrics_summary.py`.
 - Parsed both plain JSON log lines and prefixed log lines containing JSON payloads.
@@ -71,6 +71,19 @@ This file maps each V9 commit heading to:
 - Started the V9 metrics summary workflow.
 - Turned structured request and agent tool logs into reusable operational metrics.
 - Made tool usage frequency and tool success/failure counts measurable from logs.
+
+### `<pending>` - `v9: document observability proof`
+**What we did**
+- Added README observability documentation.
+- Documented request completion and agent tool log formats.
+- Added a request lifecycle trace example that connects request id, endpoint log, tool log, and metrics summary.
+- Updated V9 docs with log format guidance and observability proof.
+- Updated the project report with the new documentation milestone.
+
+**What it solved / took care of**
+- Made the V9 observability behavior explainable from the README.
+- Covered the checklist items for log format documentation, request lifecycle trace example, and README observability section.
+- Helped show how logs can debug failed requests and summarize runtime behavior.
 
 ## Reusable Entry Template
 

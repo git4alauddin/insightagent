@@ -15,7 +15,7 @@ The target flow is:
 
 Status: started.
 
-V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, and a metrics summary script foundation. Runtime tracing will continue in small follow-up chunks.
+V9 now has the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, metrics summary script foundation, log format documentation, request lifecycle example, and README observability proof. Runtime tracing will continue in small follow-up chunks.
 
 ## Planned Scope
 
@@ -158,12 +158,93 @@ This gives V9 a first reusable way to prove:
 - tool usage frequency
 - tool success/failure counts
 
+## Log Format Documentation
+
+InsightAgent emits structured JSON payloads inside Python log records. The metrics summary script supports both:
+- plain JSON lines
+- standard prefixed log lines that contain a JSON payload
+
+Core event names:
+- `request_completed`
+- `agent_tool_completed`
+
+Request log fields:
+- `event`: always `request_completed`
+- `request_id`: request trace id returned in `x-request-id`
+- `session_id`: optional session id from `x-session-id` or query parameter
+- `method`: HTTP method
+- `endpoint`: request URL path used for metrics grouping
+- `path`: same path retained for compatibility with earlier request logs
+- `status_code`: HTTP status code
+- `status`: `success` or `failed`
+- `error_category`: categorized failure reason, or `null`
+- `latency_ms`: request duration in milliseconds
+
+Agent tool log fields:
+- `event`: always `agent_tool_completed`
+- `request_id`: same request id as the API request
+- `tool_used`: selected agent tool
+- `tool_status`: tool execution status
+- `agent_status`: overall agent response status
+- `tool_output_summary`: short tool result summary
+
+## Request Lifecycle Trace Example
+
+Example request:
+
+```text
+POST /agent/query
+x-request-id: req_demo_001
+```
+
+Example API response includes:
+
+```text
+x-request-id: req_demo_001
+```
+
+Example request completion log:
+
+```json
+{
+  "event": "request_completed",
+  "request_id": "req_demo_001",
+  "session_id": null,
+  "method": "POST",
+  "endpoint": "/agent/query",
+  "path": "/agent/query",
+  "status_code": 200,
+  "status": "success",
+  "error_category": null,
+  "latency_ms": 18.5
+}
+```
+
+Example agent tool log:
+
+```json
+{
+  "event": "agent_tool_completed",
+  "request_id": "req_demo_001",
+  "tool_used": "calculator",
+  "tool_status": "success",
+  "agent_status": "success",
+  "tool_output_summary": "450"
+}
+```
+
+Debugging path:
+- use `request_id` to find all events for one API call
+- use `endpoint`, `status`, and `error_category` to understand request failure
+- use `tool_used` and `tool_status` to understand agent execution
+- use `latency_ms` to identify slow requests
+- run `scripts/metrics_summary.py` to summarize repeated behavior over many requests
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented in this scaffold chunk:
-- observability README proof
-- request lifecycle trace examples
 - token/cost runtime logging
+- link evaluation result to request logs where possible
 
 ## Testing Status
 
@@ -173,6 +254,7 @@ The scaffold will be verified through:
 - focused request ID middleware tests
 - focused agent endpoint trace tests
 - focused metrics summary tests
+- README/docs review against V9 checklist
 
 ## Interview Explanation
-In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, and a metrics summary script. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, and tool usage metrics without mixing observability work into the completed V8 evaluation layer.
+In V9, I started the observability layer by creating the version boundary, documentation scaffold, enriched request completion logs, agent tool trace logs, a metrics summary script, and clear observability proof in README/docs. This prepares the project to explain runtime behavior through request status, endpoint activity, latency, error categories, request lifecycle traces, and tool usage metrics without mixing observability work into the completed V8 evaluation layer.

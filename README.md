@@ -227,6 +227,69 @@ Invoke-RestMethod `
   -Body '{"question":"What is the refund policy?"}'
 ```
 
+## Observability
+V9 adds structured runtime logs and a metrics summary workflow.
+
+Every request receives an `x-request-id` response header. If the client provides `x-request-id`, the API reuses it; otherwise the middleware generates one.
+
+Request completion logs use this JSON payload shape:
+
+```json
+{
+  "event": "request_completed",
+  "request_id": "req_123",
+  "session_id": "session-123",
+  "method": "POST",
+  "endpoint": "/agent/query",
+  "path": "/agent/query",
+  "status_code": 200,
+  "status": "success",
+  "error_category": null,
+  "latency_ms": 12.34
+}
+```
+
+Agent requests also emit tool trace logs:
+
+```json
+{
+  "event": "agent_tool_completed",
+  "request_id": "req_123",
+  "tool_used": "calculator",
+  "tool_status": "success",
+  "agent_status": "success",
+  "tool_output_summary": "450"
+}
+```
+
+The same request id connects the API request log and the agent tool log.
+
+Example lifecycle:
+
+```text
+Client POST /agent/query with x-request-id=req_demo_001
+API returns x-request-id=req_demo_001
+Log event 1: request_completed for /agent/query
+Log event 2: agent_tool_completed for calculator
+Metrics script summarizes request success rate, endpoint counts, latency, error categories, tool usage, and tool status.
+```
+
+Summarize logs:
+
+```powershell
+.\.venv\Scripts\python scripts\metrics_summary.py `
+  --logs logs\app.log `
+  --output logs\metrics_summary.json
+```
+
+The output includes:
+- request totals and success/failure rate
+- average request latency
+- endpoint counts
+- error category counts
+- tool usage counts
+- tool success/failure counts
+
 ## Run Evaluations
 Start the API locally, then run the V8 evaluation dataset:
 
@@ -270,5 +333,5 @@ Comparison output reports pass-rate delta, newly failing cases, newly passing ca
 Current automated verification:
 
 ```text
-232 passed
+242 passed
 ```

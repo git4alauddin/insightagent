@@ -170,13 +170,14 @@ Started:
 - tool usage summary
 - tool success/failure summary
 - error categories visible in summaries
+- log format documentation
+- request lifecycle trace example
+- observability section in README
 
 Pending:
 - deeper service-level tool execution tracing
 - token/cost tracking in runtime logs
-- log format documentation
-- request lifecycle trace example
-- observability section in README
+- link evaluation result to request logs where possible
 
 ## 8. Tests Added
 
@@ -203,5 +204,38 @@ Verifies:
 - agent tool metrics are summarized
 - summary JSON can be written to disk
 
-## 9. Interview Summary
-I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, and a metrics summary script. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, and tool success/failure counts.
+## 9. Log Format And Lifecycle Proof
+
+### Log Format
+The runtime log records carry JSON payloads with stable event names.
+
+Supported event names:
+- `request_completed`
+- `agent_tool_completed`
+
+The metrics script intentionally parses JSON payloads from both plain JSON lines and prefixed Python log lines. This keeps the local workflow flexible while preserving stable event fields.
+
+### Lifecycle Example
+
+```text
+Client sends POST /agent/query with x-request-id=req_demo_001
+Middleware stores request.state.request_id=req_demo_001
+Agent route executes selected tool
+Agent route logs agent_tool_completed with request_id=req_demo_001
+Middleware logs request_completed with request_id=req_demo_001
+Metrics script groups the events by event type and summarizes endpoint/tool behavior
+```
+
+The same `request_id` gives a simple trace across API middleware and the agent route.
+
+### README Proof
+The README now includes:
+- request id behavior
+- request completion log shape
+- agent tool log shape
+- request lifecycle example
+- metrics summary command
+- metrics output categories
+
+## 10. Interview Summary
+I started V9 by creating the observability version boundary and documentation scaffold, then enriched request completion logs, agent tool trace logs, a metrics summary script, and README/docs observability proof. The API now logs request id, optional session id, method, endpoint, status code, success/failure status, basic error category, and latency for each request. Agent queries also emit tool trace logs with tool used, tool status, agent status, and output summary. The metrics script parses those logs and summarizes request volume, success/failure rate, average latency, endpoint activity, error categories, tool usage, and tool success/failure counts. The README explains how a request id ties the API request log and agent tool log together.
