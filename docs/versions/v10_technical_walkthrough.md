@@ -66,7 +66,23 @@ It covers:
 
 This is the engineer-facing technical overview foundation. The final README can keep a shorter architecture section and link to this deeper doc.
 
-## 5. Checklist Mapping
+## 5. API Examples Documentation
+
+### `docs/api_examples.md`
+Added the API reference support document.
+
+It covers:
+- public and protected endpoints
+- API key header usage
+- endpoint table
+- request examples
+- response shapes
+- common error shape
+- common failure cases
+
+This is the API documentation foundation. The final README can include a shorter endpoint table and link to this deeper doc.
+
+## 6. Checklist Mapping
 
 Started:
 - V10 version boundary
@@ -74,6 +90,9 @@ Started:
 - README version alignment
 - engineer-facing technical overview
 - architecture documentation under `docs/`
+- API endpoint table
+- API request/response examples
+- curl/Postman-style examples through PowerShell commands
 
 Pending:
 - professional README
@@ -87,9 +106,9 @@ Pending:
 - resume bullets and interview pitch
 - final repo cleanup
 
-## 6. Tests Added
+## 7. Tests Added
 
 No new tests were required for the scaffold beyond updating the existing health endpoint expectation.
 
-## 7. Interview Summary
-V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, future roadmap, resume bullets, and interview pitch. The first portfolio artifact is `docs/architecture.md`, which gives engineers the system overview and workflow map.
+## 8. Interview Summary
+V10 is the project packaging layer. It takes the completed InsightAgent backend and turns it into a portfolio-ready case study with a clear README, architecture explanation, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, future roadmap, resume bullets, and interview pitch. The first portfolio artifacts are `docs/architecture.md` for engineer-facing architecture and `docs/api_examples.md` for endpoint usage.

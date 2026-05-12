@@ -9,7 +9,7 @@ This version is not about adding new backend features. It is about making the ex
 
 Status: started.
 
-V10 now has the version boundary, documentation scaffold, and initial architecture documentation. Portfolio packaging work will proceed in focused chunks.
+V10 now has the version boundary, documentation scaffold, initial architecture documentation, and API examples documentation. Portfolio packaging work will proceed in focused chunks.
 
 ## Planned Scope
 
@@ -59,11 +59,23 @@ This document gives engineers a fast technical overview of:
 - evaluation and observability flow
 - key architecture trade-offs
 
+## API Examples Documentation
+
+Added:
+- `docs/api_examples.md`
+
+This document covers:
+- auth requirements
+- endpoint table
+- PowerShell request examples
+- representative response shapes
+- common error response shape
+- common failure cases
+
 ## Deferred To Follow-Up Chunks
 
-Not implemented in this scaffold chunk:
+Not implemented yet:
 - README rewrite
-- API examples
 - demo script
 - resume bullets
 - final cleanup
@@ -76,4 +88,4 @@ The scaffold will be verified through:
 - documentation review against the V10 checklist
 
 ## Interview Explanation
-In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I started by adding architecture documentation that explains the system flow, core components, agent workflow, CSV analysis workflow, RAG workflow, evaluation, observability, and trade-offs. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through a polished README, architecture docs, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and resume-ready summaries.
+In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I started by adding architecture documentation that explains the system flow, core components, agent workflow, CSV analysis workflow, RAG workflow, evaluation, observability, and trade-offs. I also added API examples documentation with endpoint tables, request examples, response shapes, and common error cases. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through a polished README, architecture docs, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and resume-ready summaries.

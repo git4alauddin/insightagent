@@ -22,7 +22,7 @@ This file maps each V10 commit heading to:
 - Prepared dedicated documentation space for portfolio packaging work.
 - Kept the scaffold separate from the larger README, architecture, API, and demo polish chunks.
 
-### `<pending>` - `v10: add portfolio architecture docs`
+### `1bd5366` - `v10: add portfolio architecture docs`
 **What we did**
 - Added `docs/architecture.md`.
 - Documented the high-level system flow.
@@ -36,6 +36,21 @@ This file maps each V10 commit heading to:
 - Started the engineer-facing technical overview for V10.
 - Added an architecture artifact under `docs/`.
 - Created the technical backbone that the final README can link to.
+
+### `<pending>` - `v10: add portfolio API examples`
+**What we did**
+- Added `docs/api_examples.md`.
+- Documented public and protected endpoints.
+- Added an endpoint table.
+- Added PowerShell request examples.
+- Added representative response shapes.
+- Added common error response shape and failure cases.
+- Updated V10 version docs and project report.
+
+**What it solved / took care of**
+- Started the API documentation artifact for V10.
+- Made core endpoint usage easier to inspect without reading route files.
+- Created README-ready API reference material.
 
 ## Reusable Entry Template
 
