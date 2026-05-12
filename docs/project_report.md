@@ -529,6 +529,7 @@ Status: complete.
 - Linked eval results to request traces through stable `x-request-id` values and saved trace metadata.
 - Added nullable token/cost fields to request completion logs and usage totals to metrics summaries.
 - Closed V9 with checklist coverage mapping and future-improvement notes.
+- Cleaned up metrics summary typing diagnostics for usage sums and status-code handling.
 - Added V9 documentation files:
   - `docs/versions/v9_observability_metrics.md`
   - `docs/versions/v9_technical_walkthrough.md`
@@ -555,6 +556,7 @@ Status: complete.
 - Eval runner flow tests verify CSV/RAG eval traces through in-process API calls.
 - Request middleware tests verify nullable and available usage logging.
 - Metrics summary tests verify usage aggregation when token/cost fields exist.
+- Focused metrics summary tests verified the post-closeout typing cleanup.
 - README/docs were reviewed against the V9 checklist for log format documentation, request lifecycle trace example, and observability proof.
 - Full suite status at V9 closeout: `247 passed`.
 

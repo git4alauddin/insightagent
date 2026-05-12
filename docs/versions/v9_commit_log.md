@@ -114,7 +114,7 @@ This file maps each V9 commit heading to:
 - Avoided fake estimates when providers or endpoints do not expose usage.
 - Made metrics summaries include token/cost totals without changing API response contracts.
 
-### `<pending>` - `v9: close observability checklist`
+### `361a67a` - `v9: close observability checklist`
 **What we did**
 - Marked V9 documentation as complete.
 - Added checklist coverage mapping for the V9 implementation and Done When items.
@@ -126,6 +126,18 @@ This file maps each V9 commit heading to:
 - Closed the V9 observability and metrics milestone.
 - Confirmed the checklist is covered by runtime logs, tool traces, metrics summaries, eval trace linking, and README/docs proof.
 - Prepared the project to move to V10 portfolio packaging.
+
+### `be3bb3f` - `v9: fix metrics summary typing diagnostics`
+**What we did**
+- Refactored metrics usage value collection so `sum()` receives concrete numeric values.
+- Added explicit `status_code` int coercion before success/failure comparison.
+- Kept metrics summary behavior unchanged.
+- Verified focused metrics summary tests.
+
+**What it solved / took care of**
+- Cleared IDE/type-checker diagnostics in `scripts/metrics_summary.py`.
+- Made usage aggregation and status-code handling more explicit.
+- Preserved the completed V9 behavior while cleaning up typing quality.
 
 ## Reusable Entry Template
 

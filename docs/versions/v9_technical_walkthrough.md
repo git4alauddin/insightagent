@@ -309,6 +309,10 @@ Usage summary fields:
 
 This keeps usage tracking honest: available values are summarized, unavailable values stay unavailable.
 
+Typing cleanup:
+- usage values are collected as concrete numeric values before calling `sum()`
+- `status_code` is explicitly coerced to `int` before request success/failure comparison
+
 ## 12. Final Checklist Coverage
 
 V9 closes the checklist through:
