@@ -363,7 +363,7 @@ Existing tests were updated to expect the new V6 error shape:
 - structured request logging: done
 - rate limiting: done
 - production env documentation: done
-- Cloud Run deployment: deferred
+- Cloud Run deployment: deferred at V6 closeout, completed later in the dedicated Deployment pass
 
 ## 13. Interview Summary
 In V6, I added production-style backend hardening. The service now has V6 versioned health checks, readiness checks, verified Docker runtime support, environment-aware CORS, configurable API docs exposure, API key protection for private endpoints, basic rate limiting, global exception handlers that return one consistent error format, request IDs for traceability, and structured request logs for basic observability. Controlled route errors preserve their specific error codes, while validation failures and unexpected crashes are converted into safe structured responses.

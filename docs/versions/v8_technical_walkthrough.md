@@ -365,7 +365,7 @@ The version delivers the planned evaluation layer:
 Known limits are intentional:
 - live eval pass rate can depend on LLM provider/model behavior
 - model-assisted semantic judging is not included
-- deployed Cloud Run eval is supported by `--base-url` but Cloud Run deployment remains deferred
+- deployed Cloud Run eval is supported by `--base-url`; Cloud Run deployment was deferred at V8 closeout and completed later in the dedicated Deployment pass
 - deterministic citation accuracy is useful, but not a replacement for deeper semantic citation judging
 
 ## 12. Interview Summary

@@ -216,10 +216,10 @@ Version alignment:
 - `/docs` exposure decision: done.
 - Environment-controlled docs exposure: done.
 - Production env documentation: done.
-- Cloud Run deployment: deferred on purpose.
+- Cloud Run deployment: deferred on purpose at V6 closeout, completed later in the dedicated Deployment pass.
 
 ## Deferred On Purpose
-Cloud Run deployment is not completed in this local V6 closeout.
+Cloud Run deployment was not completed in the local V6 closeout. It was completed later in the dedicated Deployment pass.
 
 Reason:
 - the backend is now container-ready and verified locally

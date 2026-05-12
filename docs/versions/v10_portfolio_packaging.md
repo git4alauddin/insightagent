@@ -9,7 +9,7 @@ This version is not about adding new backend features. It is about making the ex
 
 Status: closeout-ready.
 
-V10 now has the version boundary, documentation scaffold, Mermaid architecture documentation, API examples documentation, trade-offs documentation, a refined README opening, a public portfolio status checklist, and a final hygiene pass. Remaining public items are intentionally deferred: recorded demo link, license choice, and Cloud Run URL.
+V10 now has the version boundary, documentation scaffold, Mermaid architecture documentation, API examples documentation, trade-offs documentation, a refined README opening, a public portfolio status checklist, and a final hygiene pass. At V10 closeout, remaining public items were recorded demo link, license choice, and Cloud Run URL. Cloud Run deployment was completed later in the dedicated Deployment pass.
 
 ## Planned Scope
 
@@ -146,7 +146,7 @@ Checked:
 Not implemented yet:
 - demo recording/link in README after publishing
 - license choice
-- Cloud Run URL after deployment
+- Cloud Run URL after deployment: completed in the dedicated Deployment pass
 
 ## Testing Status
 
@@ -156,4 +156,4 @@ Verified through:
 - final hygiene scan for tracked local-only docs, ignored generated files, dependency usage, and stale V10 placeholders
 
 ## Interview Explanation
-In V10, I packaged InsightAgent as a portfolio-ready backend case study. I added architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, trade-offs documentation that captures design choices, limitations, and future improvements, a rewritten README that works as the main public entrypoint, a portfolio status checklist that separates complete public docs from local-only or deferred materials, and a final hygiene pass. The project is now clear for recruiters, technically credible for engineers, and ready for demo recording, with Cloud Run deployment, license choice, and public demo link intentionally left as follow-up items.
+In V10, I packaged InsightAgent as a portfolio-ready backend case study. I added architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, trade-offs documentation that captures design choices, limitations, and future improvements, a rewritten README that works as the main public entrypoint, a portfolio status checklist that separates complete public docs from local-only or deferred materials, and a final hygiene pass. The project became clear for recruiters and technically credible for engineers, with Cloud Run deployment completed later in the dedicated Deployment pass and only demo recording/license choice remaining as optional public follow-ups.

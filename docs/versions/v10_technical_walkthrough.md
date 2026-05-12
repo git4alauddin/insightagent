@@ -150,7 +150,7 @@ It maps each portfolio packaging item to:
 - local-only personal materials
 - remaining public portfolio tasks
 
-This keeps the repo honest about Cloud Run, demo recording, license choice, and personal job materials without mixing private planning docs into the public project.
+This kept the repo honest at V10 closeout about Cloud Run, demo recording, license choice, and personal job materials without mixing private planning docs into the public project. Cloud Run was completed later in the dedicated Deployment pass.
 
 ## 9. Final Hygiene Pass
 
@@ -196,7 +196,7 @@ Started:
 Public follow-ups:
 - demo recording/link
 - license choice
-- Cloud Run URL
+- Cloud Run URL, completed later in the dedicated Deployment pass
 
 ## 11. Tests Added
 

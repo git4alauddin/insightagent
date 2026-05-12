@@ -32,7 +32,7 @@
 - Proved the container respects runtime port configuration.
 - Proved production docs disabling and API-key protection work in the container runtime.
 
-### `<pending>` - `deploy: verify cloud run deployment`
+### `9804454` - `deploy: document cloud run deployment`
 
 **What we did**
 

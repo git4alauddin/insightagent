@@ -288,6 +288,6 @@ The suite covers route contracts, services, schemas, tool behavior, dataset work
 
 InsightAgent intentionally favors clear local architecture over external infrastructure complexity. SQLite, deterministic local embeddings, rule-based evaluation checks, and in-memory rate limiting keep the project easy to run, inspect, and test while preserving production-style boundaries.
 
-Cloud deployment, managed vector databases, distributed rate limiting, model-assisted evaluation, richer file parsing, and frontend UX are documented as future improvements instead of hidden behind unfinished work.
+Managed databases/storage, managed vector databases, distributed rate limiting, model-assisted evaluation, richer file parsing, and frontend UX are documented as future improvements instead of hidden behind unfinished work.
 
 See [docs/tradeoffs.md](docs/tradeoffs.md) for the full limitations and roadmap.

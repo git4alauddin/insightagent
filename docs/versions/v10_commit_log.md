@@ -85,7 +85,7 @@ This file maps each V10 commit heading to:
 - Added `docs/portfolio_status.md`.
 - Mapped V10 checklist items to public repo status.
 - Marked demo script, resume bullets, and interview pitch as local-only project materials.
-- Marked Cloud Run URL, published demo link, and license as deferred items.
+- Marked Cloud Run URL, published demo link, and license as deferred items at V10 closeout. Cloud Run was completed later in the dedicated Deployment pass.
 - Linked portfolio status from the README.
 - Updated V10 docs and project report with the cleanup checklist status.
 
@@ -101,7 +101,7 @@ This file maps each V10 commit heading to:
 - Confirmed generated/runtime files are ignored.
 - Confirmed project dependencies are still used by app, scripts, or tests.
 - Updated the portfolio status page to mark repo structure and cleanup as complete.
-- Recorded remaining public portfolio items as demo link, license choice, and Cloud Run URL.
+- Recorded remaining public portfolio items as demo link, license choice, and Cloud Run URL at V10 closeout. Cloud Run was completed later in the dedicated Deployment pass.
 
 **What it solved / took care of**
 - Removed stale V10 bookkeeping from the previous commit.

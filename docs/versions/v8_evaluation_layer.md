@@ -249,7 +249,7 @@ Honest limitations:
 - LLM-backed chat/structured/tool cases may vary depending on provider/model behavior.
 - The automated integration proof focuses on deterministic upload-dependent CSV/RAG eval execution.
 - Model-assisted semantic judging is deferred; V8 uses deterministic rule-based checks.
-- Deployed API evaluation is supported by `--base-url`, but Cloud Run deployment remains deferred from V6.
+- Deployed API evaluation is supported by `--base-url`. Cloud Run deployment was deferred during V8 and completed later in the dedicated Deployment pass.
 
 ## Testing Status
 Added unit tests for:
