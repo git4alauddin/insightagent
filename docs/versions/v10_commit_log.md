@@ -52,6 +52,20 @@ This file maps each V10 commit heading to:
 - Made core endpoint usage easier to inspect without reading route files.
 - Created README-ready API reference material.
 
+### `<pending>` - `v10: add portfolio tradeoffs docs`
+**What we did**
+- Added `docs/tradeoffs.md`.
+- Documented key engineering trade-offs.
+- Documented current limitations.
+- Documented future improvements.
+- Added a portfolio explanation for why the choices fit the project stage.
+- Updated V10 version docs and project report.
+
+**What it solved / took care of**
+- Added the trade-offs, limitations, and future improvements artifact required by V10.
+- Made the project read as more mature and honest.
+- Created README-ready maturity content.
+
 ## Reusable Entry Template
 
 ### `<commit_hash>` - `<commit_heading>`

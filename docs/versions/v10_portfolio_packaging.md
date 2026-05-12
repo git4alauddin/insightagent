@@ -9,7 +9,7 @@ This version is not about adding new backend features. It is about making the ex
 
 Status: started.
 
-V10 now has the version boundary, documentation scaffold, initial architecture documentation, and API examples documentation. Portfolio packaging work will proceed in focused chunks.
+V10 now has the version boundary, documentation scaffold, initial architecture documentation, API examples documentation, and trade-offs documentation. Portfolio packaging work will proceed in focused chunks.
 
 ## Planned Scope
 
@@ -72,6 +72,17 @@ This document covers:
 - common error response shape
 - common failure cases
 
+## Trade-Offs Documentation
+
+Added:
+- `docs/tradeoffs.md`
+
+This document covers:
+- design trade-offs
+- current limitations
+- future improvements
+- portfolio explanation for the chosen scope
+
 ## Deferred To Follow-Up Chunks
 
 Not implemented yet:
@@ -88,4 +99,4 @@ The scaffold will be verified through:
 - documentation review against the V10 checklist
 
 ## Interview Explanation
-In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I started by adding architecture documentation that explains the system flow, core components, agent workflow, CSV analysis workflow, RAG workflow, evaluation, observability, and trade-offs. I also added API examples documentation with endpoint tables, request examples, response shapes, and common error cases. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through a polished README, architecture docs, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and resume-ready summaries.
+In V10, I am packaging InsightAgent as a portfolio-ready backend case study. I started by adding architecture documentation that explains the system flow, API examples documentation with endpoint tables and response shapes, and trade-offs documentation that captures design choices, limitations, and future improvements. The goal is to make the project clear for recruiters, technically credible for engineers, and easy to demo through a polished README, architecture docs, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and resume-ready summaries.
