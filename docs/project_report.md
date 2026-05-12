@@ -635,3 +635,31 @@ Status: closeout-ready.
 
 ### Interview Explanation
 - In V10, I completed the portfolio packaging layer by adding architecture with Mermaid diagrams, API examples, trade-offs documentation, a refined README opening, a public portfolio status checklist, and a final repo hygiene pass. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished public entrypoint, recruiter-facing summary, engineer-facing architecture, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and an honest view of what is complete, deferred, or kept local.
+
+## Deployment Progress
+
+Status: in progress.
+
+### What We Built
+- Added a dedicated deployment documentation boundary after V10.
+- Prepared the repository for cloud deployment by ignoring local runtime artifacts.
+- Updated Docker runtime startup to respect the platform-provided `PORT`.
+- Removed the generated local `insightagent.db` artifact.
+
+### Why We Built It
+- To close the final gap between a local/container-ready portfolio backend and a cloud-verifiable deployed service.
+- To keep deployment work separate from V10 portfolio packaging.
+- To make the Docker image suitable for Cloud Run-style runtime configuration.
+- To prevent local DB, upload, and log artifacts from becoming part of source control.
+
+### Tests Performed
+- Confirmed latest deployment-prep commit: `7a6dec6 deploy: prepare repo and docker runtime for cloud`.
+- Docker build and cloud smoke tests are still pending.
+
+### What I Learned
+- Deployment readiness starts before cloud commands: repo hygiene and runtime configuration matter first.
+- A container image should respect runtime-provided configuration while keeping sensible local defaults.
+- Local SQLite and file uploads can be acceptable for a portfolio demo only when the limitation is documented honestly.
+
+### Interview Explanation
+- After completing V10, I started a dedicated deployment pass to make InsightAgent cloud-verifiable. The first step cleaned the repo boundary and Docker runtime by ignoring generated local artifacts and updating the container startup command to use the runtime `PORT` with a local fallback. The remaining deployment work is Docker verification, Cloud Run setup, secret injection, deployed smoke testing, and documentation of the storage trade-off.
