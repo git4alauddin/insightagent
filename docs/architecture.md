@@ -4,40 +4,37 @@ InsightAgent is a production-style FastAPI backend for AI-powered chat, tool cal
 
 ## High-Level Flow
 
-```text
-Client / API user
-  |
-  v
-FastAPI application
-  |
-  +-- API middleware
-  |     +-- request id
-  |     +-- structured request logging
-  |     +-- CORS
-  |     +-- rate limiting
-  |
-  +-- API routers
-  |     +-- health / readiness
-  |     +-- chat / structured chat
-  |     +-- agent query
-  |     +-- sessions and memory
-  |     +-- CSV datasets
-  |     +-- documents and RAG
-  |
-  +-- Service layer
-  |     +-- LLM calls
-  |     +-- agent controller
-  |     +-- memory/session services
-  |     +-- dataset analysis services
-  |     +-- document indexing/retrieval services
-  |
-  +-- Persistence
-  |     +-- SQLite metadata and message history
-  |     +-- local upload storage
-  |     +-- SQLite-backed local vector storage
-  |
-  v
-Structured API responses + logs + eval results
+```mermaid
+flowchart TD
+    Client["Client / API user"] --> App["FastAPI application"]
+
+    App --> Middleware["API middleware"]
+    Middleware --> RequestId["Request ID"]
+    Middleware --> RequestLogs["Structured request logging"]
+    Middleware --> Cors["CORS"]
+    Middleware --> RateLimit["Rate limiting"]
+
+    App --> Routers["API routers"]
+    Routers --> Health["Health / readiness"]
+    Routers --> Chat["Chat / structured chat"]
+    Routers --> Agent["Agent query"]
+    Routers --> Sessions["Sessions and memory"]
+    Routers --> Datasets["CSV datasets"]
+    Routers --> Documents["Documents and RAG"]
+
+    App --> Services["Service layer"]
+    Services --> Llm["LLM calls"]
+    Services --> AgentController["Agent controller"]
+    Services --> Memory["Memory/session services"]
+    Services --> Csv["Dataset analysis services"]
+    Services --> Rag["Document indexing/retrieval services"]
+
+    App --> Persistence["Persistence"]
+    Persistence --> Sqlite["SQLite metadata and message history"]
+    Persistence --> Uploads["Local upload storage"]
+    Persistence --> Vectors["SQLite-backed local vector storage"]
+
+    App --> Output["Structured API responses + logs + eval results"]
 ```
 
 ## Main Components
@@ -56,29 +53,29 @@ Structured API responses + logs + eval results
 
 ## Request Lifecycle
 
-```text
-HTTP request
-  -> request id middleware assigns/reuses x-request-id
-  -> auth/rate limiting/CORS checks run where applicable
-  -> router validates request body with Pydantic
-  -> service layer performs controlled work
-  -> response schema returns stable JSON
-  -> middleware logs request_completed with latency/status/error category
+```mermaid
+flowchart LR
+    Request["HTTP request"] --> RequestId["Assign/reuse x-request-id"]
+    RequestId --> Guards["Auth, rate limiting, and CORS checks"]
+    Guards --> Validation["Router validates body with Pydantic"]
+    Validation --> Service["Service layer performs controlled work"]
+    Service --> Response["Response schema returns stable JSON"]
+    Response --> Logs["Log request_completed with latency, status, and error category"]
 ```
 
 Private endpoints require `x-api-key`. Public endpoints such as `/health` and `/ready` remain available for health checks.
 
 ## Agent Workflow
 
-```text
-POST /agent/query
-  -> agent controller asks LLM for a tool decision
-  -> tool decision is parsed and validated
-  -> registry checks the selected tool is allowlisted
-  -> tool input is validated
-  -> backend executes the selected tool safely
-  -> response includes answer and tool trace
-  -> route logs agent_tool_completed
+```mermaid
+flowchart TD
+    Query["POST /agent/query"] --> Decision["LLM proposes tool decision"]
+    Decision --> Parse["Parse and validate decision"]
+    Parse --> Registry["Check allowlisted tool registry"]
+    Registry --> Input["Validate tool input"]
+    Input --> Execute["Execute selected tool safely"]
+    Execute --> Answer["Return answer with tool trace"]
+    Answer --> Log["Log agent_tool_completed"]
 ```
 
 The agent can use:
@@ -92,37 +89,35 @@ Tool execution is backend-controlled. The LLM does not execute arbitrary Python.
 
 ## CSV Analysis Workflow
 
-```text
-POST /datasets/upload
-  -> validate file type, size, rows, columns, encoding, and empty content
-  -> store file safely
-  -> save dataset metadata
+```mermaid
+flowchart TD
+    Upload["POST /datasets/upload"] --> ValidateFile["Validate type, size, rows, columns, encoding, and empty content"]
+    ValidateFile --> StoreFile["Store file safely"]
+    StoreFile --> Metadata["Save dataset metadata"]
 
-POST /datasets/{dataset_id}/ask
-  -> detect analysis intent
-  -> route to allowlisted pandas-backed analysis service
-  -> validate columns and operation
-  -> return answer plus analysis trace
+    Ask["POST /datasets/{dataset_id}/ask"] --> Intent["Detect analysis intent"]
+    Intent --> Route["Route to allowlisted pandas-backed analysis service"]
+    Route --> ValidateAnalysis["Validate columns and operation"]
+    ValidateAnalysis --> Result["Return answer plus analysis trace"]
 ```
 
 Supported analysis paths include dataset summary, missing values, column statistics, value counts, and groupby aggregation.
 
 ## Document Q&A Workflow
 
-```text
-POST /documents/upload
-  -> validate file
-  -> persist raw document
-  -> extract text from TXT/MD/PDF
-  -> clean and chunk text
-  -> generate deterministic local embeddings
-  -> store chunk vectors
+```mermaid
+flowchart TD
+    UploadDoc["POST /documents/upload"] --> ValidateDoc["Validate file"]
+    ValidateDoc --> PersistDoc["Persist raw document"]
+    PersistDoc --> Extract["Extract text from TXT/MD/PDF"]
+    Extract --> Chunk["Clean and chunk text"]
+    Chunk --> Embed["Generate deterministic local embeddings"]
+    Embed --> StoreVectors["Store chunk vectors"]
 
-POST /documents/{document_id}/ask
-  -> retrieve relevant chunks
-  -> apply similarity threshold
-  -> build grounded answer from retrieved context
-  -> return answer with citations
+    AskDoc["POST /documents/{document_id}/ask"] --> Retrieve["Retrieve relevant chunks"]
+    Retrieve --> Threshold["Apply similarity threshold"]
+    Threshold --> Grounded["Build grounded answer from retrieved context"]
+    Grounded --> Cited["Return answer with citations"]
 ```
 
 Weak retrieval returns an insufficient-context response instead of a confident unsupported answer.

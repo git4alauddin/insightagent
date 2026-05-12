@@ -78,6 +78,8 @@ It covers:
 
 This is the engineer-facing technical overview foundation. The final README can keep a shorter architecture section and link to this deeper doc.
 
+The architecture flow, request lifecycle, agent workflow, CSV analysis workflow, and document Q&A workflow diagrams now use Mermaid instead of ASCII blocks.
+
 ## 5. API Examples Documentation
 
 ### `docs/api_examples.md`
@@ -164,6 +166,7 @@ Started:
 - recruiter-facing project summary
 - engineer-facing technical overview
 - architecture documentation under `docs/`
+- Mermaid architecture diagrams under `docs/`
 - API endpoint table
 - API request/response examples
 - curl/Postman-style examples through PowerShell commands

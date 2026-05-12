@@ -10,7 +10,7 @@ This file maps the V10 portfolio checklist to the public repository state.
 | Professional README | Complete | `README.md` is the main portfolio entrypoint. |
 | Recruiter-facing summary | Complete | README project snapshot and capability summary. |
 | Engineer-facing technical overview | Complete | `docs/architecture.md`. |
-| Architecture diagram under `docs/` | Complete | Text architecture diagrams in `docs/architecture.md`. |
+| Architecture diagram under `docs/` | Complete | Mermaid architecture diagrams in `docs/architecture.md`. |
 | API endpoint table | Complete | README API table and `docs/api_examples.md`. |
 | API request/response examples | Complete | `docs/api_examples.md`. |
 | Local setup instructions | Complete | README Quick Start section. |

@@ -583,6 +583,7 @@ Status: closeout-ready.
 - Updated health endpoint test expectation to V10.
 - Updated README current version, Docker image examples, health response example, and V10 docs link.
 - Added engineer-facing architecture documentation in `docs/architecture.md`.
+- Converted architecture flow diagrams from ASCII blocks to Mermaid diagrams for GitHub rendering.
 - Added API examples documentation in `docs/api_examples.md`.
 - Added trade-offs, limitations, and future improvements documentation in `docs/tradeoffs.md`.
 - Rewrote `README.md` as the main public portfolio entrypoint.
@@ -599,6 +600,7 @@ Status: closeout-ready.
 - To keep portfolio packaging separate from backend feature work.
 - To prepare dedicated docs for README polish, architecture, API examples, demo flow, evaluation proof, observability proof, trade-offs, limitations, resume bullets, and interview pitch.
 - To give engineers a fast architecture overview before the final README rewrite.
+- To make the architecture diagrams easier to read directly on GitHub.
 - To make endpoint usage understandable without reading route implementation files.
 - To document mature engineering judgment, known limits, and future roadmap clearly.
 - To make the repository homepage understandable for both recruiters and engineers.
@@ -610,6 +612,7 @@ Status: closeout-ready.
 - Health endpoint test will verify V10 version reporting.
 - Full suite will verify the scaffold did not regress existing behavior.
 - Architecture documentation was reviewed against the V10 checklist.
+- Mermaid architecture diagrams were reviewed for Markdown syntax and intended flow.
 - API examples documentation was reviewed against the V10 checklist.
 - Trade-offs documentation was reviewed against the V10 checklist.
 - README foundation was reviewed against the V10 checklist.
@@ -619,6 +622,7 @@ Status: closeout-ready.
 ### What I Learned
 - Portfolio packaging is its own version because presenting the project clearly is different from adding backend features.
 - Engineer-facing docs should explain workflows and trade-offs without forcing someone to read the code first.
+- Mermaid diagrams make the architecture page feel more polished without changing the technical content.
 - API docs should show realistic request/response shapes without pretending every demo value is fixed.
 - Honest limitations make the project stronger, not weaker.
 - A portfolio README should summarize clearly and link outward instead of duplicating every detail.
@@ -626,4 +630,4 @@ Status: closeout-ready.
 - A closeout pass is useful because small stale markers can make an otherwise finished project look unfinished.
 
 ### Interview Explanation
-- In V10, I completed the portfolio packaging layer by adding architecture, API examples, trade-offs documentation, a rewritten README foundation, a public portfolio status checklist, and a final repo hygiene pass. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished public entrypoint, recruiter-facing summary, engineer-facing architecture, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and an honest view of what is complete, deferred, or kept local.
+- In V10, I completed the portfolio packaging layer by adding architecture with Mermaid diagrams, API examples, trade-offs documentation, a rewritten README foundation, a public portfolio status checklist, and a final repo hygiene pass. The goal is to turn the completed InsightAgent backend into a job-ready case study with a polished public entrypoint, recruiter-facing summary, engineer-facing architecture, API examples, evaluation proof, observability proof, trade-offs, limitations, future improvements, and an honest view of what is complete, deferred, or kept local.

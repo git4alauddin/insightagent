@@ -9,7 +9,7 @@ This version is not about adding new backend features. It is about making the ex
 
 Status: closeout-ready.
 
-V10 now has the version boundary, documentation scaffold, architecture documentation, API examples documentation, trade-offs documentation, a rewritten README foundation, a public portfolio status checklist, and a final hygiene pass. Remaining public items are intentionally deferred: recorded demo link, license choice, and Cloud Run URL.
+V10 now has the version boundary, documentation scaffold, Mermaid architecture documentation, API examples documentation, trade-offs documentation, a rewritten README foundation, a public portfolio status checklist, and a final hygiene pass. Remaining public items are intentionally deferred: recorded demo link, license choice, and Cloud Run URL.
 
 ## Planned Scope
 
@@ -58,6 +58,8 @@ This document gives engineers a fast technical overview of:
 - document Q&A workflow
 - evaluation and observability flow
 - key architecture trade-offs
+
+The flow diagrams now use Mermaid so GitHub renders them visually.
 
 ## API Examples Documentation
 

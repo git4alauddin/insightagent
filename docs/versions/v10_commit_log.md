@@ -94,7 +94,7 @@ This file maps each V10 commit heading to:
 - Prevented private/personal planning files from being treated as missing public repo docs.
 - Gave future agents and reviewers one public page to verify portfolio packaging status.
 
-### `<pending>` - `v10: final repo hygiene pass`
+### `39f6f11` - `v10: final repo hygiene pass`
 **What we did**
 - Scanned tracked files for stale V10 pending markers and local-only doc paths.
 - Confirmed `docs/demo_script.md` and `docs/resume_interview.md` are not tracked.
@@ -107,6 +107,18 @@ This file maps each V10 commit heading to:
 - Removed stale V10 bookkeeping from the previous commit.
 - Verified the public repo is not carrying private planning materials.
 - Put the repository in a closeout-ready state for V10.
+
+### `<pending>` - `v10: convert architecture diagrams to mermaid`
+**What we did**
+- Converted the high-level architecture flow in `docs/architecture.md` from ASCII to Mermaid.
+- Converted request lifecycle, agent workflow, CSV analysis workflow, and document Q&A workflow diagrams to Mermaid.
+- Updated the portfolio status page to identify the architecture diagrams as Mermaid diagrams.
+- Updated V10 docs and project report to record the diagram polish.
+
+**What it solved / took care of**
+- Made architecture diagrams render visually on GitHub.
+- Improved the engineer-facing documentation without changing backend behavior.
+- Kept the V10 documentation trail aligned with the polish work.
 
 ## Reusable Entry Template
 
