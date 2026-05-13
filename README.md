@@ -60,6 +60,7 @@ This is not a thin chat wrapper over an LLM API. It demonstrates backend pattern
 | --- | --- | --- |
 | Architecture overview | System design and request flow across layers | [docs/architecture.md](docs/architecture.md) |
 | API examples | Ready-to-run request/response samples for main endpoints | [docs/api_examples.md](docs/api_examples.md) |
+| Postman collection | Importable API playground for local and Cloud Run testing | [postman/README.md](postman/README.md) |
 | Version journey | Version-by-version build progression from V1 to V10 | [docs/project_report.md](docs/project_report.md) |
 | Trade-offs and limitations | Honest constraints, design choices, and future improvements | [docs/tradeoffs.md](docs/tradeoffs.md) |
 | Portfolio status | What is complete now vs tracked follow-ups | [docs/portfolio_status.md](docs/portfolio_status.md) |
@@ -140,6 +141,11 @@ docs/
 evals/
   evaluation_dataset.jsonl
   results/
+
+postman/
+  InsightAgent.postman_collection.json
+  InsightAgent.local.example.postman_environment.json
+  InsightAgent.cloud.example.postman_environment.json
 
 scripts/
   run_eval.py

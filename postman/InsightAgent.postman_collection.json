@@ -1,0 +1,403 @@
+{
+  "info": {
+    "name": "InsightAgent API",
+    "description": "Postman collection for exploring InsightAgent local or Cloud Run APIs. Select an environment and set api_key before running protected endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "apikey",
+    "apikey": [
+      {
+        "key": "key",
+        "value": "x-api-key",
+        "type": "string"
+      },
+      {
+        "key": "value",
+        "value": "{{api_key}}",
+        "type": "string"
+      },
+      {
+        "key": "in",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "01 Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{base_url}}/health"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('health is ok', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.status).to.eql('ok');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Readiness Check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "url": "{{base_url}}/ready"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('service is ready', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.status).to.eql('ready');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02 Chat",
+      "item": [
+        {
+          "name": "Basic Chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Explain what InsightAgent does in one paragraph.\"\n}"
+            },
+            "url": "{{base_url}}/chat"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('chat response is successful', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.answer).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 Structured Output",
+      "item": [
+        {
+          "name": "Structured Chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Give me a concise project summary for InsightAgent.\"\n}"
+            },
+            "url": "{{base_url}}/chat/structured"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('structured response shape exists', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.summary).to.be.a('string');",
+                  "  pm.expect(json.status).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 Agent Tools",
+      "item": [
+        {
+          "name": "Agent Calculator",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"Calculate 18 * 7 + 42\"\n}"
+            },
+            "url": "{{base_url}}/agent/query"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.test('agent returns traceable response', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.answer).to.be.a('string');",
+                  "  pm.expect(json.status).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 Sessions + Memory",
+      "item": [
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman ownership session\"\n}"
+            },
+            "url": "{{base_url}}/sessions"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.environment.set('session_id', json.session_id);",
+                  "pm.test('session created', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.status).to.eql('success');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Memory Chat - Teach Context",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"message\": \"Remember that I am studying InsightAgent.\"\n}"
+            },
+            "url": "{{base_url}}/chat/memory"
+          }
+        },
+        {
+          "name": "Memory Chat - Recall Context",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"message\": \"What am I studying?\"\n}"
+            },
+            "url": "{{base_url}}/chat/memory"
+          }
+        },
+        {
+          "name": "Read Session Messages",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/sessions/{{session_id}}/messages"
+          }
+        }
+      ]
+    },
+    {
+      "name": "06 CSV Analysis",
+      "item": [
+        {
+          "name": "Upload Dataset",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "session_id",
+                  "value": "{{session_id}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{base_url}}/datasets/upload"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.environment.set('dataset_id', json.dataset_id);",
+                  "pm.test('dataset uploaded', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.dataset_id).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Dataset Summary",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/datasets/{{dataset_id}}/summary"
+          }
+        },
+        {
+          "name": "Ask Dataset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"Which columns have missing values?\"\n}"
+            },
+            "url": "{{base_url}}/datasets/{{dataset_id}}/ask"
+          }
+        }
+      ]
+    },
+    {
+      "name": "07 Document Q&A",
+      "item": [
+        {
+          "name": "Upload Document",
+          "request": {
+            "method": "POST",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "session_id",
+                  "value": "{{session_id}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": "{{base_url}}/documents/upload"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const json = pm.response.json();",
+                  "pm.environment.set('document_id', json.document_id);",
+                  "pm.test('document uploaded', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(json.document_id).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Ask Document",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"question\": \"What is the document mainly about?\"\n}"
+            },
+            "url": "{{base_url}}/documents/{{document_id}}/ask"
+          }
+        }
+      ]
+    }
+  ]
+}
