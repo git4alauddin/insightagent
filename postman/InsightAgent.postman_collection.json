@@ -2,7 +2,8 @@
   "info": {
     "name": "InsightAgent API",
     "description": "Postman collection for exploring InsightAgent local or Cloud Run APIs. Select an environment and set api_key before running protected endpoints.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "9d544245-7f92-4bb3-a02b-ff78a4cc4cb4"
   },
   "auth": {
     "type": "apikey",
@@ -35,7 +36,15 @@
               "type": "noauth"
             },
             "method": "GET",
-            "url": "{{base_url}}/health"
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
           },
           "event": [
             {
@@ -60,7 +69,15 @@
               "type": "noauth"
             },
             "method": "GET",
-            "url": "{{base_url}}/ready"
+            "url": {
+              "raw": "{{base_url}}/ready",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "ready"
+              ]
+            }
           },
           "event": [
             {
@@ -97,7 +114,15 @@
               "mode": "raw",
               "raw": "{\n  \"message\": \"Explain what InsightAgent does in one paragraph.\"\n}"
             },
-            "url": "{{base_url}}/chat"
+            "url": {
+              "raw": "{{base_url}}/chat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat"
+              ]
+            }
           },
           "event": [
             {
@@ -134,7 +159,16 @@
               "mode": "raw",
               "raw": "{\n  \"message\": \"Give me a concise project summary for InsightAgent.\"\n}"
             },
-            "url": "{{base_url}}/chat/structured"
+            "url": {
+              "raw": "{{base_url}}/chat/structured",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                "structured"
+              ]
+            }
           },
           "event": [
             {
@@ -172,7 +206,16 @@
               "mode": "raw",
               "raw": "{\n  \"message\": \"Calculate 18 * 7 + 42\"\n}"
             },
-            "url": "{{base_url}}/agent/query"
+            "url": {
+              "raw": "{{base_url}}/agent/query",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "agent",
+                "query"
+              ]
+            }
           },
           "event": [
             {
@@ -210,7 +253,15 @@
               "mode": "raw",
               "raw": "{\n  \"title\": \"Postman ownership session\"\n}"
             },
-            "url": "{{base_url}}/sessions"
+            "url": {
+              "raw": "{{base_url}}/sessions",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions"
+              ]
+            }
           },
           "event": [
             {
@@ -243,7 +294,16 @@
               "mode": "raw",
               "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"message\": \"Remember that I am studying InsightAgent.\"\n}"
             },
-            "url": "{{base_url}}/chat/memory"
+            "url": {
+              "raw": "{{base_url}}/chat/memory",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                "memory"
+              ]
+            }
           }
         },
         {
@@ -260,14 +320,33 @@
               "mode": "raw",
               "raw": "{\n  \"session_id\": \"{{session_id}}\",\n  \"message\": \"What am I studying?\"\n}"
             },
-            "url": "{{base_url}}/chat/memory"
+            "url": {
+              "raw": "{{base_url}}/chat/memory",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "chat",
+                "memory"
+              ]
+            }
           }
         },
         {
           "name": "Read Session Messages",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/sessions/{{session_id}}/messages"
+            "url": {
+              "raw": "{{base_url}}/sessions/{{session_id}}/messages",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "sessions",
+                "{{session_id}}",
+                "messages"
+              ]
+            }
           }
         }
       ]
@@ -294,7 +373,16 @@
                 }
               ]
             },
-            "url": "{{base_url}}/datasets/upload"
+            "url": {
+              "raw": "{{base_url}}/datasets/upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "datasets",
+                "upload"
+              ]
+            }
           },
           "event": [
             {
@@ -317,7 +405,17 @@
           "name": "Dataset Summary",
           "request": {
             "method": "GET",
-            "url": "{{base_url}}/datasets/{{dataset_id}}/summary"
+            "url": {
+              "raw": "{{base_url}}/datasets/{{dataset_id}}/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "datasets",
+                "{{dataset_id}}",
+                "summary"
+              ]
+            }
           }
         },
         {
@@ -334,7 +432,17 @@
               "mode": "raw",
               "raw": "{\n  \"question\": \"Which columns have missing values?\"\n}"
             },
-            "url": "{{base_url}}/datasets/{{dataset_id}}/ask"
+            "url": {
+              "raw": "{{base_url}}/datasets/{{dataset_id}}/ask",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "datasets",
+                "{{dataset_id}}",
+                "ask"
+              ]
+            }
           }
         }
       ]
@@ -361,7 +469,16 @@
                 }
               ]
             },
-            "url": "{{base_url}}/documents/upload"
+            "url": {
+              "raw": "{{base_url}}/documents/upload",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "upload"
+              ]
+            }
           },
           "event": [
             {
@@ -394,7 +511,17 @@
               "mode": "raw",
               "raw": "{\n  \"question\": \"What is the document mainly about?\"\n}"
             },
-            "url": "{{base_url}}/documents/{{document_id}}/ask"
+            "url": {
+              "raw": "{{base_url}}/documents/{{document_id}}/ask",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "documents",
+                "{{document_id}}",
+                "ask"
+              ]
+            }
           }
         }
       ]
