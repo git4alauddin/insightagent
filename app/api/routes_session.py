@@ -2,7 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.dependencies import require_api_key
 from app.api.rate_limit import enforce_rate_limit
-from app.schemas.session import CreateSessionResponse, SessionMessagesResponse
+from app.schemas.session import (
+    CreateSessionRequest,
+    CreateSessionResponse,
+    SessionMessagesResponse,
+)
 from app.services.session_service import SessionServiceError, create_session, get_recent_messages
 
 
@@ -13,9 +17,9 @@ router = APIRouter(
 
 
 @router.post("/sessions", response_model=CreateSessionResponse)
-def create_new_session() -> CreateSessionResponse:
+def create_new_session(request: CreateSessionRequest | None = None) -> CreateSessionResponse:
     try:
-        session_id = create_session()
+        session_id = create_session(title=request.title if request else None)
     except SessionServiceError as exc:
         raise HTTPException(
             status_code=503,

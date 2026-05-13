@@ -181,7 +181,9 @@ Create a session:
 Invoke-RestMethod `
   -Uri "$baseUrl/sessions" `
   -Method Post `
-  -Headers $headers
+  -Headers $headers `
+  -ContentType "application/json" `
+  -Body '{"title":"Postman ownership session"}'
 ```
 
 Fetch messages:

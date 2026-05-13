@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
 
+class CreateSessionRequest(BaseModel):
+    title: str | None = None
+
+
 class CreateSessionResponse(BaseModel):
     session_id: str
     status: str
@@ -17,4 +21,3 @@ class SessionMessagesResponse(BaseModel):
     session_id: str
     messages: list[SessionMessageItem]
     status: str
-

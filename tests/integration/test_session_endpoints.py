@@ -29,6 +29,23 @@ def test_create_session_returns_session_id() -> None:
     assert len(data["session_id"]) > 0
 
 
+def test_create_session_accepts_optional_title(isolated_db) -> None:
+    response = client.post("/sessions", json={"title": "Postman study"})
+
+    data = response.json()
+    assert response.status_code == 200
+    assert data["status"] == "success"
+
+    with database_module.db_cursor() as cursor:
+        cursor.execute(
+            "SELECT title FROM sessions WHERE session_id = ?",
+            (data["session_id"],),
+        )
+        row = cursor.fetchone()
+
+    assert row["title"] == "Postman study"
+
+
 def test_create_session_returns_controlled_db_error_when_service_fails() -> None:
     with patch(
         "app.api.routes_session.create_session",

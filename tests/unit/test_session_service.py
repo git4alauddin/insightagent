@@ -35,6 +35,19 @@ def test_create_session_uses_given_id(isolated_db) -> None:
     assert session_exists("session-123") is True
 
 
+def test_create_session_stores_title(isolated_db) -> None:
+    session_id = create_session("session-titled", title="Postman study")
+
+    with database_module.db_cursor() as cursor:
+        cursor.execute(
+            "SELECT title FROM sessions WHERE session_id = ?",
+            (session_id,),
+        )
+        row = cursor.fetchone()
+
+    assert row["title"] == "Postman study"
+
+
 def test_append_message_stores_messages_in_order(isolated_db) -> None:
     session_id = create_session("session-order")
 
