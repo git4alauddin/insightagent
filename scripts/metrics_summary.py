@@ -32,12 +32,42 @@ def load_log_events(log_path: Path) -> list[dict[str, Any]]:
     if not log_path.exists():
         raise MetricsSummaryError(f"Log file not found: {log_path}")
 
-    events: list[dict[str, Any]] = []
-    for line in log_path.read_text(encoding="utf-8").splitlines():
-        payload = extract_json_payload(line)
-        if payload is not None:
-            events.append(payload)
-    return events
+    return extract_json_payloads(read_log_text(log_path))
+
+
+def extract_json_payloads(text: str) -> list[dict[str, Any]]:
+    decoder = json.JSONDecoder()
+    payloads: list[dict[str, Any]] = []
+    search_start = 0
+
+    while search_start < len(text):
+        json_start = text.find("{", search_start)
+        if json_start == -1:
+            break
+
+        try:
+            payload, json_end = decoder.raw_decode(text[json_start:])
+        except json.JSONDecodeError:
+            search_start = json_start + 1
+            continue
+
+        if isinstance(payload, dict):
+            payloads.append(payload)
+        search_start = json_start + json_end
+
+    return payloads
+
+
+def read_log_text(log_path: Path) -> str:
+    for encoding in ("utf-8", "utf-8-sig", "utf-16"):
+        try:
+            return log_path.read_text(encoding=encoding)
+        except UnicodeDecodeError:
+            continue
+
+    raise MetricsSummaryError(
+        f"Log file could not be decoded as UTF-8 or UTF-16: {log_path}"
+    )
 
 
 def build_metrics_summary(events: list[dict[str, Any]]) -> dict[str, Any]:

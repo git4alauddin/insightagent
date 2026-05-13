@@ -270,7 +270,14 @@ Every request receives an `x-request-id` response header. Completion logs includ
 
 Agent requests also emit tool trace logs with request id, selected tool, tool status, agent status, and output summary.
 
-Summarize structured logs:
+For local observability practice, start the API and redirect server output into `logs/app.log`:
+
+```powershell
+mkdir logs -ErrorAction SilentlyContinue
+cmd /c ".venv\Scripts\uvicorn.exe app.main:app --reload > logs\app.log 2>&1"
+```
+
+Then hit endpoints from curl, Postman, or the evaluation runner. Generate a metrics summary from the captured log file:
 
 ```powershell
 .\.venv\Scripts\python scripts\metrics_summary.py `

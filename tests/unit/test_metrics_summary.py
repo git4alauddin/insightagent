@@ -7,6 +7,7 @@ from scripts.metrics_summary import (
     MetricsSummaryError,
     build_metrics_summary,
     extract_json_payload,
+    extract_json_payloads,
     load_log_events,
     save_summary,
 )
@@ -32,6 +33,22 @@ def test_extract_json_payload_ignores_invalid_lines() -> None:
     assert extract_json_payload('["not", "an", "event"]') is None
 
 
+def test_extract_json_payloads_reads_wrapped_json_log_text() -> None:
+    payloads = extract_json_payloads(
+        '\n'.join(
+            [
+                '2026 INFO app - {"event": "request_completed", "endpoint":',
+                '"/ready", "status_code": 200}',
+                'INFO server noise',
+            ]
+        )
+    )
+
+    assert payloads == [
+        {"event": "request_completed", "endpoint": "/ready", "status_code": 200}
+    ]
+
+
 def test_load_log_events_reads_json_events_and_skips_noise(tmp_path: Path) -> None:
     log_path = tmp_path / "app.log"
     log_path.write_text(
@@ -52,6 +69,18 @@ def test_load_log_events_reads_json_events_and_skips_noise(tmp_path: Path) -> No
         {"event": "request_completed", "status_code": 200},
         {"event": "agent_tool_completed", "tool_used": "calculator"},
     ]
+
+
+def test_load_log_events_reads_windows_utf16_logs(tmp_path: Path) -> None:
+    log_path = tmp_path / "app.log"
+    log_path.write_text(
+        'INFO - {"event": "request_completed", "endpoint": "/ready"}',
+        encoding="utf-16",
+    )
+
+    events = load_log_events(log_path)
+
+    assert events == [{"event": "request_completed", "endpoint": "/ready"}]
 
 
 def test_load_log_events_rejects_missing_file(tmp_path: Path) -> None:

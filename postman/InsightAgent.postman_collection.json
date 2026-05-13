@@ -170,7 +170,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"Calculate 18 * 7 + 42\"\n}"
+              "raw": "{\n  \"message\": \"Calculate 18 * 7 + 42\"\n}"
             },
             "url": "{{base_url}}/agent/query"
           },
