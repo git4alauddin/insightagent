@@ -85,76 +85,77 @@ The model can propose structure and tool decisions, but backend services validat
 
 ```text
 app/
-  main.py
-  config.py
-  api/                  # routes, dependencies, middleware, CORS, rate limiting
-    routes_health.py
-    routes_chat.py
-    routes_agent.py
-    routes_session.py
-    routes_datasets.py
-    routes_documents.py
-    dependencies.py
-    middleware.py
-    error_handlers.py
-  db/                   # SQLite connection and schema setup
-    database.py
-    schema.py
-  prompts/              # versioned prompt builders
-    structured_v2.py
-    tool_router_v3.py
-    document_qa_v7.py
-  schemas/              # Pydantic API contracts
-    common.py
-    chat.py
-    structured.py
-    agent.py
-    tools.py
-    session.py
-    dataset.py
-    document.py
-  services/             # business and orchestration layers
-    llm_service.py
-    structured_llm_service.py
-    memory_chat_service.py
-    agent_controller.py
-    dataset_*.py
-    document_*.py
-    readiness_service.py
-  tools/                # allowlisted backend tools
-    calculator.py
-    date_time.py
-    text_summarizer.py
-    file_analyzer.py
-    registry.py
-  utils/
-    logger.py
+|-- main.py
+|-- config.py
+|-- api/                  # routes, dependencies, middleware, CORS, rate limiting
+|   |-- routes_health.py
+|   |-- routes_chat.py
+|   |-- routes_agent.py
+|   |-- routes_session.py
+|   |-- routes_datasets.py
+|   |-- routes_documents.py
+|   |-- dependencies.py
+|   |-- middleware.py
+|   `-- error_handlers.py
+|-- db/                   # SQLite connection and schema setup
+|   |-- database.py
+|   `-- schema.py
+|-- prompts/              # versioned prompt builders
+|   |-- structured_v2.py
+|   |-- tool_router_v3.py
+|   `-- document_qa_v7.py
+|-- schemas/              # Pydantic API contracts
+|   |-- common.py
+|   |-- chat.py
+|   |-- structured.py
+|   |-- agent.py
+|   |-- tools.py
+|   |-- session.py
+|   |-- dataset.py
+|   `-- document.py
+|-- services/             # business and orchestration layers
+|   |-- llm_service.py
+|   |-- structured_llm_service.py
+|   |-- memory_chat_service.py
+|   |-- agent_controller.py
+|   |-- dataset_*.py
+|   |-- document_*.py
+|   `-- readiness_service.py
+|-- tools/                # allowlisted backend tools
+|   |-- calculator.py
+|   |-- date_time.py
+|   |-- text_summarizer.py
+|   |-- file_analyzer.py
+|   `-- registry.py
+`-- utils/
+    `-- logger.py
 
 docs/
-  architecture.md
-  api_examples.md
-  project_report.md
-  tradeoffs.md
-  portfolio_status.md
-  versions/             # v1 to v10 notes, technical walkthroughs, and commit logs
+|-- architecture.md
+|-- api_examples.md
+|-- deployment_guide.md
+|-- project_report.md
+|-- tradeoffs.md
+|-- portfolio_status.md
+`-- versions/             # v1 to v10 notes, technical walkthroughs, and commit logs
 
 evals/
-  evaluation_dataset.jsonl
-  results/
+|-- evaluation_dataset.jsonl
+`-- results/
 
 postman/
-  InsightAgent.postman_collection.json
-  InsightAgent.local.example.postman_environment.json
-  InsightAgent.cloud.example.postman_environment.json
+|-- InsightAgent.postman_collection.json
+|-- InsightAgent.local.example.postman_environment.json
+`-- InsightAgent.cloud.example.postman_environment.json
 
 scripts/
-  run_eval.py
-  metrics_summary.py
+|-- run_eval.py
+`-- metrics_summary.py
 
 tests/
-  conftest.py
-  integration/
-  unit/
+|-- conftest.py
+|-- integration/
+`-- unit/
 ```
 
 ## Quick Start
@@ -292,7 +293,7 @@ The summary reports request totals, success/failure rate, endpoint counts, avera
 Current automated test status:
 
 ```text
-247 passed
+258 passed
 ```
 
 The suite covers route contracts, services, schemas, tool behavior, dataset workflows, document Q&A, evaluation logic, error handling, auth, middleware, observability, and metrics summaries.

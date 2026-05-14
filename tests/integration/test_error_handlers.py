@@ -26,7 +26,7 @@ def test_unexpected_error_returns_safe_internal_error() -> None:
     client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
     with patch(
-        "app.api.routes_chat.generate_answer_with_usage",
+        "app.api.routes_chat.generate_answer",
         side_effect=RuntimeError("database password leaked here"),
     ):
         response = client.post("/chat", json={"message": "Hello"})

@@ -7,11 +7,11 @@ from app.api.rate_limit import enforce_rate_limit
 from app.config import settings
 from app.schemas.chat import ChatRequest, ChatResponse, MemoryChatRequest, MemoryChatResponse
 from app.schemas.structured import StructuredLLMResponse
-from app.services.llm_service import LLMServiceError, generate_answer_with_usage
+from app.services.llm_service import LLMServiceError, generate_answer
 from app.services.memory_chat_service import MemoryChatServiceError, run_memory_chat
 from app.services.structured_llm_service import (
     StructuredLLMServiceError,
-    generate_structured_answer,
+    generate_structured_answer_with_usage,
 )
 
 
@@ -22,13 +22,11 @@ router = APIRouter(
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(chat_request: ChatRequest, request: Request) -> ChatResponse:
+def chat(request: ChatRequest) -> ChatResponse:
     start_time = time.perf_counter()
 
     try:
-        result = generate_answer_with_usage(chat_request.message)
-        answer = result["answer"]
-        request.state.usage = result["usage"]
+        answer = generate_answer(request.message)
     except LLMServiceError as exc:
         raise HTTPException(
             status_code=503,
@@ -51,9 +49,11 @@ def chat(chat_request: ChatRequest, request: Request) -> ChatResponse:
 
 
 @router.post("/chat/structured", response_model=StructuredLLMResponse)
-def structured_chat(request: ChatRequest) -> StructuredLLMResponse:
+def structured_chat(chat_request: ChatRequest, request: Request) -> StructuredLLMResponse:
     try:
-        return generate_structured_answer(request.message)
+        result = generate_structured_answer_with_usage(chat_request.message)
+        request.state.usage = result["usage"]
+        return result["response"]
     except StructuredLLMServiceError as exc:
         raise HTTPException(
             status_code=503,

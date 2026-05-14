@@ -21,6 +21,26 @@ class LLMResult(TypedDict):
     usage: LLMUsage
 
 
+def combine_usage(usages: list[LLMUsage]) -> LLMUsage:
+    return {
+        "input_tokens": _sum_usage_field(usages, "input_tokens"),
+        "output_tokens": _sum_usage_field(usages, "output_tokens"),
+        "total_tokens": _sum_usage_field(usages, "total_tokens"),
+        "estimated_cost_usd": _sum_usage_field(usages, "estimated_cost_usd"),
+    }
+
+
+def _sum_usage_field(usages: list[LLMUsage], field_name: str) -> int | float | None:
+    values = [
+        usage[field_name]
+        for usage in usages
+        if usage.get(field_name) is not None
+    ]
+    if not values:
+        return None
+    return sum(values)
+
+
 MODEL_PRICING_PER_MILLION_TOKENS = {
     "llama-3.1-8b-instant": {
         "input": 0.05,

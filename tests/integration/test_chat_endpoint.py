@@ -18,14 +18,14 @@ client = TestClient(app)
 client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
 
-def llm_result(answer: str = "Mock answer.") -> dict:
+def structured_result(response: dict) -> dict:
     return {
-        "answer": answer,
+        "response": response,
         "usage": {
             "input_tokens": 10,
             "output_tokens": 5,
             "total_tokens": 15,
-            "estimated_cost_usd": None,
+            "estimated_cost_usd": 0.000001,
         },
     }
 
@@ -46,11 +46,11 @@ def assert_usage_logged(request_log: dict, endpoint: str) -> None:
     assert request_log["input_tokens"] == 10
     assert request_log["output_tokens"] == 5
     assert request_log["total_tokens"] == 15
-    assert request_log["estimated_cost_usd"] is None
+    assert request_log["estimated_cost_usd"] == 0.000001
 
 
 def test_chat_returns_llm_answer() -> None:
-    with patch("app.api.routes_chat.generate_answer_with_usage", return_value=llm_result()):
+    with patch("app.api.routes_chat.generate_answer", return_value="Mock answer."):
         response = client.post("/chat", json={"message": "Hello"})
 
     data = response.json()
@@ -62,25 +62,9 @@ def test_chat_returns_llm_answer() -> None:
     assert data["status"] == "success"
 
 
-def test_chat_logs_llm_usage(caplog) -> None:
-    with patch("app.api.routes_chat.generate_answer_with_usage", return_value=llm_result()):
-        with caplog.at_level(logging.INFO, logger="app.api.middleware"):
-            response = client.post(
-                "/chat",
-                json={"message": "Hello"},
-                headers={"x-request-id": "chat-usage-request"},
-            )
-
-    request_log = request_log_from_caplog(caplog)
-
-    assert response.status_code == 200
-    assert request_log["request_id"] == "chat-usage-request"
-    assert_usage_logged(request_log, "/chat")
-
-
 def test_chat_returns_controlled_error_when_llm_fails() -> None:
     with patch(
-        "app.api.routes_chat.generate_answer_with_usage",
+        "app.api.routes_chat.generate_answer",
         side_effect=LLMServiceError("LLM API key is not configured."),
     ):
         response = client.post("/chat", json={"message": "Hello"})
@@ -106,8 +90,8 @@ def test_structured_chat_returns_structured_answer() -> None:
     }
 
     with patch(
-        "app.api.routes_chat.generate_structured_answer",
-        return_value=structured_answer,
+        "app.api.routes_chat.generate_structured_answer_with_usage",
+        return_value=structured_result(structured_answer),
     ):
         response = client.post(
             "/chat/structured",
@@ -118,9 +102,37 @@ def test_structured_chat_returns_structured_answer() -> None:
     assert response.json() == structured_answer
 
 
+def test_structured_chat_logs_llm_usage(caplog) -> None:
+    structured_answer = {
+        "answer": "Missing values are empty entries in a dataset.",
+        "confidence": "high",
+        "reasoning_summary": "The user asked for a simple explanation.",
+        "next_action": "No tool required.",
+        "prompt_version": "v2.1",
+        "status": "success",
+    }
+
+    with patch(
+        "app.api.routes_chat.generate_structured_answer_with_usage",
+        return_value=structured_result(structured_answer),
+    ):
+        with caplog.at_level(logging.INFO, logger="app.api.middleware"):
+            response = client.post(
+                "/chat/structured",
+                json={"message": "Explain missing values."},
+                headers={"x-request-id": "structured-usage-request"},
+            )
+
+    request_log = request_log_from_caplog(caplog)
+
+    assert response.status_code == 200
+    assert request_log["request_id"] == "structured-usage-request"
+    assert_usage_logged(request_log, "/chat/structured")
+
+
 def test_structured_chat_returns_controlled_error_when_service_fails() -> None:
     with patch(
-        "app.api.routes_chat.generate_structured_answer",
+        "app.api.routes_chat.generate_structured_answer_with_usage",
         side_effect=StructuredLLMServiceError("LLM request timed out."),
     ):
         response = client.post(
@@ -142,8 +154,8 @@ def test_structured_chat_can_return_fallback_response() -> None:
     fallback_response = build_structured_fallback_response()
 
     with patch(
-        "app.api.routes_chat.generate_structured_answer",
-        return_value=fallback_response,
+        "app.api.routes_chat.generate_structured_answer_with_usage",
+        return_value=structured_result(fallback_response.model_dump()),
     ):
         response = client.post(
             "/chat/structured",
