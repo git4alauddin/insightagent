@@ -1,3 +1,5 @@
+import json
+import logging
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -16,8 +18,39 @@ client = TestClient(app)
 client.headers.update({"x-api-key": "test-api-key", "x-request-id": "test-request-id"})
 
 
+def llm_result(answer: str = "Mock answer.") -> dict:
+    return {
+        "answer": answer,
+        "usage": {
+            "input_tokens": 10,
+            "output_tokens": 5,
+            "total_tokens": 15,
+            "estimated_cost_usd": None,
+        },
+    }
+
+
+def request_log_from_caplog(caplog) -> dict:
+    log_payloads = [
+        json.loads(record.message)
+        for record in caplog.records
+        if record.name == "app.api.middleware"
+    ]
+    return next(
+        payload for payload in log_payloads if payload["event"] == "request_completed"
+    )
+
+
+def assert_usage_logged(request_log: dict, endpoint: str) -> None:
+    assert request_log["endpoint"] == endpoint
+    assert request_log["input_tokens"] == 10
+    assert request_log["output_tokens"] == 5
+    assert request_log["total_tokens"] == 15
+    assert request_log["estimated_cost_usd"] is None
+
+
 def test_chat_returns_llm_answer() -> None:
-    with patch("app.api.routes_chat.generate_answer", return_value="Mock answer."):
+    with patch("app.api.routes_chat.generate_answer_with_usage", return_value=llm_result()):
         response = client.post("/chat", json={"message": "Hello"})
 
     data = response.json()
@@ -29,9 +62,25 @@ def test_chat_returns_llm_answer() -> None:
     assert data["status"] == "success"
 
 
+def test_chat_logs_llm_usage(caplog) -> None:
+    with patch("app.api.routes_chat.generate_answer_with_usage", return_value=llm_result()):
+        with caplog.at_level(logging.INFO, logger="app.api.middleware"):
+            response = client.post(
+                "/chat",
+                json={"message": "Hello"},
+                headers={"x-request-id": "chat-usage-request"},
+            )
+
+    request_log = request_log_from_caplog(caplog)
+
+    assert response.status_code == 200
+    assert request_log["request_id"] == "chat-usage-request"
+    assert_usage_logged(request_log, "/chat")
+
+
 def test_chat_returns_controlled_error_when_llm_fails() -> None:
     with patch(
-        "app.api.routes_chat.generate_answer",
+        "app.api.routes_chat.generate_answer_with_usage",
         side_effect=LLMServiceError("LLM API key is not configured."),
     ):
         response = client.post("/chat", json={"message": "Hello"})

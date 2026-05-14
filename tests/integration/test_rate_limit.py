@@ -22,7 +22,17 @@ def test_rate_limit_rejects_too_many_private_requests(monkeypatch) -> None:
     client = TestClient(app)
     headers = {"x-api-key": "test-api-key", "x-request-id": "rate-limit-request"}
 
-    with patch("app.api.routes_chat.generate_answer", return_value="Mock answer."):
+    llm_result = {
+        "answer": "Mock answer.",
+        "usage": {
+            "input_tokens": None,
+            "output_tokens": None,
+            "total_tokens": None,
+            "estimated_cost_usd": None,
+        },
+    }
+
+    with patch("app.api.routes_chat.generate_answer_with_usage", return_value=llm_result):
         first = client.post("/chat", json={"message": "Hello"}, headers=headers)
         second = client.post("/chat", json={"message": "Hello"}, headers=headers)
         third = client.post("/chat", json={"message": "Hello"}, headers=headers)

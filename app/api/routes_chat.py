@@ -1,13 +1,13 @@
 import time
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.api.dependencies import require_api_key
 from app.api.rate_limit import enforce_rate_limit
 from app.config import settings
 from app.schemas.chat import ChatRequest, ChatResponse, MemoryChatRequest, MemoryChatResponse
 from app.schemas.structured import StructuredLLMResponse
-from app.services.llm_service import LLMServiceError, generate_answer
+from app.services.llm_service import LLMServiceError, generate_answer_with_usage
 from app.services.memory_chat_service import MemoryChatServiceError, run_memory_chat
 from app.services.structured_llm_service import (
     StructuredLLMServiceError,
@@ -22,11 +22,13 @@ router = APIRouter(
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(request: ChatRequest) -> ChatResponse:
+def chat(chat_request: ChatRequest, request: Request) -> ChatResponse:
     start_time = time.perf_counter()
 
     try:
-        answer = generate_answer(request.message)
+        result = generate_answer_with_usage(chat_request.message)
+        answer = result["answer"]
+        request.state.usage = result["usage"]
     except LLMServiceError as exc:
         raise HTTPException(
             status_code=503,
